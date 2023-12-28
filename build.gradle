@@ -64,6 +64,8 @@ dependencies {
 
     installer('io.github.realmangorage:installer:2.2.0')
     bot('io.github.realmangorage:mangobot:1.0.346')
+
+    library('org.kohsuke:github-api:1.123')
 }
 
 test {

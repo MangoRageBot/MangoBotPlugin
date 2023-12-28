@@ -50,6 +50,7 @@ import org.mangorage.mangobot.modules.developer.RestartCommand;
 import org.mangorage.mangobot.modules.developer.RunCode;
 import org.mangorage.mangobot.modules.developer.SpeakCommand;
 import org.mangorage.mangobot.modules.developer.TerminateCommand;
+import org.mangorage.mangobot.modules.github.GHPRStatus;
 import org.mangorage.mangobot.modules.mappings.ClassMapCommand;
 import org.mangorage.mangobot.modules.mappings.DefMapCommand;
 import org.mangorage.mangobot.modules.mappings.FCICommand;
@@ -66,7 +67,7 @@ import org.mangorage.mangobot.modules.music.commands.PlayingCommand;
 import org.mangorage.mangobot.modules.music.commands.QueueCommand;
 import org.mangorage.mangobot.modules.music.commands.StopCommand;
 import org.mangorage.mangobot.modules.music.commands.VolumeCommand;
-import org.mangorage.mangobot.modules.requestpaste.PasteRequestModule;
+import org.mangorage.mangobot.modules.github.PasteRequestModule;
 import org.mangorage.mangobot.modules.tricks.TrickCommand;
 import org.mangorage.mangobotapi.core.events.LoadEvent;
 import org.mangorage.mangobotapi.core.events.SaveEvent;
@@ -221,6 +222,7 @@ public class MangoBotPlugin extends org.mangorage.mangobotapi.core.plugin.api.Co
 
         permRegistry.save();
         PasteRequestModule.register(getPluginBus());
+        new GHPRStatus(this);
 
         getPluginBus().addListener(PluginMessageEvent.class, pm -> {
             if (pm.getMethod().equals("getDate")) {
