@@ -70,8 +70,10 @@ import org.mangorage.mangobot.modules.requestpaste.PasteRequestModule;
 import org.mangorage.mangobot.modules.tricks.TrickCommand;
 import org.mangorage.mangobotapi.core.events.LoadEvent;
 import org.mangorage.mangobotapi.core.events.SaveEvent;
+import org.mangorage.mangobotapi.core.plugin.api.PluginMessageEvent;
 import org.mangorage.mangobotapi.core.plugin.impl.Plugin;
 
+import java.util.Date;
 import java.util.EnumSet;
 
 import static org.mangorage.mangobot.core.BotPermissions.*;
@@ -219,6 +221,14 @@ public class MangoBotPlugin extends org.mangorage.mangobotapi.core.plugin.api.Co
 
         permRegistry.save();
         PasteRequestModule.register(getPluginBus());
+
+        getPluginBus().addListener(PluginMessageEvent.class, pm -> {
+            if (pm.getMethod().equals("getDate")) {
+                if (pm.getObject() instanceof Date date) {
+                    System.out.println("Recieved a Plugin Comms with Data: " + date);
+                }
+            }
+        });
     }
 
     @Override

@@ -59,7 +59,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
 
     installer('io.github.realmangorage:installer:2.1.3')
-    bot('io.github.realmangorage:mangobot:1.0.0-c344')
+    bot('io.github.realmangorage:mangobot:1.0.0-c345')
 }
 
 test {
