@@ -32,6 +32,8 @@ def getCommitNumber = {
     return proc.text.trim()
 }
 
+def props = new Properties()
+file("secrets.properties").withInputStream { props.load(it) }
 
 group = 'org.mangorage'
 version = "${BOT_VERSION}-c" + getCommitNumber()
@@ -65,9 +67,16 @@ test {
 }
 
 MangoBotConfig {
-    // shadowJar if you want to use a library that doesnt exist natively inside of MangoBot
-    // Will eventually allow a way to add libraries without needing to use shadowJar...
     setJarTask(jar)
+    setReleaseTask(() -> getTasks().getByName("publish"))
+    if (props != null && props.containsKey("SERVER_TOKEN")) {
+        enableRestartServerTask(
+                "f32263f3",
+                "https://panel.sodiumhosting.com/",
+                props.get("SERVER_TOKEN") as String,
+                null
+        )
+    }
 }
 
 publishing {
