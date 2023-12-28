@@ -63,7 +63,7 @@ public class GHPRStatus extends TimerTask {
     private final CorePlugin corePlugin;
 
     public GHPRStatus(CorePlugin corePlugin) {
-        this.file = PluginManager.getPlugin("mangobot").getPluginDirectory().resolve("ghprstatus/data.txt");
+        this.file = corePlugin.getPluginDirectory().resolve("ghprstatus/data.txt");
         this.corePlugin = corePlugin;
         new Timer().scheduleAtFixedRate(this, 15 * 1000, 60 * 60 * 1000); // 60 minutes/1hr
     }
