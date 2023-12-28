@@ -225,7 +225,7 @@ public class MangoBotPlugin extends org.mangorage.mangobotapi.core.plugin.api.Co
         getPluginBus().addListener(PluginMessageEvent.class, pm -> {
             if (pm.getMethod().equals("getDate")) {
                 if (pm.getObject() instanceof Date date) {
-                    System.out.println("Recieved a Plugin Comms with Data: " + date);
+                    System.out.println("Recieved a Plugin Comms with Data: %s from %s".formatted(date, pm.getOrigin().getId()));
                 }
             }
         });
