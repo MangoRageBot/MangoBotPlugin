@@ -76,8 +76,8 @@ import java.util.EnumSet;
 
 import static org.mangorage.mangobot.core.BotPermissions.*;
 
-@Plugin(id = CorePlugin.ID)
-public class CorePlugin extends org.mangorage.mangobotapi.core.plugin.api.CorePlugin {
+@Plugin(id = MangoBotPlugin.ID)
+public class MangoBotPlugin extends org.mangorage.mangobotapi.core.plugin.api.CorePlugin {
     public static final String ID = "mangobot";
     private static final EnumSet<GatewayIntent> intents = EnumSet.of(
             // Enables MessageReceivedEvent for guild (also known as servers)
@@ -110,7 +110,7 @@ public class CorePlugin extends org.mangorage.mangobotapi.core.plugin.api.CorePl
     );
 
     // Where we create our "config"
-    private final static Config CONFIG = new Config("plugins/%s/".formatted(CorePlugin.ID), ".env");
+    private final static Config CONFIG = new Config("plugins/%s/".formatted(MangoBotPlugin.ID), ".env");
 
 
     // Where we create Settings for said Config
@@ -120,9 +120,9 @@ public class CorePlugin extends org.mangorage.mangobotapi.core.plugin.api.CorePl
     public static final ISetting<String> DEEPL_TOKEN = ConfigSetting.create(CONFIG, "DEEPL_TOKEN", "empty");
 
 
-    public CorePlugin() {
+    public MangoBotPlugin() {
         super(
-                CorePlugin.ID,
+                MangoBotPlugin.ID,
                 JDABuilder.createDefault(BOT_TOKEN.get())
                         .setEnabledIntents(intents)
                         .enableCache(cacheFlags)

@@ -24,7 +24,7 @@ package org.mangorage.mangobot.modules.mappings;
 
 import net.dv8tion.jda.api.entities.Message;
 import org.jetbrains.annotations.NotNull;
-import org.mangorage.mangobot.CorePlugin;
+import org.mangorage.mangobot.MangoBotPlugin;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
 import org.mangorage.mangobotapi.core.commands.IBasicCommand;
@@ -33,9 +33,9 @@ import org.mangorage.mangobotapi.core.util.MessageSettings;
 public class MappingsMainCommand implements IBasicCommand {
 
 	public MappingsManager manager;
-    public CorePlugin core;
+    public MangoBotPlugin core;
 
-    public MappingsMainCommand(MappingsManager mappings_manager, CorePlugin core) {
+    public MappingsMainCommand(MappingsManager mappings_manager, MangoBotPlugin core) {
 		// TODO Auto-generated constructor stub
 	this.manager=mappings_manager;
 	this.core = core;
