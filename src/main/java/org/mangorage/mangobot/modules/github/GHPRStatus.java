@@ -90,25 +90,28 @@ public class GHPRStatus extends TimerTask {
 
             var channel = corePlugin.getJDA().getTextChannelById(1129095014094475285L);
 
-            if (PRS.size() > 1) {
+            StringBuilder builder = new StringBuilder();
 
-                channel.sendMessage("New Forge PRS: %s".formatted(PRS.size())).queue();
 
-                for (GHPullRequest PR : PRS) {
-                    System.out.println(PR.getNumber());
-                    if (PR.getNumber() > number)
-                        number = PR.getNumber();
-                    channel.sendMessage(
-                            "\u200E \u200E \u200E \u200E \u200E * PR: %s [%s](%s)"
-                                    .formatted(
-                                            PR.getTitle(),
-                                            PR.getNumber(),
-                                            PR.getHtmlUrl()
-                                    )
-                    ).setSuppressEmbeds(true).queue();
-                }
-                save(number, file);
+            builder.append("New Forge PR's: %s".formatted(PRS.size())).append("\n");
+
+            for (GHPullRequest PR : PRS) {
+                System.out.println(PR.getNumber());
+                if (PR.getNumber() > number)
+                    number = PR.getNumber();
+                builder.append(
+                        "- %s [%s](%s)"
+                                .formatted(
+                                        PR.getTitle(),
+                                        PR.getNumber(),
+                                        PR.getHtmlUrl()
+                                )
+                ).append("\n");
             }
+
+            channel.sendMessage(builder).setSuppressEmbeds(true).queue();
+
+            save(number, file);
         } catch (Exception e) {
             e.printStackTrace();
         }
