@@ -23,6 +23,7 @@
 package org.mangorage.mangobot.modules.github;
 
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import org.eclipse.egit.github.core.Gist;
 import org.eclipse.egit.github.core.GistFile;
@@ -90,7 +91,7 @@ public class PasteRequestModule {
         return calculatePrintableCharacterConfidence(input) > 0.6;
     }
 
-    public static void createGists(Message msg) {
+    public static void createGists(Message msg, User requester) {
         TaskScheduler.getExecutor().execute(() -> {
             if (!msg.isFromGuild()) return;
             if (!GUILDS.contains(msg.getGuildId())) return;
@@ -130,7 +131,15 @@ public class PasteRequestModule {
 
             try {
                 var remote = service.createGist(gist);
-                msg.reply("gist -> %s".formatted(remote.getHtmlUrl())).setSuppressEmbeds(true).mentionRepliedUser(false).queue();
+                StringBuilder result = new StringBuilder();
+                result.append("Gist -> [[gist](%s)]".formatted(remote.getHtmlUrl()));
+
+                remote.getFiles().forEach((key, file) -> {
+                    result.append(" [[raw %s](%s)]".formatted(file.getFilename(), file.getRawUrl()));
+                });
+
+                msg.reply(result).setSuppressEmbeds(true).mentionRepliedUser(false).queue();
+
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -176,7 +185,7 @@ public class PasteRequestModule {
             a.retrieveReactionUsers(EMOJI).queue(b -> {
                 b.stream().filter(user -> user.getId().equals(dEvent.getJDA().getSelfUser().getId())).findFirst().ifPresent(c -> {
                     a.clearReactions(EMOJI).queue();
-                    createGists(a);
+                    createGists(a, dEvent.getUser());
                 });
             });
         });
