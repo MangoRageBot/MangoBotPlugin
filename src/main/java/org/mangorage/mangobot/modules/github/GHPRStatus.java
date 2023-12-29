@@ -82,9 +82,7 @@ public class GHPRStatus extends TimerTask {
             GHRepository repository = github.getRepository("MinecraftForge/MinecraftForge");
 
 
-            var PRS = repository.getPullRequests(GHIssueState.OPEN).stream().filter(pr -> {
-                return pr.getNumber() > lastChecked;
-            }).toList();
+            var PRS = repository.getPullRequests(GHIssueState.OPEN).stream().filter(pr -> pr.getNumber() > lastChecked).toList();
 
             if (PRS.isEmpty()) return;
 
