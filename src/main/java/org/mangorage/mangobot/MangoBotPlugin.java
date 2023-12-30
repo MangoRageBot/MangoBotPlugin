@@ -79,6 +79,7 @@ import org.mangorage.mangobotapi.core.plugin.api.PluginMessageEvent;
 import org.mangorage.mangobotapi.core.plugin.impl.Plugin;
 import org.mangorage.mangobotapi.core.registry.commands.CommandRegistry;
 
+import java.nio.file.Path;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.concurrent.TimeUnit;
@@ -119,7 +120,7 @@ public class MangoBotPlugin extends CorePlugin {
     );
 
     // Where we create our "config"
-    private final static Config CONFIG = new Config("plugins/%s/".formatted(MangoBotPlugin.ID), ".env");
+    private final static Config CONFIG = new Config(Path.of("plugins/%s/.env".formatted(MangoBotPlugin.ID)));
 
 
     // Where we create Settings for said Config
@@ -228,7 +229,6 @@ public class MangoBotPlugin extends CorePlugin {
         // Test
         cmdRegistry.addBasicCommand(new RunCode());
         cmdRegistry.addBasicCommand(new GetEmbedsCommand());
-
 
         permRegistry.save();
         PasteRequestModule.register(getPluginBus());
