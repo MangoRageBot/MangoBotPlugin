@@ -29,6 +29,7 @@ import net.dv8tion.jda.api.hooks.AnnotatedEventManager;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
+import org.mangorage.basicutils.TaskScheduler;
 import org.mangorage.basicutils.config.Config;
 import org.mangorage.basicutils.config.ConfigSetting;
 import org.mangorage.basicutils.config.ISetting;
@@ -69,18 +70,22 @@ import org.mangorage.mangobot.modules.music.commands.StopCommand;
 import org.mangorage.mangobot.modules.music.commands.VolumeCommand;
 import org.mangorage.mangobot.modules.github.PasteRequestModule;
 import org.mangorage.mangobot.modules.tricks.TrickCommand;
+import org.mangorage.mangobot.modules.tricks.TrickSlashCommand;
 import org.mangorage.mangobotapi.core.events.LoadEvent;
 import org.mangorage.mangobotapi.core.events.SaveEvent;
+import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
 import org.mangorage.mangobotapi.core.plugin.api.PluginMessageEvent;
 import org.mangorage.mangobotapi.core.plugin.impl.Plugin;
+import org.mangorage.mangobotapi.core.registry.commands.CommandRegistry;
 
 import java.util.Date;
 import java.util.EnumSet;
+import java.util.concurrent.TimeUnit;
 
 import static org.mangorage.mangobot.core.BotPermissions.*;
 
 @Plugin(id = MangoBotPlugin.ID)
-public class MangoBotPlugin extends org.mangorage.mangobotapi.core.plugin.api.CorePlugin {
+public class MangoBotPlugin extends CorePlugin {
     public static final String ID = "mangobot";
     private static final EnumSet<GatewayIntent> intents = EnumSet.of(
             // Enables MessageReceivedEvent for guild (also known as servers)
@@ -199,7 +204,11 @@ public class MangoBotPlugin extends org.mangorage.mangobotapi.core.plugin.api.Co
 
 
         // Tricks
-        cmdRegistry.addBasicCommand(new TrickCommand(this));
+        var trickCommand = new TrickCommand(this);
+        var trickSlashCommand = new TrickSlashCommand(trickCommand, this);
+        cmdRegistry.addBasicCommand(trickCommand);
+        cmdRegistry.addSlashCommand(trickSlashCommand);
+
 
         // Mappings
         MappingsManager latest_mappings_manager = MappingsManager.new_(); // Soon we need to do for multiple versions but not ATM
@@ -237,6 +246,7 @@ public class MangoBotPlugin extends org.mangorage.mangobotapi.core.plugin.api.Co
     @Override
     public void finished() {
         getPluginBus().post(new LoadEvent());
+        getCommandRegistry().registerSlashCommands();
     }
 
     @Override

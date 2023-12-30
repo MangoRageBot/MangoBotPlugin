@@ -23,6 +23,7 @@
 package org.mangorage.mangobot.core;
 
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
+import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
@@ -69,6 +70,11 @@ public class BotEventListener {
     @SubscribeEvent
     public void onSlashCommand(SlashCommandInteractionEvent event) {
         plugin.getCommandRegistry().postSlashCommand(new SlashCommandEvent(event, event.getName(), Arguments.empty()));
+    }
+
+    @SubscribeEvent
+    public void onSlashAuto(CommandAutoCompleteInteractionEvent event) {
+        plugin.getCommandRegistry().postAutoCompleteEvent(event);
     }
 
     @SubscribeEvent

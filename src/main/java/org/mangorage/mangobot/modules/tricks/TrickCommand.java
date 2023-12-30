@@ -61,7 +61,7 @@ public class TrickCommand implements IBasicCommand {
 
     private static final List<String> ALIASES = List.of("trick", "tk");
 
-    private final HashMap<String, HashMap<String, Data>> CONTENT = new HashMap<>(); // guildID Map<ID, Content>
+    protected final HashMap<String, HashMap<String, Data>> CONTENT = new HashMap<>(); // guildID Map<ID, Content>
     private final ConcurrentHashMap<String, PagedList<String>> PAGES = new ConcurrentHashMap<>();
 
     private final DataHandler<Data> TRICK_DATA_HANDLER;
@@ -290,6 +290,39 @@ public class TrickCommand implements IBasicCommand {
             }
         }
 
+        return CommandResult.PASS;
+    }
+
+    public CommandResult executeTrick(Data data, MessageChannelUnion channel, Arguments args) {
+        MessageSettings dMessage = plugin.getMessageSettings();
+        String response = data.content();
+        String guildID = data.guildID;
+
+        switch (data.trickType()) {
+            case DEFAULT -> {
+                boolean supressEmbeds = data.settings().supressEmbeds();
+                dMessage.apply(channel.sendMessage(response)).setSuppressEmbeds(supressEmbeds).queue();
+            }
+            case CODE -> {
+                // Not Supported yet! TODO
+            }
+            case ALIAS -> {
+                String defer = data.content();
+                if (CONTENT.get(guildID).containsKey(defer)) {
+                    var tData = CONTENT.get(guildID).get(defer);
+                    if (tData.trickType() == Type.ALIAS) {
+                        // Cant do it because its an alias
+                        return CommandResult.FAIL;
+                    } else {
+                        executeTrick(tData, channel, args);
+                        return CommandResult.PASS;
+                    }
+                } else {
+                    // Cant find the trick?
+                    return CommandResult.FAIL;
+                }
+            }
+        }
         return CommandResult.PASS;
     }
 

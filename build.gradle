@@ -25,22 +25,10 @@ apply plugin: 'java'
 apply plugin: 'gradleutils'
 apply plugin: 'maven-publish'
 
-def projectRootDir = project.projectDir.toPath()
-def getCommitNumber = {
-    def proc = 'git rev-list --count master'.execute()
-    proc.waitFor()
-    return proc.text.trim()
-}
-
 def props = new Properties()
 file("secrets.properties").withInputStream { props.load(it) }
 
 group = 'org.mangorage'
-version "%s.%s.%s".formatted(
-        1,
-        0,
-        getCommitNumber()
-)
 
 repositories {
     mavenCentral()
@@ -63,7 +51,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
 
     installer('io.github.realmangorage:installer:2.2.0')
-    bot('io.github.realmangorage:mangobot:1.0.346')
+    bot('io.github.realmangorage:mangobot:2.0.5')
 
     library('org.kohsuke:github-api:1.123')
 }
