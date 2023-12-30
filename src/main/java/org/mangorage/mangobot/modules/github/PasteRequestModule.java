@@ -46,10 +46,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class PasteRequestModule {
-    private static final LazyReference<GitHubClient> GITHUB_CLIENT = LazyReference.create(() -> new GitHubClient().setOAuth2Token(MangoBotPlugin.PASTE_TOKEN.get()));
+    private static final LazyReference<GitHubClient> GITHUB_CLIENT = LazyReference.create(() -> new GitHubClient().setOAuth2Token(MangoBotPlugin.GITHUB_TOKEN.get()));
     private static final List<String> GUILDS = List.of(
             "1129059589325852724",
-            "834300742864601088"
+            "834300742864601088",
+            "1179586337431633991"
     );
     private static final Emoji EMOJI = Emoji.fromUnicode("\uD83D\uDCCB");
 

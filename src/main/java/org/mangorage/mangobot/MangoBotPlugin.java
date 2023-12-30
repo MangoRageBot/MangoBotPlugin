@@ -22,15 +22,17 @@
 
 package org.mangorage.mangobot;
 
-import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.OnlineStatus;
-import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.hooks.AnnotatedEventManager;
-import net.dv8tion.jda.api.interactions.commands.Command;
-import net.dv8tion.jda.api.requests.GatewayIntent;
-import net.dv8tion.jda.api.utils.MemberCachePolicy;
-import net.dv8tion.jda.api.utils.cache.CacheFlag;
-import org.mangorage.basicutils.TaskScheduler;
+import static org.mangorage.mangobot.core.BotPermissions.CUSTOM_VC_ADMIN;
+import static org.mangorage.mangobot.core.BotPermissions.MOD_MAIL;
+import static org.mangorage.mangobot.core.BotPermissions.PERMISSION_ADMIN;
+import static org.mangorage.mangobot.core.BotPermissions.PLAYING;
+import static org.mangorage.mangobot.core.BotPermissions.PREFIX_ADMIN;
+import static org.mangorage.mangobot.core.BotPermissions.TRICK_ADMIN;
+
+import java.util.Date;
+import java.util.EnumSet;
+import java.util.Scanner;
+
 import org.mangorage.basicutils.config.Config;
 import org.mangorage.basicutils.config.ConfigSetting;
 import org.mangorage.basicutils.config.ISetting;
@@ -52,7 +54,11 @@ import org.mangorage.mangobot.modules.developer.RestartCommand;
 import org.mangorage.mangobot.modules.developer.RunCode;
 import org.mangorage.mangobot.modules.developer.SpeakCommand;
 import org.mangorage.mangobot.modules.developer.TerminateCommand;
+import org.mangorage.mangobot.modules.github.GHIssueStatus;
 import org.mangorage.mangobot.modules.github.GHPRStatus;
+import org.mangorage.mangobot.modules.github.IssueScanCommand;
+import org.mangorage.mangobot.modules.github.PRScanCommand;
+import org.mangorage.mangobot.modules.github.PasteRequestModule;
 import org.mangorage.mangobot.modules.mappings.ClassMapCommand;
 import org.mangorage.mangobot.modules.mappings.DefMapCommand;
 import org.mangorage.mangobot.modules.mappings.FCICommand;
@@ -69,7 +75,6 @@ import org.mangorage.mangobot.modules.music.commands.PlayingCommand;
 import org.mangorage.mangobot.modules.music.commands.QueueCommand;
 import org.mangorage.mangobot.modules.music.commands.StopCommand;
 import org.mangorage.mangobot.modules.music.commands.VolumeCommand;
-import org.mangorage.mangobot.modules.github.PasteRequestModule;
 import org.mangorage.mangobot.modules.tricks.TrickCommand;
 import org.mangorage.mangobot.modules.tricks.TrickSlashCommand;
 import org.mangorage.mangobotapi.core.events.LoadEvent;
@@ -77,14 +82,14 @@ import org.mangorage.mangobotapi.core.events.SaveEvent;
 import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
 import org.mangorage.mangobotapi.core.plugin.api.PluginMessageEvent;
 import org.mangorage.mangobotapi.core.plugin.impl.Plugin;
-import org.mangorage.mangobotapi.core.registry.commands.CommandRegistry;
 
-import java.nio.file.Path;
-import java.util.Date;
-import java.util.EnumSet;
-import java.util.concurrent.TimeUnit;
-
-import static org.mangorage.mangobot.core.BotPermissions.*;
+import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.hooks.AnnotatedEventManager;
+import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
 @Plugin(id = MangoBotPlugin.ID)
 public class MangoBotPlugin extends CorePlugin {
@@ -120,13 +125,14 @@ public class MangoBotPlugin extends CorePlugin {
     );
 
     // Where we create our "config"
-    private final static Config CONFIG = new Config(Path.of("plugins/%s/.env".formatted(MangoBotPlugin.ID)));
+    public final static Config CONFIG = new Config("plugins/%s/".formatted(MangoBotPlugin.ID), ".env");
 
 
     // Where we create Settings for said Config
     public static final ISetting<String> MAPPINGS_VERSION = ConfigSetting.create(CONFIG, "MAPPINGS_VERSION", "empty");
     public static final ISetting<String> BOT_TOKEN = ConfigSetting.create(CONFIG, "BOT_TOKEN", "empty");
-    public static final ISetting<String> PASTE_TOKEN = ConfigSetting.create(CONFIG, "PASTE_TOKEN", "empty");
+    public static final ISetting<String> GITHUB_TOKEN = ConfigSetting.create(CONFIG, "PASTE_TOKEN", "empty");
+    public static final ISetting<String> GITHUB_USERNAME = ConfigSetting.create(CONFIG, "GITHUB_USERNAME", "RealMangoRage");
     public static final ISetting<String> DEEPL_TOKEN = ConfigSetting.create(CONFIG, "DEEPL_TOKEN", "empty");
 
 
@@ -230,9 +236,15 @@ public class MangoBotPlugin extends CorePlugin {
         cmdRegistry.addBasicCommand(new RunCode());
         cmdRegistry.addBasicCommand(new GetEmbedsCommand());
 
+
         permRegistry.save();
         PasteRequestModule.register(getPluginBus());
         new GHPRStatus(this);
+        new GHIssueStatus(this);
+        
+        cmdRegistry.addBasicCommand(new PRScanCommand());
+        cmdRegistry.addBasicCommand(new IssueScanCommand());
+
 
         getPluginBus().addListener(PluginMessageEvent.class, pm -> {
             if (pm.getMethod().equals("getDate")) {
@@ -260,4 +272,27 @@ public class MangoBotPlugin extends CorePlugin {
     public void shutdownPost() {
 
     }
+
+    public static String getToken() {
+    	if (BOT_TOKEN.get().equals("empty")||BOT_TOKEN.get().equals("")) {
+    		System.out.println("Empty bot token, replace the bot token with the one from discord in"+CONFIG.location+ " or by typing it in here if you are not in gradle:");
+    		Scanner scanner = new Scanner(System.in);
+           if(scanner.hasNext()) {
+    		String token = scanner.nextLine();
+            BOT_TOKEN.set(token);
+            scanner.close();
+            return token;
+           }else {
+        	   System.out.println("Blank response, this is expected from being run within Gradle. You need to put your token here "+CONFIG.location);
+          scanner.close();
+           return BOT_TOKEN.get();
+           }
+
+    	}else {
+    		return BOT_TOKEN.get();
+    	}
+    }
+
+
+
 }
