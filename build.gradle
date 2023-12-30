@@ -51,7 +51,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
 
     installer('io.github.realmangorage:installer:2.2.0')
-    bot('io.github.realmangorage:mangobot:2.0.5')
+    bot('io.github.realmangorage:mangobot:2.0.6')
 
     library('org.kohsuke:github-api:1.123')
 }

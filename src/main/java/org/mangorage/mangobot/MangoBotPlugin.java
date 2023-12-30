@@ -26,6 +26,7 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.hooks.AnnotatedEventManager;
+import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
@@ -205,7 +206,7 @@ public class MangoBotPlugin extends CorePlugin {
 
         // Tricks
         var trickCommand = new TrickCommand(this);
-        var trickSlashCommand = new TrickSlashCommand(trickCommand, this);
+        var trickSlashCommand = new TrickSlashCommand(trickCommand);
         cmdRegistry.addBasicCommand(trickCommand);
         cmdRegistry.addSlashCommand(trickSlashCommand);
 

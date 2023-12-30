@@ -25,7 +25,9 @@ package org.mangorage.mangobot.modules.tricks;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction;
 import org.jetbrains.annotations.NotNull;
 import org.mangorage.basicutils.LogHelper;
 import org.mangorage.basicutils.TaskScheduler;
@@ -50,6 +52,7 @@ import java.util.List;
 import java.util.StringJoiner;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 @SuppressWarnings("all")
 public class TrickCommand implements IBasicCommand {
@@ -293,7 +296,7 @@ public class TrickCommand implements IBasicCommand {
         return CommandResult.PASS;
     }
 
-    public CommandResult executeTrick(Data data, MessageChannelUnion channel, Arguments args) {
+    public CommandResult executeTrick(Data data, IReplyCallback channel, Arguments args) {
         MessageSettings dMessage = plugin.getMessageSettings();
         String response = data.content();
         String guildID = data.guildID;
@@ -301,7 +304,7 @@ public class TrickCommand implements IBasicCommand {
         switch (data.trickType()) {
             case DEFAULT -> {
                 boolean supressEmbeds = data.settings().supressEmbeds();
-                dMessage.apply(channel.sendMessage(response)).setSuppressEmbeds(supressEmbeds).queue();
+                channel.reply(response).setSuppressEmbeds(supressEmbeds).queue();
             }
             case CODE -> {
                 // Not Supported yet! TODO

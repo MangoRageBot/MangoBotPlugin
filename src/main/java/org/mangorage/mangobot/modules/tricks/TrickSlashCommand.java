@@ -1,28 +1,20 @@
 package org.mangorage.mangobot.modules.tricks;
 
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.CommandAutoCompleteInteraction;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import org.jetbrains.annotations.NotNull;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
 import org.mangorage.mangobotapi.core.commands.ISlashCommand;
-import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
 
 public class TrickSlashCommand implements ISlashCommand {
 
     private final TrickCommand trickCommand;
-    private final CorePlugin plugin;
 
-    public TrickSlashCommand(TrickCommand command, CorePlugin plugin) {
+    public TrickSlashCommand(TrickCommand command) {
         this.trickCommand = command;
-        this.plugin = plugin;
     }
     @NotNull
     @Override
@@ -33,17 +25,17 @@ public class TrickSlashCommand implements ISlashCommand {
         if (id != null) {
             var trick = id.getAsString();
             var guildID = interaction.getGuild().getId();
-            var channel = interaction.getChannel();
             var tricks = trickCommand.CONTENT.get(guildID);
             if (tricks != null) {
                 var trickData = tricks.get(trick);
                 if (trickData == null) return CommandResult.PASS;
-                trickCommand.executeTrick(trickData, channel, arguments);
-                interaction.deferReply().queue();
+                trickCommand.executeTrick(trickData, interaction, arguments);
+                return CommandResult.PASS;
             }
         }
 
-        return CommandResult.PASS;
+        interaction.reply("Failed to execute trick!").queue();
+        return CommandResult.FAIL;
     }
 
     @Override
@@ -63,13 +55,17 @@ public class TrickSlashCommand implements ISlashCommand {
 
 
     @Override
-    public void onAutoCompleteEvent(CommandAutoCompleteInteraction commandAutoCompleteInteraction) {
-        if (commandAutoCompleteInteraction.getFocusedOption().getName().equals("id")) {
-            var guild = commandAutoCompleteInteraction.getGuild();
+    public void onAutoCompleteEvent(CommandAutoCompleteInteraction interaction) {
+        if (interaction.getFocusedOption().getName().equals("id")) {
+            var guild = interaction.getGuild();
             if (guild != null) {
                 var tricks = trickCommand.CONTENT.get(guild.getId());
                 if (tricks != null) {
-                    commandAutoCompleteInteraction.replyChoiceStrings(tricks.keySet()).queue();
+                    var options = tricks.keySet().stream()
+                            .filter(word -> word.startsWith(interaction.getFocusedOption().getValue())) // only display words that start with the user's current input
+                            .limit(25)
+                            .toList();
+                    interaction.replyChoiceStrings(options).queue();
                 }
             }
         }
