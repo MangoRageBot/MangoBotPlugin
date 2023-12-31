@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.kohsuke.github.GHIssue;
 import org.kohsuke.github.GHIssueState;
-import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
 import org.mangorage.mangobot.MangoBotPlugin;
@@ -21,7 +21,7 @@ import org.mangorage.mangobot.config.GuildConfig;
 import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
 
 
-public class GHPRStatus extends TimerTask {
+public class GHIssueStatus extends TimerTask {
 
 	public static ArrayList<String> indexed_channels = new ArrayList<String>();
 
@@ -67,7 +67,7 @@ public class GHPRStatus extends TimerTask {
 
 	private final CorePlugin corePlugin;
 
-	public GHPRStatus(CorePlugin corePlugin) {
+	public GHIssueStatus(CorePlugin corePlugin) {
 		this.corePlugin = corePlugin;
 		new Timer().scheduleAtFixedRate(this, 15 * 1000, 60 * 60 * 1000); // 60 minutes/1hr
 	}
@@ -75,7 +75,6 @@ public class GHPRStatus extends TimerTask {
 	@Override
 
 	public void run() {
-
 		try {
 			String token = MangoBotPlugin.GITHUB_TOKEN.get();
 
@@ -85,31 +84,33 @@ public class GHPRStatus extends TimerTask {
 				String guild = corePlugin.getJDA().getTextChannelById(chan).getGuild().getId();
 				GuildConfig config = GuildConfig.guildsConfig(guild);
 				String[] repos = config.GIT_REPOS_PR_SCANNED.get().split(",");
-				int prs = 0;
+				int issues = 0;
 				StringBuilder builder = new StringBuilder();
 
 				for (String repo: repos) {
 					int lastChecked = get(getFile(repo));
 					int number = lastChecked;
-					List<GHPullRequest> PRS = new ArrayList<GHPullRequest>();
+					List<GHIssue> ISSUES = new ArrayList<GHIssue>();
 					GHRepository repository = github.getRepository(repo);
-					PRS.addAll(repository.getPullRequests(GHIssueState.OPEN).stream().filter(pr -> pr.getNumber() > lastChecked).toList());
+					repository.getIssues(GHIssueState.OPEN);
+					repository.getIssues(GHIssueState.OPEN).stream();
+					ISSUES.addAll(repository.getIssues(GHIssueState.OPEN).stream().filter(pr -> pr.getNumber() > lastChecked).toList());
 
-					if (PRS.size() != 0) {
-						prs = prs + PRS.size();
-						builder.append("New " + repo + " PR's: %s".formatted(PRS.size())).append("\n");
+					if (ISSUES.size() != 0) {
+						issues = issues + ISSUES.size();
+						builder.append("New " + repo + " Issue's: %s".formatted(ISSUES.size())).append("\n");
 
-						for (GHPullRequest PR: PRS) {
-							System.out.println(PR.getNumber());
+						for (GHIssue issue: ISSUES) {
+							System.out.println(issue.getNumber());
 
-							if (PR.getNumber() > number)
-								number = PR.getNumber();
+							if (issue.getNumber() > number)
+								number = issue.getNumber();
 							builder.append(
 								"- %s [%s](%s)"
 								.formatted(
-									PR.getTitle(),
-									PR.getNumber(),
-									PR.getHtmlUrl()
+									issue.getTitle(),
+									issue.getNumber(),
+									issue.getHtmlUrl()
 								)
 							).append("\n");
 						}
@@ -132,7 +133,7 @@ public class GHPRStatus extends TimerTask {
 	}
 
 	public Path getFile(String repo) {
-		return corePlugin.getPluginDirectory().resolve("ghprstatus/" + repo.replace("/", ".") + ".txt");
+		return corePlugin.getPluginDirectory().resolve("ghissuestatus/" + repo.replace("/", ".") + ".txt");
 	}
 
 }
