@@ -45,7 +45,7 @@ public class GHIssueStatus extends TimerTask {
     }
 
     public static int get(Path fileName) {
-        int result = 9743;
+        int result = 0;
         File file = fileName.toFile();
 
         // Check if the file exists before reading
@@ -73,13 +73,10 @@ public class GHIssueStatus extends TimerTask {
 
     @Override
     public void run() {
-        
-
         try {
             String token = MangoBotPlugin.GITHUB_TOKEN.get();
 
             GitHub github = GitHub.connect(MangoBotPlugin.GITHUB_USERNAME.get(), token);
-
             for(String chan:indexed_channels) {
             	String guild = corePlugin.getJDA().getTextChannelById(chan).getGuild().getId();
             	GuildConfig config = GuildConfig.guildsConfig(guild);
@@ -91,6 +88,8 @@ public class GHIssueStatus extends TimerTask {
                     int number = lastChecked;
                 	List<GHIssue> ISSUES = new ArrayList<GHIssue>();
             		GHRepository repository = github.getRepository(repo);
+            		repository.getIssues(GHIssueState.OPEN);
+            		repository.getIssues(GHIssueState.OPEN).stream();
             		ISSUES.addAll(repository.getIssues(GHIssueState.OPEN).stream().filter(pr -> pr.getNumber() > lastChecked).toList());
                      if(ISSUES.size()!=0) {
                      issues = issues + ISSUES.size();
@@ -117,9 +116,9 @@ public class GHIssueStatus extends TimerTask {
             	
             	
             	}
-            	
+            	if(!builder.isEmpty()) {
             	  corePlugin.getJDA().getTextChannelById(chan).sendMessage(builder).setSuppressEmbeds(true).queue();
-
+            	}
               
             	
 

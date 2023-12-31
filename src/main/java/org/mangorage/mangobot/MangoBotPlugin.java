@@ -29,6 +29,7 @@ import static org.mangorage.mangobot.core.BotPermissions.PLAYING;
 import static org.mangorage.mangobot.core.BotPermissions.PREFIX_ADMIN;
 import static org.mangorage.mangobot.core.BotPermissions.TRICK_ADMIN;
 
+import java.nio.file.Path;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.Scanner;
@@ -36,6 +37,7 @@ import java.util.Scanner;
 import org.mangorage.basicutils.config.Config;
 import org.mangorage.basicutils.config.ConfigSetting;
 import org.mangorage.basicutils.config.ISetting;
+import org.mangorage.mangobot.config.GuildConfig;
 import org.mangorage.mangobot.core.BotEventListener;
 import org.mangorage.mangobot.core.BotPermissions;
 import org.mangorage.mangobot.core.Listeners;
@@ -125,8 +127,7 @@ public class MangoBotPlugin extends CorePlugin {
     );
 
     // Where we create our "config"
-    public final static Config CONFIG = new Config("plugins/%s/".formatted(MangoBotPlugin.ID), ".env");
-
+    public final static Config CONFIG = new Config(Path.of("plugins/%s/.env".formatted(MangoBotPlugin.ID)));
 
     // Where we create Settings for said Config
     public static final ISetting<String> MAPPINGS_VERSION = ConfigSetting.create(CONFIG, "MAPPINGS_VERSION", "empty");
@@ -237,14 +238,15 @@ public class MangoBotPlugin extends CorePlugin {
         cmdRegistry.addBasicCommand(new GetEmbedsCommand());
 
 
+        cmdRegistry.addBasicCommand(new PRScanCommand(this));
+        cmdRegistry.addBasicCommand(new IssueScanCommand(this));
+
+        GuildConfig.loadServerConfigs();
         permRegistry.save();
         PasteRequestModule.register(getPluginBus());
         new GHPRStatus(this);
         new GHIssueStatus(this);
         
-        cmdRegistry.addBasicCommand(new PRScanCommand());
-        cmdRegistry.addBasicCommand(new IssueScanCommand());
-
 
         getPluginBus().addListener(PluginMessageEvent.class, pm -> {
             if (pm.getMethod().equals("getDate")) {
@@ -275,7 +277,7 @@ public class MangoBotPlugin extends CorePlugin {
 
     public static String getToken() {
     	if (BOT_TOKEN.get().equals("empty")||BOT_TOKEN.get().equals("")) {
-    		System.out.println("Empty bot token, replace the bot token with the one from discord in"+CONFIG.location+ " or by typing it in here if you are not in gradle:");
+    		System.out.println("Empty bot token, replace the bot token with the one from discord in"+CONFIG.getFile()+ " or by typing it in here if you are not in gradle:");
     		Scanner scanner = new Scanner(System.in);
            if(scanner.hasNext()) {
     		String token = scanner.nextLine();
@@ -283,7 +285,7 @@ public class MangoBotPlugin extends CorePlugin {
             scanner.close();
             return token;
            }else {
-        	   System.out.println("Blank response, this is expected from being run within Gradle. You need to put your token here "+CONFIG.location);
+        	   System.out.println("Blank response, this is expected from being run within Gradle. You need to put your token here "+CONFIG.getFile());
           scanner.close();
            return BOT_TOKEN.get();
            }

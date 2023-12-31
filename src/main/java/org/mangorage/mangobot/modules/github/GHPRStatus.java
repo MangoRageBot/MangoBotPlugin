@@ -44,7 +44,7 @@ public class GHPRStatus extends TimerTask {
     }
 
     public static int get(Path fileName) {
-        int result = 9743;
+        int result = 0;
         File file = fileName.toFile();
 
         // Check if the file exists before reading
@@ -116,9 +116,9 @@ public class GHPRStatus extends TimerTask {
             	
             	
             	}
-            	
+            	if(!builder.isEmpty()) {
             	  corePlugin.getJDA().getTextChannelById(chan).sendMessage(builder).setSuppressEmbeds(true).queue();
-
+            	}
               
             	
 
