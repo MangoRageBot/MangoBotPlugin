@@ -1,6 +1,0 @@
-https://repo.maven.apache.org/maven2/ org.kohsuke github-api 1.123 github-api-1.123.jar
-https://repo.maven.apache.org/maven2/ org.apache.commons commons-lang3 3.9 commons-lang3-3.9.jar
-https://repo.maven.apache.org/maven2/ com.fasterxml.jackson.core jackson-databind 2.12.1 jackson-databind-2.12.1.jar
-https://repo.maven.apache.org/maven2/ com.fasterxml.jackson.core jackson-annotations 2.12.1 jackson-annotations-2.12.1.jar
-https://repo.maven.apache.org/maven2/ com.fasterxml.jackson.core jackson-core 2.12.1 jackson-core-2.12.1.jar
-https://repo.maven.apache.org/maven2/ commons-io commons-io 2.4 commons-io-2.4.jar
