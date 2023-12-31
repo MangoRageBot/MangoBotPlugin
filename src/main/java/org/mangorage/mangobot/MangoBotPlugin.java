@@ -276,23 +276,24 @@ public class MangoBotPlugin extends CorePlugin {
     }
 
     public static String getToken() {
-    	if (BOT_TOKEN.get().equals("empty")||BOT_TOKEN.get().equals("")) {
-    		System.out.println("Empty bot token, replace the bot token with the one from discord in"+CONFIG.getFile()+ " or by typing it in here if you are not in gradle:");
-    		Scanner scanner = new Scanner(System.in);
-           if(scanner.hasNext()) {
-    		String token = scanner.nextLine();
-            BOT_TOKEN.set(token);
-            scanner.close();
-            return token;
-           }else {
-        	   System.out.println("Blank response, this is expected from being run within Gradle. You need to put your token here "+CONFIG.getFile());
-          scanner.close();
-           return BOT_TOKEN.get();
-           }
+		if (BOT_TOKEN.get().equals("empty") || BOT_TOKEN.get().equals("")) {
+			System.out.println("Empty bot token, replace the bot token with the one from discord in" + CONFIG.getFile() + " or by typing it in here if you are not in gradle:");
+			Scanner scanner = new Scanner(System.in);
 
-    	}else {
-    		return BOT_TOKEN.get();
-    	}
+			if (scanner.hasNext()) {
+				String token = scanner.nextLine();
+				BOT_TOKEN.set(token);
+				scanner.close();
+				return token;
+			} else {
+				System.out.println("Blank response, this is expected from being run within Gradle. You need to put your token here " + CONFIG.getFile());
+				scanner.close();
+				return BOT_TOKEN.get();
+			}
+
+		} else {
+			return BOT_TOKEN.get();
+		}
     }
 
 
