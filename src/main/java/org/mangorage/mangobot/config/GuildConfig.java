@@ -12,16 +12,25 @@ import org.mangorage.mangobot.modules.github.GHIssueStatus;
 import org.mangorage.mangobot.modules.github.GHPRStatus;
 
 
-public class GuildConfig extends Config {
-
+public class GuildConfig {
 	public static HashMap<String, GuildConfig> configs = new HashMap<String, GuildConfig>();
-	public ISetting<String> GIT_REPOS_PR_SCANNED = ConfigSetting.create(this, "GIT_REPOS_PR_SCANNED", "MinecraftForge/MinecraftForge,MangoRageBot/MangoBot,MangoRageBot/MangoBotPlugin,mikumikudanceminecraftmoddingdiscord/PMXMC");
-	public ISetting<String> GIT_REPOS_PR_SCANNED_CHANNELID = ConfigSetting.create(this, "GIT_REPOS_PR_SCANNED_CHANNELID", "empty");
-	public ISetting<String> GIT_REPOS_ISSUE_SCANNED = ConfigSetting.create(this, "GIT_REPOS_ISSUE_SCANNED", "MinecraftForge/MinecraftForge,MangoRageBot/MangoBot,MangoRageBot/MangoBotPlugin,mikumikudanceminecraftmoddingdiscord/PMXMC");
-	public ISetting<String> GIT_REPOS_ISSUE_SCANNED_CHANNELID = ConfigSetting.create(this, "GIT_REPOS_ISSUE_SCANNED_CHANNELID", "empty");
+
+	public final Config guildConfig;
+	public final ISetting<String> GIT_REPOS_PR_SCANNED;
+	public final ISetting<String> GIT_REPOS_PR_SCANNED_CHANNELID;
+	public final ISetting<String> GIT_REPOS_ISSUE_SCANNED;
+	public final ISetting<String> GIT_REPOS_ISSUE_SCANNED_CHANNELID;
 
 	private GuildConfig(String guildID) {
-		super(Path.of("config/" + guildID + "/config.env"));
+		var root = MangoBotPlugin.CONFIG.getFile().getParent();
+
+		this.guildConfig = new Config(Path.of("%s/guildConfigs/%s/config.conf".formatted(root, guildID)));
+
+		this.GIT_REPOS_PR_SCANNED = ConfigSetting.create(this.guildConfig, "GIT_REPOS_PR_SCANNED", "");
+		this.GIT_REPOS_PR_SCANNED_CHANNELID = ConfigSetting.create(this.guildConfig, "GIT_REPOS_PR_SCANNED_CHANNELID", "empty");
+		this.GIT_REPOS_ISSUE_SCANNED = ConfigSetting.create(this.guildConfig, "GIT_REPOS_ISSUE_SCANNED", "");
+		this.GIT_REPOS_ISSUE_SCANNED_CHANNELID = ConfigSetting.create(this.guildConfig, "GIT_REPOS_ISSUE_SCANNED_CHANNELID", "empty");
+
 		configs.put(guildID, this);
 
 		if (!GIT_REPOS_PR_SCANNED_CHANNELID.get().equals("empty")) {
@@ -39,15 +48,12 @@ public class GuildConfig extends Config {
 			return configs.get(guildID);
 		}
 
-		Path root = MangoBotPlugin.CONFIG.getFile().getParent();
-		File path = new File(root + "/config/" + guildID + "/config.env");
-		path.getParentFile().mkdirs();
 		return new GuildConfig(guildID);
 	}
 
 	public static void loadServerConfigs() {
 		Path root = MangoBotPlugin.CONFIG.getFile().getParent();
-		File path = new File(root + "/config/");
+		File path = new File(root + "/guildConfigs/");
 
 		if (path.exists()) {
 			File[] listOfFiles = path.listFiles();

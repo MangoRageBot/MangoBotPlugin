@@ -74,9 +74,7 @@ public class GHPRStatus extends TimerTask {
 	}
 
 	@Override
-
 	public void run() {
-
 		try {
 			String token = MangoBotPlugin.GITHUB_TOKEN.get();
 
@@ -85,7 +83,8 @@ public class GHPRStatus extends TimerTask {
 			for (String chan: indexed_channels) {
 				String guild = corePlugin.getJDA().getTextChannelById(chan).getGuild().getId();
 				GuildConfig config = GuildConfig.guildsConfig(guild);
-				String[] repos = config.GIT_REPOS_PR_SCANNED.get().split(",");
+				String[] repos = config.GIT_REPOS_PR_SCANNED.get().contains(",") ? config.GIT_REPOS_PR_SCANNED.get().split(",") : new String[] {config.GIT_REPOS_PR_SCANNED.get()};
+				if (repos.length == 0) continue;
 				int prs = 0;
 				StringBuilder builder = new StringBuilder();
 
