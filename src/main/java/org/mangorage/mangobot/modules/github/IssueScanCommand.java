@@ -38,21 +38,21 @@ public class IssueScanCommand implements IBasicCommand {
 		}
 
 		if (!type.equals("") && !type.equals(" ")) {
-			if (type.equals("-add") || type.equals("-追加")) {
+			if (type.equals("-add")) {
 				String[] repos_arr = guildConfig.GIT_REPOS_ISSUE_SCANNED.get().split(",");
 				ArrayList<String> repos = new ArrayList<String> (Arrays.asList(repos_arr));
 				repos.add(answer);
 				String result = String.join(",", repos);
 				guildConfig.GIT_REPOS_ISSUE_SCANNED.set(result);
 				dMessage.apply(message.reply("Added: " + answer)).queue();
-			} else if (type.equals("-remove") || type.equals("-取り除く")) {
+			} else if (type.equals("-remove")) {
 				String[] repos_arr = guildConfig.GIT_REPOS_ISSUE_SCANNED.get().split(",");
 				ArrayList<String> repos = new ArrayList<String> (Arrays.asList(repos_arr));
 				repos.remove(answer);
 				String result = String.join(",", repos);
 				guildConfig.GIT_REPOS_ISSUE_SCANNED.set(result);
 				dMessage.apply(message.reply("Removed: " + answer)).queue();
-			} else if (type.equals("-list") || type.equals("-リスト")) {
+			} else if (type.equals("-list")) {
 				String[] repos = guildConfig.GIT_REPOS_ISSUE_SCANNED.get().split(",");
 				StringBuilder builder = new StringBuilder();
 
@@ -61,7 +61,7 @@ public class IssueScanCommand implements IBasicCommand {
 				}
 
 				dMessage.apply(message.reply(builder)).queue();
-			} else if (type.equals("-setchannel") || type.equals("-チャンネルを設定する")) {
+			} else if (type.equals("-setchannel")) {
 				GHIssueStatus.indexed_channels.remove(guildConfig.GIT_REPOS_ISSUE_SCANNED_CHANNELID.get());
 
 				if (answer == null) {
@@ -77,11 +77,13 @@ public class IssueScanCommand implements IBasicCommand {
 			}
 
 		} else {
-			dMessage.apply(message.reply("Issue Scan Command Usage:\n" +
-				"``!issuescan -add Org/Repo`` Adds a Repository\n" +
-				"``!issuescan -remove Org/Repo`` Removes a Repository\n" +
-				"``!issuescan -list`` Lists Indexed Repository\n" +
-				"``!issuescan -setchannel`` Sets this as the current channel to list the issues\n"
+			dMessage.apply(message.reply("""
+                    Issue Scan Command Usage:
+                    ``!issuescan -add Org/Repo`` Adds a Repository
+                    ``!issuescan -remove Org/Repo`` Removes a Repository
+                    ``!issuescan -list`` Lists Indexed Repository
+                    ``!issuescan -setchannel`` Sets this as the current channel to list the issues
+                    """
 			)).queue();
 		}
 

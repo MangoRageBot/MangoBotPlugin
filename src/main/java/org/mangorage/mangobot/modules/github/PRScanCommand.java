@@ -37,21 +37,21 @@ public class PRScanCommand implements IBasicCommand {
 		}
 
 		if (!type.equals("") && !type.equals(" ")) {
-			if (type.equals("-add") || type.equals("-追加")) {
+			if (type.equals("-add")) {
 				String[] repos_arr = guildConfig.GIT_REPOS_PR_SCANNED.get().split(",");
 				ArrayList<String> repos = new ArrayList<String> (Arrays.asList(repos_arr));
 				repos.add(answer);
 				String result = String.join(",", repos);
 				guildConfig.GIT_REPOS_PR_SCANNED.set(result);
 				dMessage.apply(message.reply("Added: " + answer)).queue();
-			} else if (type.equals("-remove") || type.equals("-取り除く")) {
+			} else if (type.equals("-remove")) {
 				String[] repos_arr = guildConfig.GIT_REPOS_PR_SCANNED.get().split(",");
 				ArrayList<String> repos = new ArrayList<String> (Arrays.asList(repos_arr));
 				repos.remove(answer);
 				String result = String.join(",", repos);
 				guildConfig.GIT_REPOS_PR_SCANNED.set(result);
 				dMessage.apply(message.reply("Removed: " + answer)).queue();
-			} else if (type.equals("-list") || type.equals("-リスト")) {
+			} else if (type.equals("-list")) {
 				String[] repos = guildConfig.GIT_REPOS_PR_SCANNED.get().split(",");
 				StringBuilder builder = new StringBuilder();
 
@@ -60,7 +60,7 @@ public class PRScanCommand implements IBasicCommand {
 				}
 
 				dMessage.apply(message.reply(builder)).queue();
-			} else if (type.equals("-setchannel") || type.equals("-チャンネルを設定する")) {
+			} else if (type.equals("-setchannel")) {
 				GHPRStatus.indexed_channels.remove(guildConfig.GIT_REPOS_PR_SCANNED_CHANNELID.get());
 
 				if (answer == null) {
@@ -76,11 +76,13 @@ public class PRScanCommand implements IBasicCommand {
 			}
 
 		} else {
-			dMessage.apply(message.reply("PR Scan Command Usage:\n" +
-				"``!prscan -add Org/Repo`` Adds a Repository\n" +
-				"``!prscan -remove Org/Repo`` Removes a Repository\n" +
-				"``!prscan -list`` Lists Indexed Repository\n" +
-				"``!prscan -setchannel`` Sets this as the current channel to list the pull requests\n"
+			dMessage.apply(message.reply("""
+                    PR Scan Command Usage:
+                    ``!prscan -add Org/Repo`` Adds a Repository
+                    ``!prscan -remove Org/Repo`` Removes a Repository
+                    ``!prscan -list`` Lists Indexed Repository
+                    ``!prscan -setchannel`` Sets this as the current channel to list the pull requests
+                    """
 			)).queue();
 		}
 

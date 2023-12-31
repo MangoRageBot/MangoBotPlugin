@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.channels.Channel;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -91,13 +92,12 @@ public class GHPRStatus extends TimerTask {
 				for (String repo: repos) {
 					int lastChecked = get(getFile(repo));
 					int number = lastChecked;
-					List<GHPullRequest> PRS = new ArrayList<GHPullRequest>();
-					GHRepository repository = github.getRepository(repo);
-					PRS.addAll(repository.getPullRequests(GHIssueState.OPEN).stream().filter(pr -> pr.getNumber() > lastChecked).toList());
+                    GHRepository repository = github.getRepository(repo);
+                    List<GHPullRequest> PRS = new ArrayList<GHPullRequest>(repository.getPullRequests(GHIssueState.OPEN).stream().filter(pr -> pr.getNumber() > lastChecked).toList());
 
-					if (PRS.size() != 0) {
+					if (!PRS.isEmpty()) {
 						prs = prs + PRS.size();
-						builder.append("New " + repo + " PR's: %s".formatted(PRS.size())).append("\n");
+						builder.append("New ").append(repo).append(" PR's: %s".formatted(PRS.size())).append("\n");
 
 						for (GHPullRequest PR: PRS) {
 							System.out.println(PR.getNumber());
@@ -121,7 +121,9 @@ public class GHPRStatus extends TimerTask {
 				}
 
 				if (!builder.isEmpty()) {
-					corePlugin.getJDA().getTextChannelById(chan).sendMessage(builder).setSuppressEmbeds(true).queue();
+					var channel = corePlugin.getJDA().getTextChannelById(chan);
+					if (channel == null) return;
+					channel.sendMessage(builder).setSuppressEmbeds(true).queue();
 				}
 
 			}

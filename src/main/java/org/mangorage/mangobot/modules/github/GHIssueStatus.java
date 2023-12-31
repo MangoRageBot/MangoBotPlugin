@@ -90,15 +90,14 @@ public class GHIssueStatus extends TimerTask {
 				for (String repo: repos) {
 					int lastChecked = get(getFile(repo));
 					int number = lastChecked;
-					List<GHIssue> ISSUES = new ArrayList<GHIssue>();
-					GHRepository repository = github.getRepository(repo);
+                    GHRepository repository = github.getRepository(repo);
 					repository.getIssues(GHIssueState.OPEN);
 					repository.getIssues(GHIssueState.OPEN).stream();
-					ISSUES.addAll(repository.getIssues(GHIssueState.OPEN).stream().filter(pr -> pr.getNumber() > lastChecked).toList());
+                    List<GHIssue> ISSUES = new ArrayList<GHIssue>(repository.getIssues(GHIssueState.OPEN).stream().filter(pr -> pr.getNumber() > lastChecked).toList());
 
-					if (ISSUES.size() != 0) {
+					if (!ISSUES.isEmpty()) {
 						issues = issues + ISSUES.size();
-						builder.append("New " + repo + " Issue's: %s".formatted(ISSUES.size())).append("\n");
+						builder.append("New ").append(repo).append(" Issue's: %s".formatted(ISSUES.size())).append("\n");
 
 						for (GHIssue issue: ISSUES) {
 							System.out.println(issue.getNumber());
@@ -122,7 +121,9 @@ public class GHIssueStatus extends TimerTask {
 				}
 
 				if (!builder.isEmpty()) {
-					corePlugin.getJDA().getTextChannelById(chan).sendMessage(builder).setSuppressEmbeds(true).queue();
+					var channel = corePlugin.getJDA().getTextChannelById(chan);
+					if (channel == null) return;
+					channel.sendMessage(builder).setSuppressEmbeds(true).queue();
 				}
 
 			}
