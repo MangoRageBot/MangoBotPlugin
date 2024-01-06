@@ -124,10 +124,6 @@ public class TrickCommand implements IBasicCommand {
                 `!tricks -s exampletrick`
                 `!tricks -r exampletrick`
                 `!tricks -l 10`
-                ## `!pings`
-                Shows an embed to ask people to disable pings when replying to others.
-                ## `!record`
-                Records a voice channel. First arg is the channel name, second arg is how long to record for in seconds.
                 """;
     }
 
