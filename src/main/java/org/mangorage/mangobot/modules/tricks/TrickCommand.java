@@ -108,6 +108,28 @@ public class TrickCommand implements IBasicCommand {
         plugin.getPluginBus().addListener(DButtonInteractionEvent.class, this::onButton);
     }
 
+    @Override
+    public String usage() {
+        return """
+                ## `!tricks`
+                `-a` to add, `-e` to edit, `-s` to view source, `-r` to remove, `-l` to list.
+                - To run a trick, use its ID as if it were another command. E.g.: `!drivers`
+                - When adding or editing, you can optionally add the `-supress` arg to supress embeds in your trick's links.
+                - When listing tricks, you can optionally specify how many you want per page.
+                                
+                Examples:
+                `!tricks -a exampletrick -content this is an example trick`
+                `!tricks -e exampletrick -supress -content editing the trick. https://bing.com`
+                `!exampletrick`
+                `!tricks -s exampletrick`
+                `!tricks -r exampletrick`
+                `!tricks -l 10`
+                ## `!pings`
+                Shows an embed to ask people to disable pings when replying to others.
+                ## `!record`
+                Records a voice channel. First arg is the channel name, second arg is how long to record for in seconds.
+                """;
+    }
 
     @NotNull
     @Override

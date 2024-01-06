@@ -29,6 +29,7 @@ import static org.mangorage.mangobot.core.BotPermissions.PLAYING;
 import static org.mangorage.mangobot.core.BotPermissions.PREFIX_ADMIN;
 import static org.mangorage.mangobot.core.BotPermissions.TRICK_ADMIN;
 
+import java.lang.ref.PhantomReference;
 import java.nio.file.Path;
 import java.util.Date;
 import java.util.EnumSet;
