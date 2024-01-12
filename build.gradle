@@ -50,8 +50,8 @@ dependencies {
     testImplementation platform('org.junit:junit-bom:5.9.1')
     testImplementation 'org.junit.jupiter:junit-jupiter'
 
-    installer('io.github.realmangorage:installer:2.2.2')
-    bot('io.github.realmangorage:mangobot:2.0.7')
+    installer('io.github.realmangorage:installer:2.2.4')
+    bot('io.github.realmangorage:mangobot:2.0.+')
 
     library('org.kohsuke:github-api:1.123')
 }

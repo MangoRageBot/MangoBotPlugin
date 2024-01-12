@@ -189,7 +189,7 @@ public class TrickCommand implements IBasicCommand {
             CONTENT.computeIfAbsent(guildID, (k) -> new HashMap<>()).put(id, data);
 
             data.save(TRICK_DATA_HANDLER);
-            dMessage.apply(message.reply("Modfied Trick: '%s'".formatted(id))).queue();
+            dMessage.apply(message.reply("Modified Trick: '%s'".formatted(id))).queue();
 
             return CommandResult.PASS;
         } else if ((type.equals("-r") || type.equals("-remove")) && id != null) {
@@ -291,7 +291,6 @@ public class TrickCommand implements IBasicCommand {
             }
             case CODE -> {
                 executeScript(message, args.getFrom(2).split(" "), response);
-                // TODO: Readd Scripts!
             }
             case ALIAS -> {
                 String defer = data.content();

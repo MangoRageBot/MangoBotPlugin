@@ -34,7 +34,11 @@ public class TrickSlashCommand implements ISlashCommand {
             }
         }
 
-        interaction.reply("Failed to execute trick!").queue();
+        if (interaction.getOption("test") != null) {
+            interaction.reply("Incorrect Option").setEphemeral(true).queue();
+        } else {
+            interaction.reply("Failed to execute trick!").queue();
+        }
         return CommandResult.FAIL;
     }
 
@@ -68,6 +72,8 @@ public class TrickSlashCommand implements ISlashCommand {
                     interaction.replyChoiceStrings(options).queue();
                 }
             }
+        } else if (interaction.getFocusedOption().getName().equals("test")) {
+            interaction.replyChoiceStrings("none").queue();
         }
     }
 }

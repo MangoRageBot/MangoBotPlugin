@@ -50,7 +50,7 @@ public class HelpCommand implements IBasicCommand {
 
         var command = corePlugin.getCommandRegistry().getCommand(cmd);
         if (command == null) {
-            settings.apply(message.reply("Command not found!")).queue();
+            settings.apply(message.reply("Command not found!\nUsage: " + usage())).queue();
             return CommandResult.PASS;
         }
 
@@ -66,6 +66,6 @@ public class HelpCommand implements IBasicCommand {
 
     @Override
     public String usage() {
-        return "!help <command>";
+        return "!help <command/alias>";
     }
 }
