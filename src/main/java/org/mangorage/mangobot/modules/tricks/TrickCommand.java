@@ -287,7 +287,8 @@ public class TrickCommand implements IBasicCommand {
             case DEFAULT -> {
                 boolean supressEmbeds = data.settings().supressEmbeds();
                 var mData = dMessage.apply(channel.sendMessage(response)).setSuppressEmbeds(supressEmbeds);
-                dMessage.withDeletion(mData, message.getAuthor()).queue();
+                //dMessage.withDeletion(mData, message.getAuthor()).queue();
+                mData.queue();
             }
             case CODE -> {
                 executeScript(message, args.getFrom(2).split(" "), response);
