@@ -42,6 +42,8 @@ import org.mangorage.mangobot.config.GuildConfig;
 import org.mangorage.mangobot.core.BotEventListener;
 import org.mangorage.mangobot.core.BotPermissions;
 import org.mangorage.mangobot.core.Listeners;
+import org.mangorage.mangobot.loader.CoreMain;
+import org.mangorage.mangobot.loader.Loader;
 import org.mangorage.mangobot.modules.basic.commands.GetEmbedsCommand;
 import org.mangorage.mangobot.modules.basic.commands.HelpCommand;
 import org.mangorage.mangobot.modules.basic.commands.InfoCommand;
@@ -51,6 +53,7 @@ import org.mangorage.mangobot.modules.basic.commands.PermissionCommand;
 import org.mangorage.mangobot.modules.basic.commands.PingCommand;
 import org.mangorage.mangobot.modules.basic.commands.PrefixCommand;
 import org.mangorage.mangobot.modules.basic.commands.VersionCommand;
+import org.mangorage.mangobot.modules.betatricks.BetaTrickCommand;
 import org.mangorage.mangobot.modules.developer.EchoCommand;
 import org.mangorage.mangobot.modules.developer.KickBotCommand;
 import org.mangorage.mangobot.modules.developer.RestartCommand;
@@ -218,6 +221,8 @@ public class MangoBotPlugin extends CorePlugin {
         var trickSlashCommand = new TrickSlashCommand(trickCommand);
         cmdRegistry.addBasicCommand(trickCommand);
         cmdRegistry.addSlashCommand(trickSlashCommand);
+
+        cmdRegistry.addBasicCommand(new BetaTrickCommand(this));
 
 
         // Mappings
