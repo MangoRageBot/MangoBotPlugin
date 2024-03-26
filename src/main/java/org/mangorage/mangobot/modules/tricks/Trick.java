@@ -1,8 +1,8 @@
-package org.mangorage.mangobot.modules.betatricks;
+package org.mangorage.mangobot.modules.tricks;
 
 import com.google.gson.annotations.Expose;
 
-public class BetaTrick {
+public class Trick {
     @Expose
     private long ownerID;
 
@@ -45,7 +45,7 @@ public class BetaTrick {
     @Expose
     private TrickType type;
 
-    protected BetaTrick(String trickID, String guildID) {
+    protected Trick(String trickID, String guildID) {
         this.trickID = trickID;
         this.guildID = guildID;
         this.created = System.currentTimeMillis();

@@ -20,14 +20,33 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.modules.betatricks.lua;
+package org.mangorage.mangobot.modules.tricks.lua;
 
-import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Message;
 
-public class JDALib {
-    private final JDA JDA;
+public class JDAMessageLib {
+    private final Message message;
 
-    public JDALib(JDA jda) {
-        this.JDA = jda;
+    private StringBuilder response = new StringBuilder();
+
+    public JDAMessageLib(Message message) {
+        this.message = message;
+    }
+
+    public void replY(String input) {
+        reply(input, false);
+    }
+
+    public void reply(String input, boolean mention) {
+        message.reply(input).mentionRepliedUser(mention).queue();
+    }
+
+    public void reply(boolean mention) {
+        message.reply(response.toString()).mentionRepliedUser(mention).queue();
+        response = new StringBuilder();
+    }
+
+    public void appendLine(String string) {
+        response.append(string).append("\n");
     }
 }

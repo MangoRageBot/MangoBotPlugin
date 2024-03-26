@@ -20,10 +20,19 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.modules.tricks;
+package org.mangorage.mangobot.modules.tricks.lua;
 
-public record TrickConfig(boolean supressEmbeds) {
-    public TrickConfig withEmbeds(boolean value) {
-        return new TrickConfig(value);
+import org.mangorage.mangobotapi.core.events.discord.DMessageRecievedEvent;
+
+public class MessageEventLuaTable {
+    private final DMessageRecievedEvent dEvent;
+
+    public MessageEventLuaTable(DMessageRecievedEvent event) {
+        this.dEvent = event;
     }
+
+    public void reply(String value) {
+        dEvent.get().getMessage().reply(value).queue();
+    }
+
 }

@@ -20,7 +20,7 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.modules.betatricks;
+package org.mangorage.mangobot.modules.tricks;
 
 import net.dv8tion.jda.api.entities.Message;
 import org.luaj.vm2.Globals;
@@ -32,8 +32,8 @@ import org.luaj.vm2.lib.PackageLib;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.luaj.vm2.lib.jse.JseBaseLib;
 import org.luaj.vm2.lib.jse.JseMathLib;
-import org.mangorage.mangobot.modules.betatricks.lua.JDALib;
-import org.mangorage.mangobot.modules.betatricks.lua.JDAMessageLib;
+import org.mangorage.mangobot.modules.tricks.lua.JDALib;
+import org.mangorage.mangobot.modules.tricks.lua.JDAMessageLib;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;

@@ -1,4 +1,4 @@
-package org.mangorage.mangobot.modules.betatricks;
+package org.mangorage.mangobot.modules.tricks;
 
 public enum TrickCMDType {
     ADD,

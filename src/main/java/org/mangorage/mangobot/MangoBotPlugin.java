@@ -29,7 +29,6 @@ import static org.mangorage.mangobot.core.BotPermissions.PLAYING;
 import static org.mangorage.mangobot.core.BotPermissions.PREFIX_ADMIN;
 import static org.mangorage.mangobot.core.BotPermissions.TRICK_ADMIN;
 
-import java.lang.ref.PhantomReference;
 import java.nio.file.Path;
 import java.util.Date;
 import java.util.EnumSet;
@@ -42,8 +41,6 @@ import org.mangorage.mangobot.config.GuildConfig;
 import org.mangorage.mangobot.core.BotEventListener;
 import org.mangorage.mangobot.core.BotPermissions;
 import org.mangorage.mangobot.core.Listeners;
-import org.mangorage.mangobot.loader.CoreMain;
-import org.mangorage.mangobot.loader.Loader;
 import org.mangorage.mangobot.modules.basic.commands.GetEmbedsCommand;
 import org.mangorage.mangobot.modules.basic.commands.HelpCommand;
 import org.mangorage.mangobot.modules.basic.commands.InfoCommand;
@@ -53,7 +50,7 @@ import org.mangorage.mangobot.modules.basic.commands.PermissionCommand;
 import org.mangorage.mangobot.modules.basic.commands.PingCommand;
 import org.mangorage.mangobot.modules.basic.commands.PrefixCommand;
 import org.mangorage.mangobot.modules.basic.commands.VersionCommand;
-import org.mangorage.mangobot.modules.betatricks.BetaTrickCommand;
+import org.mangorage.mangobot.modules.tricks.TrickCommand;
 import org.mangorage.mangobot.modules.developer.EchoCommand;
 import org.mangorage.mangobot.modules.developer.KickBotCommand;
 import org.mangorage.mangobot.modules.developer.RestartCommand;
@@ -81,7 +78,6 @@ import org.mangorage.mangobot.modules.music.commands.PlayingCommand;
 import org.mangorage.mangobot.modules.music.commands.QueueCommand;
 import org.mangorage.mangobot.modules.music.commands.StopCommand;
 import org.mangorage.mangobot.modules.music.commands.VolumeCommand;
-import org.mangorage.mangobot.modules.tricks.TrickCommand;
 import org.mangorage.mangobot.modules.tricks.TrickSlashCommand;
 import org.mangorage.mangobotapi.core.events.LoadEvent;
 import org.mangorage.mangobotapi.core.events.SaveEvent;
@@ -217,7 +213,7 @@ public class MangoBotPlugin extends CorePlugin {
 
 
         // Tricks
-        cmdRegistry.addBasicCommand(new BetaTrickCommand(this));
+        cmdRegistry.addBasicCommand(new TrickCommand(this));
 
 
         // Mappings

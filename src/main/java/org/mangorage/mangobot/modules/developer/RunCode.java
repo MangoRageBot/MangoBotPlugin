@@ -24,7 +24,7 @@ package org.mangorage.mangobot.modules.developer;
 
 import net.dv8tion.jda.api.entities.Message;
 import org.jetbrains.annotations.NotNull;
-import org.mangorage.mangobot.modules.betatricks.TrickScriptable;
+import org.mangorage.mangobot.modules.tricks.TrickScriptable;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
 import org.mangorage.mangobotapi.core.commands.IBasicCommand;
