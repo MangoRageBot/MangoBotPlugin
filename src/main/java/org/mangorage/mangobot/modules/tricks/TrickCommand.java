@@ -27,13 +27,13 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.interactions.callbacks.IReplyCallback;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction;
 import org.jetbrains.annotations.NotNull;
 import org.mangorage.basicutils.LogHelper;
 import org.mangorage.basicutils.TaskScheduler;
 import org.mangorage.basicutils.misc.PagedList;
 import org.mangorage.basicutils.misc.RunnableTask;
 import org.mangorage.mangobot.core.BotPermissions;
+import org.mangorage.mangobot.modules.betatricks.TrickScriptable;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
 import org.mangorage.mangobotapi.core.commands.IBasicCommand;
@@ -52,7 +52,6 @@ import java.util.List;
 import java.util.StringJoiner;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 @SuppressWarnings("all")
 public class TrickCommand implements IBasicCommand {

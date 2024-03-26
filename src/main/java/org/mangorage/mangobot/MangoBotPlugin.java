@@ -217,11 +217,6 @@ public class MangoBotPlugin extends CorePlugin {
 
 
         // Tricks
-        var trickCommand = new TrickCommand(this);
-        var trickSlashCommand = new TrickSlashCommand(trickCommand);
-        cmdRegistry.addBasicCommand(trickCommand);
-        cmdRegistry.addSlashCommand(trickSlashCommand);
-
         cmdRegistry.addBasicCommand(new BetaTrickCommand(this));
 
 

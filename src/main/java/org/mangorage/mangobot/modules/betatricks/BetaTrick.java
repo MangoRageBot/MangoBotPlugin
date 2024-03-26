@@ -37,17 +37,18 @@ public class BetaTrick {
     private final String trickID;
 
     @Expose
-    private final String id;
+    private final String guildID;
 
-    private final boolean isGuild; // Guild/User
+    @Expose
+    private final long created;
 
     @Expose
     private TrickType type;
 
-    protected BetaTrick(String trickID, String id, boolean isGuild) {
+    protected BetaTrick(String trickID, String guildID) {
         this.trickID = trickID;
-        this.id = id;
-        this.isGuild = isGuild;
+        this.guildID = guildID;
+        this.created = System.currentTimeMillis();
     }
 
     protected void setAliasTarget(String target) {
@@ -121,12 +122,12 @@ public class BetaTrick {
         return trickID;
     }
 
-    public String getId() {
-        return id;
+    public long getCreated() {
+        return created;
     }
 
-    public boolean isGuild() {
-        return isGuild;
+    public String getGuildID() {
+        return guildID;
     }
 
     public boolean isLocked() {

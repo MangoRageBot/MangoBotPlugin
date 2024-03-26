@@ -20,19 +20,33 @@
  * OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package org.mangorage.mangobot.modules.tricks.lua;
+package org.mangorage.mangobot.modules.betatricks.lua;
 
-import org.mangorage.mangobotapi.core.events.discord.DMessageRecievedEvent;
+import net.dv8tion.jda.api.entities.Message;
 
-public class MessageEventLuaTable {
-    private final DMessageRecievedEvent dEvent;
+public class JDAMessageLib {
+    private final Message message;
 
-    public MessageEventLuaTable(DMessageRecievedEvent event) {
-        this.dEvent = event;
+    private StringBuilder response = new StringBuilder();
+
+    public JDAMessageLib(Message message) {
+        this.message = message;
     }
 
-    public void reply(String value) {
-        dEvent.get().getMessage().reply(value).queue();
+    public void replY(String input) {
+        reply(input, false);
     }
 
+    public void reply(String input, boolean mention) {
+        message.reply(input).mentionRepliedUser(mention).queue();
+    }
+
+    public void reply(boolean mention) {
+        message.reply(response.toString()).mentionRepliedUser(mention).queue();
+        response = new StringBuilder();
+    }
+
+    public void appendLine(String string) {
+        response.append(string).append("\n");
+    }
 }

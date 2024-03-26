@@ -2,9 +2,11 @@ package org.mangorage.mangobot.modules.betatricks;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import org.jetbrains.annotations.NotNull;
 import org.mangorage.basicutils.LogHelper;
+import org.mangorage.mangobot.modules.tricks.TrickCommand;
+import org.mangorage.mangobot.modules.tricks.TrickConfig;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
 import org.mangorage.mangobotapi.core.commands.IBasicCommand;
@@ -13,16 +15,12 @@ import org.mangorage.mangobotapi.core.events.BasicCommandEvent;
 import org.mangorage.mangobotapi.core.events.LoadEvent;
 import org.mangorage.mangobotapi.core.events.SaveEvent;
 import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
+import org.mangorage.mangobotapi.core.registry.GuildCache;
 import org.mangorage.mangobotapi.core.util.MessageSettings;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 public class BetaTrickCommand implements IBasicCommand {
-
-
     private final CorePlugin plugin;
     private final DataHandler<BetaTrick> TRICK_DATA_HANDLER;
     private final Map<String, Map<String, BetaTrick>> TRICKS = new HashMap<>();
@@ -32,14 +30,47 @@ public class BetaTrickCommand implements IBasicCommand {
         this.plugin = plugin;
         this.TRICK_DATA_HANDLER = DataHandler.create(
                 (data) -> {
-                    if (data.isGuild()) // If its a guild based trick, then goes here...
-                        TRICKS.computeIfAbsent(data.getId(), (k) -> new HashMap<>()).put(data.getTrickID(), data);
+                    TRICKS.computeIfAbsent(data.getGuildID(), (k) -> new HashMap<>()).put(data.getTrickID(), data);
                 },
                 BetaTrick.class,
-                "plugins/%s/data/btricks".formatted(plugin.getId()),
+                "plugins/%s/data/tricksV2".formatted(plugin.getId()),
                 DataHandler.Properties.create()
                         .setFileNamePredicate(e -> true)
         );
+
+        // Migration, Will remove in later update. Doesnt migrate scripts. Dont need to.
+        @Deprecated(forRemoval = true)
+        var TRICK_DATA_HANDLER = DataHandler.create(
+                (data) -> {
+                    if (data.trickType() == TrickCommand.Type.CODE) return;
+                    var settings = data.settings();
+
+                    var newTrick = new BetaTrick(data.trickID(), data.guildID());
+                    if (data.trickType() == TrickCommand.Type.DEFAULT) {
+                        newTrick.setType(TrickType.NORMAL);
+                        newTrick.setContent(data.content());
+                    } else if (data.trickType() == TrickCommand.Type.ALIAS) {
+                        newTrick.setType(TrickType.ALIAS);
+                        newTrick.setAliasTarget(data.content());
+                    }
+
+                    newTrick.setOwnerID(Long.parseLong(data.ownerID()));
+                    newTrick.setSuppress(settings.supressEmbeds());
+                    newTrick.setLastUserEdited(Long.parseLong(data.ownerID()));
+                    newTrick.setLastEdited(System.currentTimeMillis());
+
+
+                    TRICKS.computeIfAbsent(data.guildID(), (k) -> new HashMap<>()).put(data.trickID(), newTrick);
+                    save(newTrick);
+                },
+                TrickCommand.Data.class,
+                "plugins/%s/data/tricks".formatted(plugin.getId()),
+                DataHandler.Properties.create()
+                        .setFileNamePredicate(e -> true)
+        );
+
+        TRICK_DATA_HANDLER.loadAll();
+
         plugin.getPluginBus().addListener(LoadEvent.class, this::onLoadEvent);
         plugin.getPluginBus().addListener(SaveEvent.class, this::onSaveEvent);
         plugin.getPluginBus().addListener(BasicCommandEvent.class, this::onCommandEvent);
@@ -77,22 +108,17 @@ public class BetaTrickCommand implements IBasicCommand {
 
 
     private void delete(BetaTrick trick) {
-        TRICK_DATA_HANDLER.deleteFile("%s.json".formatted(trick.getTrickID()), (trick.isGuild() ? "g-" : "u-") + trick.getId());
+        TRICK_DATA_HANDLER.deleteFile("%s.json".formatted(trick.getTrickID()), trick.getGuildID());
     }
 
     private void save(BetaTrick trick) {
-        TRICK_DATA_HANDLER.save("%s.json".formatted(trick.getTrickID()), trick, (trick.isGuild() ? "g-" : "u-") + trick.getId());
+        TRICK_DATA_HANDLER.save("%s.json".formatted(trick.getTrickID()), trick, trick.getGuildID());
     }
 
-    private boolean exists(String trickID, String id, boolean isGuild) {
-        if (isGuild) {
-            var map = TRICKS.get(id);
-            if (map != null)
-                return map.containsKey(trickID);
-        } else {
-
-        }
-
+    private boolean exists(String trickID, String guildID) {
+        var map = TRICKS.get(guildID);
+        if (map != null)
+            return map.containsKey(trickID);
         return false;
     }
 
@@ -115,26 +141,42 @@ public class BetaTrickCommand implements IBasicCommand {
         // By Default Tricks are for Guilds.
         // Will update for Users...
         if (type == TrickCMDType.ADD) {
-            if (exists(trickID, guildID, true)) {
+            if (exists(trickID, guildID)) {
                 dMessage.apply(message.reply("Trick Already Exists!")).queue();
                 return CommandResult.PASS;
             }
 
-            var trick = new BetaTrick(trickID, guildID, true);
+            var trick = new BetaTrick(trickID, guildID);
             if (args.hasArg("-content")) {
                 trick.setType(TrickType.NORMAL);
                 trick.setSuppress(suppress);
-                trick.setContent(args.getFrom(args.getArgIndex("-content") + 1));
+                var content = args.getFrom(args.getArgIndex("-content") + 1);
+                if (content == null || content.isEmpty()) {
+                    dMessage.apply(message.reply("Content Cannot be null/empty!")).queue();
+                    return CommandResult.PASS;
+                }
+                trick.setContent(content);
             } else if (args.hasArg("-script")) {
                 trick.setType(TrickType.SCRIPT);
                 // Update for CodeBlocks ->
-                trick.setScript(args.getFrom(args.getArgIndex("-script") + 1));
+                var script = args.getFrom(args.getArgIndex("-script") + 1);
+                if (script == null || script.isEmpty()) {
+                    dMessage.apply(message.reply("Script Cannot be null/empty!")).queue();
+                    return CommandResult.PASS;
+                }
+                trick.setScript(script);
             } else if (args.hasArg("-alias")) {
                 // Check if Target is Normal/Scriptable too! Can be added later...
 
                 trick.setType(TrickType.ALIAS);
                 // Update for CodeBlocks ->
-                trick.setAliasTarget(args.getFrom(args.getArgIndex("-alias") + 1));
+                var alias = args.getFrom(args.getArgIndex("-alias") + 1);
+                if (alias == null || alias.isEmpty()) {
+                    dMessage.apply(message.reply("Trick Cannot be null/empty!")).queue();
+                    return CommandResult.PASS;
+                }
+
+                trick.setAliasTarget(alias);
             }
 
             trick.setOwnerID(member.getIdLong());
@@ -147,11 +189,59 @@ public class BetaTrickCommand implements IBasicCommand {
             dMessage.apply(message.reply("Added New Trick %s!".formatted(trickID))).queue();
 
         } else if (type == TrickCMDType.MODIFY) {
+            if (exists(trickID, guildID)) {
+                var trick = TRICKS.get(guildID).get(trickID);
+                if (args.hasArg("-content")) {
+                    trick.setType(TrickType.NORMAL);
+                    trick.setSuppress(suppress);
+                    var content = args.getFrom(args.getArgIndex("-content") + 1);
+                    if (content == null || content.isEmpty()) {
+                        dMessage.apply(message.reply("Content Cannot be null/empty!")).queue();
+                        return CommandResult.PASS;
+                    }
+                    trick.setContent(content);
+                } else if (args.hasArg("-script")) {
+                    trick.setType(TrickType.SCRIPT);
+                    // Update for CodeBlocks ->
+                    var script = args.getFrom(args.getArgIndex("-script") + 1);
+                    if (script == null || script.isEmpty()) {
+                        dMessage.apply(message.reply("Script Cannot be null/empty!")).queue();
+                        return CommandResult.PASS;
+                    }
+                    trick.setScript(script);
+                } else if (args.hasArg("-alias")) {
+                    // Check if Target is Normal/Scriptable too! Can be added later...
 
+                    trick.setType(TrickType.ALIAS);
+                    // Update for CodeBlocks ->
+                    var alias = args.getFrom(args.getArgIndex("-alias") + 1);
+                    if (alias == null || alias.isEmpty()) {
+                        dMessage.apply(message.reply("Trick Cannot be null/empty!")).queue();
+                        return CommandResult.PASS;
+                    }
+
+                    trick.setAliasTarget(alias);
+                }
+
+                trick.setLastUserEdited(member.getIdLong());
+                trick.setLastEdited(System.currentTimeMillis());
+
+                save(trick);
+
+                dMessage.apply(message.reply("Modified Trick %s!".formatted(trickID))).queue();
+                return CommandResult.PASS;
+            } else {
+                dMessage.apply(message.reply("Trick %s does not exist!".formatted(trickID))).queue();
+            }
         } else if (type == TrickCMDType.REMOVE) {
-
+            if (exists(trickID, guildID)) {
+                var trick = TRICKS.get(guildID).get(trickID);
+                delete(trick);
+                TRICKS.get(guildID).remove(trickID);
+                dMessage.apply(message.reply("Removed Trick %s.".formatted(trickID))).queue();
+            }
         } else if (type == TrickCMDType.INFO) {
-            if (!exists(trickID, guildID, true)) {
+            if (!exists(trickID, guildID)) {
                 dMessage.apply(message.reply("Trick %s Doesn't Exist!".formatted(trickID))).queue();
                 return CommandResult.PASS;
             }
@@ -163,9 +253,9 @@ public class BetaTrickCommand implements IBasicCommand {
                     
                     Type -> %s
                     Owner -> <@%s>
+                    Created -> <t:%s:d> <t:%s:T>
                     LastUserEdited -> <@%s>
-                    LastEdited -> %s
-                    isGuild -> %s
+                    LastEdited -> <t:%s:d> <t:%s:T>
                     isLocked -> %s
                     isSuppressed -> %s
                     Times Used -> %s
@@ -175,9 +265,11 @@ public class BetaTrickCommand implements IBasicCommand {
                             trick.getTrickID(),
                             trick.getType(),
                             trick.getOwnerID(),
+                            trick.getCreated(),
+                            trick.getCreated(),
                             trick.getLastUserEdited(),
-                            convertMillisecondsToDate(trick.getLastEdited()),
-                            trick.isGuild(),
+                            trick.getLastEdited(),
+                            trick.getLastEdited(),
                             trick.isLocked(),
                             trick.isSuppressed(),
                             trick.getTimesUsed()
@@ -195,26 +287,13 @@ public class BetaTrickCommand implements IBasicCommand {
             dMessage.apply(message.reply(details)).setSuppressedNotifications(true).queue();
 
         } else if (type == TrickCMDType.SHOW) {
-            if (!exists(trickID, guildID, true)) {
+            if (!exists(trickID, guildID)) {
                 dMessage.apply(message.reply("Trick %s Doesn't Exist!".formatted(trickID))).queue();
                 return CommandResult.PASS;
             }
 
             var trick = TRICKS.get(guildID).get(trickID);
-            var trickType = trick.getType();
-            if (trickType == TrickType.NORMAL) {
-                MessageChannelUnion channel = message.getChannel();
-
-                channel.sendMessage(trick.getContent()).setSuppressedNotifications(trick.isSuppressed()).queue();
-                trick.use();
-                save(trick);
-
-            } else if (trickType == TrickType.ALIAS) {
-
-            } else if (trickType == TrickType.SCRIPT) {
-                // WIP
-                dMessage.apply(message.reply("Scriptable Tricks are not yet added!")).queue();
-            }
+            useTrick(trick, message, message.getChannel(), guildID);
         }
 
         /*
@@ -225,7 +304,7 @@ public class BetaTrickCommand implements IBasicCommand {
         !trick -e trickID -suppress -content Hello There!
         !trick -e trickID -script msg.reply(''Hello!');
         !trick -e trickID -alias targetID
-
+`
         !trick -a trickID -suppress -content Hello There!
         !trick -a trickID -alias targetID
         !trick -a trickID -script msg.reply(''Hello!');
@@ -235,15 +314,21 @@ public class BetaTrickCommand implements IBasicCommand {
         return CommandResult.PASS;
     }
 
-    public String convertMillisecondsToDate(long milliseconds) {
-        // Create a Date object using milliseconds
-        Date date = new Date(milliseconds);
-
-        // Create a SimpleDateFormat object to format the date
-        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-
-        // Format the date
-        return sdf.format(date);
+    private void useTrick(BetaTrick trick, Message message, MessageChannel channel, String guiildID) {
+        MessageSettings dMessage = plugin.getMessageSettings();
+        var type = trick.getType();
+        if (type == TrickType.NORMAL) {
+            channel.sendMessage(trick.getContent()).setSuppressedNotifications(trick.isSuppressed()).queue();
+            trick.use();
+            save(trick);
+        } else if (type == TrickType.ALIAS) {
+            if (exists(trick.getAliasTarget(), guiildID)) {
+                var alias = TRICKS.get(guiildID).get(trick.getAliasTarget());
+                useTrick(alias, message, channel, guiildID);
+            }
+        } else if (type == TrickType.SCRIPT) {
+            dMessage.apply(message.reply("Scriptable Tricks currently disabled...")).queue();
+        }
     }
 
     @Override
