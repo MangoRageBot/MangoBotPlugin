@@ -3,8 +3,13 @@ package org.mangorage.mangobot.modules.tricks;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import org.mangorage.basicutils.LogHelper;
+import org.mangorage.basicutils.TaskScheduler;
+import org.mangorage.basicutils.misc.PagedList;
+import org.mangorage.basicutils.misc.RunnableTask;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
 import org.mangorage.mangobotapi.core.commands.IBasicCommand;
@@ -12,16 +17,21 @@ import org.mangorage.mangobotapi.core.data.DataHandler;
 import org.mangorage.mangobotapi.core.events.BasicCommandEvent;
 import org.mangorage.mangobotapi.core.events.LoadEvent;
 import org.mangorage.mangobotapi.core.events.SaveEvent;
+import org.mangorage.mangobotapi.core.events.discord.DButtonInteractionEvent;
 import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
 import org.mangorage.mangobotapi.core.util.MessageSettings;
+
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 public class TrickCommand implements IBasicCommand {
     private final CorePlugin plugin;
     private final DataHandler<Trick> TRICK_DATA_HANDLER;
     private final Map<String, Map<String, Trick>> TRICKS = new HashMap<>();
-
+    private final Map<String, PagedList<String>> PAGES = new ConcurrentHashMap<>();
 
     public TrickCommand(CorePlugin plugin) {
         this.plugin = plugin;
@@ -38,6 +48,7 @@ public class TrickCommand implements IBasicCommand {
         plugin.getPluginBus().addListener(LoadEvent.class, this::onLoadEvent);
         plugin.getPluginBus().addListener(SaveEvent.class, this::onSaveEvent);
         plugin.getPluginBus().addListener(BasicCommandEvent.class, this::onCommandEvent);
+        plugin.getPluginBus().addListener(DButtonInteractionEvent.class, this::onButton);
     }
 
 
@@ -86,6 +97,11 @@ public class TrickCommand implements IBasicCommand {
         return false;
     }
 
+    private boolean isOwnerAndUnlocked(Trick trick, Member member) {
+        if (!trick.isLocked()) return true;
+        return trick.getOwnerID() == member.getIdLong();
+    }
+
     @NotNull
     @Override
     public CommandResult execute(Message message, Arguments args) {
@@ -101,12 +117,15 @@ public class TrickCommand implements IBasicCommand {
             trickID = trickID.toLowerCase();
         boolean suppress = args.hasArg("-suppress");
 
+        if (type == TrickCMDType.NONE) {
+            return CommandResult.PASS;
+        }
 
         // By Default Tricks are for Guilds.
         // Will update for Users...
         if (type == TrickCMDType.ADD) {
             if (exists(trickID, guildID)) {
-                dMessage.apply(message.reply("Trick Already Exists!")).queue();
+                dMessage.apply(message.reply("Trick '%s' Already Exists!".formatted(trickID))).queue();
                 return CommandResult.PASS;
             }
 
@@ -150,11 +169,17 @@ public class TrickCommand implements IBasicCommand {
             TRICKS.computeIfAbsent(guildID, (k) -> new HashMap<>()).put(trickID, trick);
             save(trick);
 
-            dMessage.apply(message.reply("Added New Trick %s!".formatted(trickID))).queue();
+            dMessage.apply(message.reply("Added New Trick '%s'!".formatted(trickID))).queue();
 
         } else if (type == TrickCMDType.MODIFY) {
             if (exists(trickID, guildID)) {
                 var trick = TRICKS.get(guildID).get(trickID);
+
+                if (!isOwnerAndUnlocked(trick, member)) {
+                    dMessage.apply(message.reply("Cannot modify/remove Trick '%s' as your not the owner of this trick and its locked.")).queue();
+                    return CommandResult.PASS;
+                }
+
                 if (args.hasArg("-content")) {
                     trick.setType(TrickType.NORMAL);
                     trick.setSuppress(suppress);
@@ -195,18 +220,24 @@ public class TrickCommand implements IBasicCommand {
                 dMessage.apply(message.reply("Modified Trick %s!".formatted(trickID))).queue();
                 return CommandResult.PASS;
             } else {
-                dMessage.apply(message.reply("Trick %s does not exist!".formatted(trickID))).queue();
+                dMessage.apply(message.reply("Trick '%s' does not exist!".formatted(trickID))).queue();
             }
         } else if (type == TrickCMDType.REMOVE) {
             if (exists(trickID, guildID)) {
                 var trick = TRICKS.get(guildID).get(trickID);
+
+                if (!isOwnerAndUnlocked(trick, member)) {
+                    dMessage.apply(message.reply("Cannot modify/remove Trick '%s' as your not the owner of this trick and its locked.")).queue();
+                    return CommandResult.PASS;
+                }
+
                 delete(trick);
                 TRICKS.get(guildID).remove(trickID);
                 dMessage.apply(message.reply("Removed Trick %s.".formatted(trickID))).queue();
             }
         } else if (type == TrickCMDType.INFO) {
             if (!exists(trickID, guildID)) {
-                dMessage.apply(message.reply("Trick %s Doesn't Exist!".formatted(trickID))).queue();
+                dMessage.apply(message.reply("Trick '%s' does not exist!".formatted(trickID))).queue();
                 return CommandResult.PASS;
             }
 
@@ -252,18 +283,60 @@ public class TrickCommand implements IBasicCommand {
 
         } else if (type == TrickCMDType.SHOW) {
             if (!exists(trickID, guildID)) {
-                dMessage.apply(message.reply("Trick %s Doesn't Exist!".formatted(trickID))).queue();
+                dMessage.apply(message.reply("Trick '%s' does not exist!".formatted(trickID))).queue();
                 return CommandResult.PASS;
             }
 
             var trick = TRICKS.get(guildID).get(trickID);
             useTrick(trick, message, message.getChannel(), guildID);
+        } else if (type == TrickCMDType.LIST) {
+            int length;
+            try {
+                length = Integer.parseInt(trickID);
+            } catch (NumberFormatException e) {
+                length = 5;
+            }
+
+            MessageChannelUnion channel = message.getChannel();
+            if (TRICKS.containsKey(guildID) && !TRICKS.get(guildID).isEmpty()) {
+
+                PagedList<String> tricks = createTricks(guildID, length);
+
+                channel.sendMessage("""
+                        Getting Tricks List... 
+                        """).queue((m -> {
+                            PAGES.put(m.getId(), tricks);
+                            TaskScheduler.getExecutor().schedule(new RunnableTask<>(m, (d) -> removeTricksList(d.get())), 10, TimeUnit.MINUTES);
+                            updateTrickListMessage(tricks, m, true);
+                        })
+                );
+            }
+            return CommandResult.PASS;
+        } else if (type == TrickCMDType.LOCK) {
+            if (!exists(trickID, guildID)) {
+                dMessage.apply(message.reply("Trick '%s' does not exist!".formatted(trickID)));
+                return CommandResult.PASS;
+            }
+
+            var trick = TRICKS.get(guildID).get(trickID);
+            if (trick.getOwnerID() == member.getIdLong()) {
+                dMessage.apply(
+                        message.reply((trick.isLocked() ? "Unlocked" : "Locked") + " Trick '%s'".formatted(trickID))
+                ).queue();
+                trick.setLock(!trick.isLocked());
+                save(trick);
+            } else {
+                dMessage.apply(message.reply("Can only lock/unlock your own Tricks!")).queue();
+            }
+        } else if (type == TrickCMDType.TRANSFER) {
+            // TODO: Add transfer ability...
         }
 
         /*
         !trick -s trickID
         !trick -r trickID
         !trick -i trickID
+        !trick -l <10>
 
         !trick -e trickID -suppress -content Hello There!
         !trick -e trickID -script msg.reply(''Hello!');
@@ -298,5 +371,89 @@ public class TrickCommand implements IBasicCommand {
     @Override
     public String commandId() {
         return "trick";
+    }
+
+    @Override
+    public String usage() {
+        return """
+                ## `!tricks`
+                `-a` to add, `-e` to edit, `-s` to view source, `-r` to remove, `-l` to list.
+                - To run a trick, use its ID as if it were another command. E.g.: `!drivers`
+                - When adding or editing, you can optionally add the `-supress` arg to supress embeds in your trick's links.
+                - When listing tricks, you can optionally specify how many you want per page.
+                                
+                Examples:
+                `!tricks -a exampletrick -content this is an example trick`
+                `!tricks -e exampletrick -supress -content editing the trick. https://bing.com`
+                `!exampletrick`
+                `!tricks -s exampletrick`
+                `!tricks -r exampletrick`
+                `!tricks -l 10`
+                """;
+    }
+
+    private void removeTricksList(Message message) {
+        if (PAGES.containsKey(message.getId())) {
+            message.editMessage(createTricksString(PAGES.get(message.getId()))).setComponents().queue();
+            PAGES.remove(message.getId());
+        }
+    }
+
+    private void updateTrickListMessage(PagedList<String> tricks, Message message, boolean addButtons, String buttonID) {
+        switch (buttonID) {
+            case "next" -> tricks.next();
+            case "prev" -> tricks.previous();
+        }
+
+        String result = createTricksString(tricks);
+
+        if (addButtons) {
+            // Add buttons!
+            Button prev = Button.primary("prev".formatted(message.getId()), "previous");
+            Button next = Button.primary("next".formatted(message.getId()), "next");
+
+            message.editMessage(result).setActionRow(prev, next).queue();
+        } else {
+            message.editMessage(result).queue();
+        }
+    }
+
+    private void updateTrickListMessage(PagedList<String> tricks, Message message, boolean addButtons) {
+        updateTrickListMessage(tricks, message, addButtons, "");
+    }
+
+    private String createTricksString(PagedList<String> tricks) {
+        String result = "List of Tricks (%s / %s) \r".formatted(tricks.getPage(), tricks.totalPages());
+
+        PagedList.Page<String> entries = tricks.current();
+
+        int i = 0;
+        for (String entry : entries.getEntries()) {
+            i++;
+            result = result + "%s: %s \r".formatted(i, entry);
+        }
+
+        return result;
+    }
+
+    private PagedList<String> createTricks(String guildID, int entries) {
+        PagedList<String> tricks = new PagedList<>();
+
+        Object[] LIST = TRICKS.get(guildID).keySet().toArray();
+        tricks.rebuild(Arrays.copyOf(LIST, LIST.length, String[].class), entries);
+
+        return tricks;
+    }
+
+    public void onButton(DButtonInteractionEvent event) {
+        var interaction = event.get();
+
+        Message message = interaction.getMessage();
+        String ID = message.getId();
+
+        if (PAGES.containsKey(ID)) {
+            updateTrickListMessage(PAGES.get(ID), message, false, interaction.getButton().getId());
+            interaction.getInteraction().deferEdit().queue();
+        }
     }
 }

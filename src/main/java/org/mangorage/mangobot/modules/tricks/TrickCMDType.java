@@ -1,25 +1,32 @@
 package org.mangorage.mangobot.modules.tricks;
 
 public enum TrickCMDType {
-    ADD,
-    REMOVE,
-    MODIFY,
-    SHOW,
-    INFO,
-    NONE;
+    ADD("-a", "-add"),
+    REMOVE("-r", "-remove"),
+    MODIFY("-m", "-e", "-modify", "-edit"),
+    SHOW("-s", "-show"),
+    INFO("-i", "-info"),
+    LIST("-l", "-list"),
+    TRANSFER("-t", "-transfer"),
+    LOCK("-lock"),
+    NONE();
+
+    private String[] strings;
+
+    TrickCMDType(String... strings) {
+        this.strings = strings;
+    }
 
     public static TrickCMDType getType(String s) {
-        if (s.contains("-a"))
-            return ADD;
-        if (s.contains("-r"))
-            return REMOVE;
-        if (s.contains("-e"))
-            return MODIFY;
-        if (s.contains("-s"))
-            return SHOW;
-        if (s.contains("-i"))
-            return INFO;
+        for (var type : TrickCMDType.values())
+            for (var str : type.getStrings())
+                if (s.contains(str))
+                    return type;
 
         return NONE;
+    }
+
+    private String[] getStrings() {
+        return strings;
     }
 }
