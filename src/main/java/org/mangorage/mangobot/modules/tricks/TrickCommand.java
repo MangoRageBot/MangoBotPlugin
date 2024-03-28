@@ -5,6 +5,8 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.MarkdownSanitizer;
+import net.dv8tion.jda.api.utils.MarkdownUtil;
 import org.jetbrains.annotations.NotNull;
 import org.mangorage.basicutils.LogHelper;
 import org.mangorage.basicutils.TaskScheduler;
@@ -28,13 +30,16 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 public class TrickCommand implements IBasicCommand {
+    private static final boolean ALLOW_SCRIPT_TRICKS = true;
     private final CorePlugin plugin;
     private final DataHandler<Trick> TRICK_DATA_HANDLER;
     private final Map<String, Map<String, Trick>> TRICKS = new HashMap<>();
     private final Map<String, PagedList<String>> PAGES = new ConcurrentHashMap<>();
+    private TrickScriptable SCRIPT_RUNNER;
 
     public TrickCommand(CorePlugin plugin) {
         this.plugin = plugin;
+        this.SCRIPT_RUNNER = new TrickScriptable(plugin);
         this.TRICK_DATA_HANDLER = DataHandler.create(
                 (data) -> {
                     TRICKS.computeIfAbsent(data.getGuildID(), (k) -> new HashMap<>()).put(data.getTrickID(), data);
@@ -176,7 +181,7 @@ public class TrickCommand implements IBasicCommand {
                 var trick = TRICKS.get(guildID).get(trickID);
 
                 if (!isOwnerAndUnlocked(trick, member)) {
-                    dMessage.apply(message.reply("Cannot modify/remove Trick '%s' as your not the owner of this trick and its locked.")).queue();
+                    dMessage.apply(message.reply("Cannot modify/remove Trick '%s' as your not the owner of this trick and its locked.".formatted(trickID))).queue();
                     return CommandResult.PASS;
                 }
 
@@ -227,7 +232,7 @@ public class TrickCommand implements IBasicCommand {
                 var trick = TRICKS.get(guildID).get(trickID);
 
                 if (!isOwnerAndUnlocked(trick, member)) {
-                    dMessage.apply(message.reply("Cannot modify/remove Trick '%s' as your not the owner of this trick and its locked.")).queue();
+                    dMessage.apply(message.reply("Cannot modify/remove Trick '%s' as your not the owner of this trick and its locked.".formatted(trickID))).queue();
                     return CommandResult.PASS;
                 }
 
@@ -364,7 +369,18 @@ public class TrickCommand implements IBasicCommand {
                 useTrick(alias, message, channel, guildID);
             }
         } else if (type == TrickType.SCRIPT) {
-            dMessage.apply(message.reply("Scriptable Tricks currently disabled...")).queue();
+            if (!ALLOW_SCRIPT_TRICKS) {
+                dMessage.apply(message.reply("Scriptable Tricks currently disabled...")).queue();
+            } else {
+                // Execute code
+                var script = MarkdownSanitizer.sanitize(trick.getScript());
+                SCRIPT_RUNNER.execute(
+                        script,
+                        message,
+                        channel,
+                        new String[]{}
+                );
+            }
         }
     }
 

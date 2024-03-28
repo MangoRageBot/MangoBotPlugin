@@ -20,7 +20,7 @@ public enum TrickCMDType {
     public static TrickCMDType getType(String s) {
         for (var type : TrickCMDType.values())
             for (var str : type.getStrings())
-                if (s.contains(str))
+                if (s.equals(str))
                     return type;
 
         return NONE;

@@ -23,6 +23,7 @@
 package org.mangorage.mangobot.modules.tricks;
 
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LoadState;
 import org.luaj.vm2.LuaTable;
@@ -32,8 +33,8 @@ import org.luaj.vm2.lib.PackageLib;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.luaj.vm2.lib.jse.JseBaseLib;
 import org.luaj.vm2.lib.jse.JseMathLib;
-import org.mangorage.mangobot.modules.tricks.lua.JDALib;
-import org.mangorage.mangobot.modules.tricks.lua.JDAMessageLib;
+import org.mangorage.mangobot.modules.tricks.lua.LuaActions;
+import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -44,16 +45,19 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 public class TrickScriptable {
-    public static Globals sandBoxedGlobals(Message message) {
+    private final CorePlugin plugin;
+
+    public TrickScriptable(CorePlugin plugin) {
+        this.plugin = plugin;
+    }
+
+
+    public Globals sandBoxedGlobals() {
         Globals server_globals = new Globals();
 
         server_globals.load(new JseBaseLib());
         server_globals.load(new PackageLib());
         server_globals.load(new JseMathLib());
-
-        LuaValue sandbox = new LuaTable();
-        sandbox.set("JDALib", CoerceJavaToLua.coerce(new JDALib(message.getJDA())));
-        sandbox.set("JDAMessage", CoerceJavaToLua.coerce(new JDAMessageLib(message)));
 
 
         LoadState.install(server_globals);
@@ -68,19 +72,17 @@ public class TrickScriptable {
         for (String library : array)
             NILLIFY.accept(library);
 
-        server_globals.set("api", sandbox);
-
         return server_globals;
     }
 
-    public static void execute(String script, Message message, String[] args) {
+    public void execute(String script, Message message, MessageChannel messageChannel, String[] args) {
         // Create a ScheduledExecutorService
         ScheduledExecutorService executor = Executors.newScheduledThreadPool(2);
         AtomicReference<ScheduledFuture<?>> TASK = new AtomicReference<>();
 
         // Define the task you want to execute
 
-        Globals globals = sandBoxedGlobals(message);
+        Globals globals = sandBoxedGlobals();
         LuaValue code = globals.load(script);
 
         Runnable task = () -> {
@@ -93,7 +95,9 @@ public class TrickScriptable {
                     arr.set(i + 1, LuaValue.valueOf(args[i]));
 
                 if (!method.isnil()) {
-                    method.call(arr);
+                    method.call(
+                            CoerceJavaToLua.coerce(new LuaActions(plugin, message, messageChannel))
+                    );
                 }
                 if (TASK.get() != null) {
                     var a = TASK.get();
@@ -117,7 +121,7 @@ public class TrickScriptable {
             if (future.isDone() || future.isCancelled()) return;
             message.reply("Trick took to long to run. Stopping Trick...").mentionRepliedUser(false).queue();
             future.cancel(true);
-        }, 25, TimeUnit.MILLISECONDS));
+        }, 1000, TimeUnit.MILLISECONDS));
 
         // Shutdown the executor
         executor.shutdown();

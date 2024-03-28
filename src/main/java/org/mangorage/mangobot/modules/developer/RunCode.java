@@ -44,7 +44,7 @@ public class RunCode implements IBasicCommand {
         }
         String script = args.getFrom(0);
         System.out.println(script);
-        TrickScriptable.execute(script, message, new String[]{"Arg"});
+
         return CommandResult.PASS;
     }
 
