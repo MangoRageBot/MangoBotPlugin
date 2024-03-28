@@ -34,6 +34,7 @@ import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.luaj.vm2.lib.jse.JseBaseLib;
 import org.luaj.vm2.lib.jse.JseMathLib;
 import org.mangorage.mangobot.modules.tricks.lua.LuaActions;
+import org.mangorage.mangobot.modules.tricks.lua.LuaPrimitiveStringArray;
 import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
 
 import java.util.concurrent.Executors;
@@ -96,7 +97,8 @@ public class TrickScriptable {
 
                 if (!method.isnil()) {
                     method.call(
-                            CoerceJavaToLua.coerce(new LuaActions(plugin, message, messageChannel))
+                            CoerceJavaToLua.coerce(new LuaActions(plugin, message, messageChannel)),
+                            CoerceJavaToLua.coerce(new LuaPrimitiveStringArray(args))
                     );
                 }
                 if (TASK.get() != null) {

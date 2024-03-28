@@ -293,12 +293,17 @@ public class TrickCommand implements IBasicCommand {
             }
 
             var trick = TRICKS.get(guildID).get(trickID);
-            useTrick(trick, message, message.getChannel(), guildID);
+            useTrick(trick, message, message.getChannel(), guildID, args);
         } else if (type == TrickCMDType.LIST) {
             int length;
-            try {
-                length = Integer.parseInt(trickID);
-            } catch (NumberFormatException e) {
+
+            if (trickID != null) {
+                try {
+                    length = Integer.parseInt(trickID);
+                } catch (NumberFormatException e) {
+                    length = 5;
+                }
+            } else {
                 length = 5;
             }
 
@@ -356,7 +361,7 @@ public class TrickCommand implements IBasicCommand {
         return CommandResult.PASS;
     }
 
-    private void useTrick(Trick trick, Message message, MessageChannel channel, String guildID) {
+    private void useTrick(Trick trick, Message message, MessageChannel channel, String guildID, Arguments args) {
         MessageSettings dMessage = plugin.getMessageSettings();
         var type = trick.getType();
         if (type == TrickType.NORMAL) {
@@ -366,7 +371,7 @@ public class TrickCommand implements IBasicCommand {
         } else if (type == TrickType.ALIAS) {
             if (exists(trick.getAliasTarget(), guildID)) {
                 var alias = TRICKS.get(guildID).get(trick.getAliasTarget());
-                useTrick(alias, message, channel, guildID);
+                useTrick(alias, message, channel, guildID, args);
             }
         } else if (type == TrickType.SCRIPT) {
             if (!ALLOW_SCRIPT_TRICKS) {
@@ -378,7 +383,7 @@ public class TrickCommand implements IBasicCommand {
                         script,
                         message,
                         channel,
-                        new String[]{}
+                        args.getArgs().length > 1 ? args.getFrom(2).split(" ") : new String[]{}
                 );
             }
         }
