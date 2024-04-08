@@ -23,8 +23,6 @@
 package org.mangorage.mangobot.core;
 
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -34,7 +32,6 @@ import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandPrefix;
 import org.mangorage.mangobotapi.core.events.BasicCommandEvent;
 import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
-
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
@@ -46,7 +43,6 @@ import java.time.temporal.TemporalAccessor;
 public class Util {
 
     private static final boolean verbose = false;
-    private static final Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 
     public static TemporalAccessor getTimestamp(ISnowflake iSnowflake) {
         return TimeUtil.getTimeCreated(iSnowflake);
@@ -55,7 +51,7 @@ public class Util {
 
     public static boolean handleMessage(CorePlugin plugin, MessageReceivedEvent event) {
         // Handle Message and prefix
-        String Prefix = event.isFromGuild() ? CommandPrefix.getPrefix(event.getGuild().getId()) : "!";
+        String Prefix = event.isFromGuild() ? CommandPrefix.getPrefix(event.getGuild().getId()) : plugin.getCommandPrefix();
 
         Message message = event.getMessage();
         String rawMessage = message.getContentRaw();

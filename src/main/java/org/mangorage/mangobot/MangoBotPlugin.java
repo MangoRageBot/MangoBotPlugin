@@ -37,6 +37,7 @@ import java.util.Scanner;
 import org.mangorage.basicutils.config.Config;
 import org.mangorage.basicutils.config.ConfigSetting;
 import org.mangorage.basicutils.config.ISetting;
+import org.mangorage.jdautils.command.Command;
 import org.mangorage.mangobot.config.GuildConfig;
 import org.mangorage.mangobot.core.BotEventListener;
 import org.mangorage.mangobot.core.BotPermissions;
@@ -50,6 +51,7 @@ import org.mangorage.mangobot.modules.basic.commands.PermissionCommand;
 import org.mangorage.mangobot.modules.basic.commands.PingCommand;
 import org.mangorage.mangobot.modules.basic.commands.PrefixCommand;
 import org.mangorage.mangobot.modules.basic.commands.VersionCommand;
+import org.mangorage.mangobot.modules.developer.ServerAuthorizer;
 import org.mangorage.mangobot.modules.tricks.TrickCommand;
 import org.mangorage.mangobot.modules.developer.EchoCommand;
 import org.mangorage.mangobot.modules.developer.KickBotCommand;
@@ -159,7 +161,7 @@ public class MangoBotPlugin extends CorePlugin {
                         .build()
         );
 
-        // translate.register();
+        new ServerAuthorizer(this);
 
         getJDA().addEventListener(new BotEventListener(this));
     }
@@ -257,7 +259,10 @@ public class MangoBotPlugin extends CorePlugin {
     @Override
     public void finished() {
         getPluginBus().post(new LoadEvent());
-        getCommandRegistry().registerSlashCommands();
+        getJDA()
+                .updateCommands()
+                .addCommands(Command.globalCommands)
+                .queue();
     }
 
     @Override
@@ -269,6 +274,11 @@ public class MangoBotPlugin extends CorePlugin {
     @Override
     public void shutdownPost() {
 
+    }
+
+    @Override
+    public String getCommandPrefix() {
+        return "mb?";
     }
 
     public static String getToken() {

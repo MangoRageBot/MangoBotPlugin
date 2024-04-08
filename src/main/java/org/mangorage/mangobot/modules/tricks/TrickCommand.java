@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.MarkdownSanitizer;
 import net.dv8tion.jda.api.utils.MarkdownUtil;
@@ -12,6 +13,8 @@ import org.mangorage.basicutils.LogHelper;
 import org.mangorage.basicutils.TaskScheduler;
 import org.mangorage.basicutils.misc.PagedList;
 import org.mangorage.basicutils.misc.RunnableTask;
+import org.mangorage.jdautils.command.Command;
+import org.mangorage.jdautils.command.CommandOption;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
 import org.mangorage.mangobotapi.core.commands.IBasicCommand;
@@ -28,6 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 public class TrickCommand implements IBasicCommand {
     private static final boolean ALLOW_SCRIPT_TRICKS = true;
@@ -54,6 +58,33 @@ public class TrickCommand implements IBasicCommand {
         plugin.getPluginBus().addListener(SaveEvent.class, this::onSaveEvent);
         plugin.getPluginBus().addListener(BasicCommandEvent.class, this::onCommandEvent);
         plugin.getPluginBus().addListener(DButtonInteractionEvent.class, this::onButton);
+
+        Command.slash("trick", "Displays a Trick!")
+                .addSubCommand("execute", "execute a trick")
+                    .executes(e -> {
+                        e.reply("Trick Executed! " + e.getInteraction().getOption("name")).queue();
+                    })
+                    .addOption(
+                            new CommandOption(OptionType.STRING, "name", "desc", false, true)
+                                    .onAutoComplete(e -> {
+                                        var guild = e.getGuild();
+                                        if (guild != null) {
+                                            var id = guild.getId();
+                                            var entries = TRICKS.get(id);
+                                            if (entries != null) {
+                                                e.replyChoiceStrings(
+                                                        entries.entrySet().stream()
+                                                                .filter(k -> k.getValue().getType() == TrickType.NORMAL)
+                                                                .map(Map.Entry::getKey)
+                                                                .limit(25)
+                                                                .toList()
+                                                ).queue();
+                                            }
+                                        }
+                                    })
+                    )
+                    .build()
+                .buildAndRegister();
     }
 
 

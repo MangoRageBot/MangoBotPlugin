@@ -35,6 +35,7 @@ import net.dv8tion.jda.api.events.session.SessionDisconnectEvent;
 import net.dv8tion.jda.api.events.session.SessionResumeEvent;
 import net.dv8tion.jda.api.hooks.SubscribeEvent;
 import org.mangorage.basicutils.LogHelper;
+import org.mangorage.jdautils.WatcherManager;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.events.SlashCommandEvent;
 import org.mangorage.mangobotapi.core.events.discord.DButtonInteractionEvent;
@@ -69,12 +70,12 @@ public class BotEventListener {
 
     @SubscribeEvent
     public void onSlashCommand(SlashCommandInteractionEvent event) {
-        plugin.getCommandRegistry().postSlashCommand(new SlashCommandEvent(event, event.getName(), Arguments.empty()));
+        WatcherManager.onCommandEvent(event);
     }
 
     @SubscribeEvent
     public void onSlashAuto(CommandAutoCompleteInteractionEvent event) {
-        plugin.getCommandRegistry().postAutoCompleteEvent(event);
+        WatcherManager.onCommandAutoCompleteEvent(event);
     }
 
     @SubscribeEvent

@@ -30,6 +30,10 @@ import org.mangorage.mangobotapi.core.commands.IBasicCommand;
 import org.mangorage.mangobotapi.core.data.DataHandler;
 import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class VersionCommand implements IBasicCommand {
@@ -50,9 +54,24 @@ public class VersionCommand implements IBasicCommand {
         VERSION_DATA_HANDLER.loadAll();
     }
 
+    public static String findVersion(String key, String filePath) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split("=");
+                if (parts.length == 2 && parts[0].trim().equals(key)) {
+                    return parts[1].trim();
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "Undefined Version"; // Key not found or file error occurred
+    }
+
     public static String getVersion() {
         if (VERSION.get() == null)
-            VERSION.set(new Version("Undefined Version"));
+            VERSION.set(new Version(findVersion("mangobotplugin.jar", "installer/installed.txt")));
         return VERSION.get().version();
     }
 
