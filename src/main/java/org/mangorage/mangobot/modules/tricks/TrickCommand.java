@@ -16,6 +16,7 @@ import org.mangorage.basicutils.misc.RunnableTask;
 import org.mangorage.jdautils.command.Command;
 import org.mangorage.jdautils.command.CommandOption;
 import org.mangorage.mangobotapi.core.commands.Arguments;
+import org.mangorage.mangobotapi.core.commands.CommandAlias;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
 import org.mangorage.mangobotapi.core.commands.IBasicCommand;
 import org.mangorage.mangobotapi.core.data.DataHandler;
@@ -28,6 +29,7 @@ import org.mangorage.mangobotapi.core.util.MessageSettings;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -426,6 +428,11 @@ public class TrickCommand implements IBasicCommand {
     }
 
     @Override
+    public List<String> commandAliases() {
+        return CommandAlias.create(this, "tricks", "tr");
+    }
+
+    @Override
     public String usage() {
         return """
                 ## `!tricks`
@@ -433,13 +440,28 @@ public class TrickCommand implements IBasicCommand {
                 - To run a trick, use its ID as if it were another command. E.g.: `!drivers`
                 - When adding or editing, you can optionally add the `-supress` arg to supress embeds in your trick's links.
                 - When listing tricks, you can optionally specify how many you want per page.
-                                
-                Examples:
+               
+               
+                ## Examples:
+                
+                ## How to add tricks: 
                 `!tricks -a exampletrick -content this is an example trick`
+                '!tricks -a exampletrickalias -alias exampletrick'
+                
+                ## How to modify tricks:
                 `!tricks -e exampletrick -supress -content editing the trick. https://bing.com`
-                `!exampletrick`
+                '!tricks -e exampletrickalias -alias exampletrick'
+                
+                ## How to lock/unlock a trick:
+                '!tricks -lock exampletrick' // Do it again to unlock
+               
+                ## How to show tricks:
                 `!tricks -s exampletrick`
+                
+                ## How to remove tricks:
                 `!tricks -r exampletrick`
+                
+                ## How to show a list of tricks:
                 `!tricks -l 10`
                 """;
     }

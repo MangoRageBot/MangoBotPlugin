@@ -148,7 +148,7 @@ public class MangoBotPlugin extends CorePlugin {
                                 Activity.of(
                                         Activity.ActivityType.CUSTOM_STATUS,
                                         """
-                                                    MangoBot is on version %s"
+                                                    MangoBot is on version %s
                                                 """.formatted(VersionCommand.getVersion()),
                                         "https://www.discord.minecraftforge.net/"
                                 )
