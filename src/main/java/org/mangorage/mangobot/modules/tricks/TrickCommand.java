@@ -446,14 +446,14 @@ public class TrickCommand implements IBasicCommand {
                 
                 ## How to add tricks: 
                 `!tricks -a exampletrick -content this is an example trick`
-                '!tricks -a exampletrickalias -alias exampletrick'
+                `!tricks -a exampletrickalias -alias exampletrick`
                 
                 ## How to modify tricks:
                 `!tricks -e exampletrick -supress -content editing the trick. https://bing.com`
-                '!tricks -e exampletrickalias -alias exampletrick'
+                `!tricks -e exampletrickalias -alias exampletrick`
                 
                 ## How to lock/unlock a trick:
-                '!tricks -lock exampletrick' // Do it again to unlock
+                `!tricks -lock exampletrick` // Do it again to unlock
                
                 ## How to show tricks:
                 `!tricks -s exampletrick`
