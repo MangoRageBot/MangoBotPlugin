@@ -64,7 +64,23 @@ public class TrickCommand implements IBasicCommand {
         Command.slash("trick", "Displays a Trick!")
                 .addSubCommand("execute", "execute a trick")
                     .executes(e -> {
-                        e.reply("Trick Executed! " + e.getInteraction().getOption("name")).queue();
+                        var valueOption = e.getInteraction().getOption("name");
+                        if (valueOption != null) {
+                            var g = e.getGuild();
+                            if (g != null) {
+                                var gid = g.getId();
+                                var gTricks = TRICKS.get(gid);
+                                if (gTricks != null) {
+                                    var trick = gTricks.get(valueOption.getAsString());
+                                    if (trick != null) {
+                                        useTrick(trick, null, e.getChannel(), gid, Arguments.of());
+                                        e.reply("Executed Trick!").setEphemeral(true).queue();
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                        e.reply("Failed to execute trick!").setEphemeral(true).queue();
                     })
                     .addOption(
                             new CommandOption(OptionType.STRING, "name", "desc", false, true)
@@ -136,7 +152,8 @@ public class TrickCommand implements IBasicCommand {
     }
 
     private boolean isOwnerAndUnlocked(Trick trick, Member member) {
-        if (!trick.isLocked()) return true;
+        if (!trick.isLocked())
+            return true;
         return trick.getOwnerID() == member.getIdLong();
     }
 
@@ -404,13 +421,16 @@ public class TrickCommand implements IBasicCommand {
         } else if (type == TrickType.ALIAS) {
             if (exists(trick.getAliasTarget(), guildID)) {
                 var alias = TRICKS.get(guildID).get(trick.getAliasTarget());
+                trick.use();
                 useTrick(alias, message, channel, guildID, args);
             }
-        } else if (type == TrickType.SCRIPT) {
+            // Cannot use Scripts with slash commands
+        } else if (type == TrickType.SCRIPT && message != null) {
             if (!ALLOW_SCRIPT_TRICKS) {
                 dMessage.apply(message.reply("Scriptable Tricks currently disabled...")).queue();
             } else {
                 // Execute code
+                trick.use();
                 var script = MarkdownSanitizer.sanitize(trick.getScript());
                 SCRIPT_RUNNER.execute(
                         script,
