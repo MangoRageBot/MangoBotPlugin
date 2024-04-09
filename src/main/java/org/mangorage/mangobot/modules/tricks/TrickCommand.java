@@ -469,7 +469,7 @@ public class TrickCommand implements IBasicCommand {
                 `!tricks -a exampletrickalias -alias exampletrick`
                 
                 ## How to modify tricks:
-                `!tricks -e exampletrick -supress -content editing the trick. https://bing.com`
+                `!tricks -e exampletrick -suppress -content editing the trick. https://bing.com`
                 `!tricks -e exampletrickalias -alias exampletrick`
                 
                 ## How to lock/unlock a trick:
