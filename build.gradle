@@ -15,7 +15,7 @@ buildscript {
 
     dependencies {
         classpath 'gradle.plugin.com.github.johnrengelman:shadow:7.1.2'
-        classpath 'io.github.realmangorage:gradleutils:3.0.2-beta2109'
+        classpath 'io.github.realmangorage:gradleutils:3.0.3'
     }
 }
 
@@ -43,6 +43,9 @@ repositories {
     maven {
         url 'https://jitpack.io'
     }
+    maven {
+        url 'https://maven.lavalink.dev/snapshots/'
+    }
 }
 
 dependencies {
@@ -54,7 +57,7 @@ dependencies {
 
     library('org.eclipse.mylyn.github:org.eclipse.egit.github.core:2.1.5')
     library('org.kohsuke:github-api:1.321')
-    library('dev.arbjerg:lavaplayer:2.1.1')
+    library('dev.arbjerg:lavaplayer:afec211f05c9dcf0b6ee44276a02f0316ea2458a-SNAPSHOT')
 }
 
 test {
@@ -72,6 +75,20 @@ MangoBotConfig {
                 null
         )
     }
+    addResolver(e -> {
+
+        System.out.println(e.versionID2() + " -> DOOOl")
+        if (e.versionID2().equals("afec211f05c9dcf0b6ee44276a02f0316ea2458a-SNAPSHOT"))
+            return e.complete(
+                    e.groupID(),
+                    e.nameID(),
+                    e.versionID(),
+                    e.nameID2(),
+                    "afec211f05c9dcf0b6ee44276a02f0316ea2458a-20240330.121616-1"
+            )
+
+        return e.pass()
+    })
 }
 
 publishing {

@@ -36,6 +36,7 @@ public class BotPermissions {
 
     static {
         PLAYING.addPermission(Permission.ADMINISTRATOR);
+        PLAYING.addRole("1129059589325852724", "1169103412663697483");
         TRICK_ADMIN.addPermission(Permission.ADMINISTRATOR);
         PREFIX_ADMIN.addPermission(Permission.ADMINISTRATOR);
         MOD_MAIL.addPermission(Permission.ADMINISTRATOR);
