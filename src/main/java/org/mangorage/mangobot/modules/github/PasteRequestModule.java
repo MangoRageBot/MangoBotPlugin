@@ -32,7 +32,7 @@ import org.eclipse.egit.github.core.service.GistService;
 import org.mangorage.basicutils.TaskScheduler;
 import org.mangorage.basicutils.misc.LazyReference;
 import org.mangorage.mangobot.MangoBotPlugin;
-import org.mangorage.mangobotapi.core.events.discord.DMessageRecievedEvent;
+import org.mangorage.mangobotapi.core.events.discord.DMessageReceivedEvent;
 import org.mangorage.mangobotapi.core.events.discord.DReactionEvent;
 import org.mangorage.mboteventbus.impl.IEventBus;
 
@@ -55,7 +55,7 @@ public class PasteRequestModule {
     private static final Emoji EMOJI = Emoji.fromUnicode("\uD83D\uDCCB");
 
     public static void register(IEventBus bus) {
-        bus.addListener(DMessageRecievedEvent.class, PasteRequestModule::onMessage);
+        bus.addListener(DMessageReceivedEvent.class, PasteRequestModule::onMessage);
         bus.addListener(DReactionEvent.class, PasteRequestModule::onReact);
     }
 
@@ -148,7 +148,7 @@ public class PasteRequestModule {
         });
     }
 
-    public static void onMessage(DMessageRecievedEvent event) {
+    public static void onMessage(DMessageReceivedEvent event) {
         var dEvent = event.get();
         var message = dEvent.getMessage();
         var attachments = message.getAttachments();

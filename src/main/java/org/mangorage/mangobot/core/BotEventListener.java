@@ -23,6 +23,7 @@
 package org.mangorage.mangobot.core;
 
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -36,12 +37,12 @@ import net.dv8tion.jda.api.events.session.SessionResumeEvent;
 import net.dv8tion.jda.api.hooks.SubscribeEvent;
 import org.mangorage.basicutils.LogHelper;
 import org.mangorage.jdautils.WatcherManager;
-import org.mangorage.mangobotapi.core.commands.Arguments;
-import org.mangorage.mangobotapi.core.events.SlashCommandEvent;
 import org.mangorage.mangobotapi.core.events.discord.DButtonInteractionEvent;
 import org.mangorage.mangobotapi.core.events.discord.DMessageDeleteEvent;
-import org.mangorage.mangobotapi.core.events.discord.DMessageRecievedEvent;
+
+import org.mangorage.mangobotapi.core.events.discord.DMessageReceivedEvent;
 import org.mangorage.mangobotapi.core.events.discord.DMessageUpdateEvent;
+import org.mangorage.mangobotapi.core.events.discord.DModalInteractionEvent;
 import org.mangorage.mangobotapi.core.events.discord.DReactionEvent;
 import org.mangorage.mangobotapi.core.events.discord.DStringSelectInteractionEvent;
 import org.mangorage.mangobotapi.core.events.discord.DVoiceUpdateEvent;
@@ -51,7 +52,6 @@ import org.mangorage.mboteventbus.impl.IEventBus;
 
 @SuppressWarnings("unused")
 public class BotEventListener {
-
 
     private final CorePlugin plugin;
     private final IEventBus bus;
@@ -63,9 +63,14 @@ public class BotEventListener {
 
 
     @SubscribeEvent
+    public void modalInteraction(ModalInteractionEvent event) {
+        bus.post(new DModalInteractionEvent(event));
+    }
+
+    @SubscribeEvent
     public void messageRecieved(MessageReceivedEvent event) {
         var isCommand = Util.handleMessage(plugin, event);
-        bus.post(new DMessageRecievedEvent(event, isCommand));
+        bus.post(new DMessageReceivedEvent(event, isCommand));
     }
 
     @SubscribeEvent

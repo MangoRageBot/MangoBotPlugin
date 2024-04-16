@@ -4,8 +4,14 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
+import net.dv8tion.jda.api.interactions.components.text.TextInput;
+import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
+import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.utils.MarkdownSanitizer;
 import net.dv8tion.jda.api.utils.MarkdownUtil;
 import org.jetbrains.annotations.NotNull;
@@ -24,6 +30,7 @@ import org.mangorage.mangobotapi.core.events.BasicCommandEvent;
 import org.mangorage.mangobotapi.core.events.LoadEvent;
 import org.mangorage.mangobotapi.core.events.SaveEvent;
 import org.mangorage.mangobotapi.core.events.discord.DButtonInteractionEvent;
+import org.mangorage.mangobotapi.core.events.discord.DModalInteractionEvent;
 import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
 import org.mangorage.mangobotapi.core.util.MessageSettings;
 
@@ -60,9 +67,11 @@ public class TrickCommand implements IBasicCommand {
         plugin.getPluginBus().addListener(SaveEvent.class, this::onSaveEvent);
         plugin.getPluginBus().addListener(BasicCommandEvent.class, this::onCommandEvent);
         plugin.getPluginBus().addListener(DButtonInteractionEvent.class, this::onButton);
+        plugin.getPluginBus().addListener(DModalInteractionEvent.class, this::onModal);
 
-        Command.slash("trick", "Displays a Trick!")
-                .addSubCommand("execute", "execute a trick")
+
+        Command.slash("trick", "The Trick System")
+                .addSubCommand("execute", "Execute a trick!")
                     .executes(e -> {
                         var valueOption = e.getInteraction().getOption("name");
                         if (valueOption != null) {
@@ -102,7 +111,94 @@ public class TrickCommand implements IBasicCommand {
                                     })
                     )
                     .build()
+                .addSubCommand("create", "Creates a new Trick!")
+                    .executes(e -> {
+
+                        var typeOption = e.getOption("type");
+                        var type = typeOption != null ? typeOption.getAsString(): "";
+
+                        if (type.equals("NORMAL") || type.equals("SUPPRESSED-NORMAL")) {
+                            e.replyModal(
+                                    Modal.create("trickcreation" + (type.equals("NORMAL") ? 0 : 1), "Create a new %s Trick!".formatted(type.toLowerCase()))
+                                            .addComponents(
+                                                    ActionRow.of(
+                                                            TextInput.create("trickid", "Trick ID", TextInputStyle.SHORT)
+                                                                    .setRequired(true)
+                                                                    .build()
+                                                    ),
+                                                    ActionRow.of(
+                                                            TextInput.create("content", "Content", TextInputStyle.PARAGRAPH)
+                                                                    .setRequired(true)
+                                                                    .setMaxLength(1900)
+                                                                    .build()
+                                                    )
+                                            )
+                                            .build()
+                            ).queue();
+                        } else {
+                            e.replyModal(
+                                    Modal.create("trickcreation2", "Create a new %s Trick!".formatted(type.toLowerCase()))
+                                            .addComponents(
+                                                    ActionRow.of(
+                                                            TextInput.create("trickid", "Trick ID", TextInputStyle.SHORT)
+                                                                    .setRequired(true)
+                                                                    .build()
+                                                    ),
+                                                    ActionRow.of(
+                                                            TextInput.create("alias", "Alias", TextInputStyle.SHORT)
+                                                                    .setRequired(true)
+                                                                    .setMaxLength(30)
+                                                                    .build()
+                                                    )
+                                            )
+                                            .build()
+                            ).queue();
+                        }
+                    })
+                    .addOption(
+                            new CommandOption(OptionType.STRING, "type", "What type of Trick?", true, true)
+                                    .onAutoComplete(e -> {
+                                        e.replyChoiceStrings(
+                                                "NORMAL",
+                                                "SUPPRESSED-NORMAL",
+                                                "ALIAS"
+                                        ).queue();
+                                    })
+                    )
+                    .build()
                 .buildAndRegister();
+    }
+
+    public void onModal(DModalInteractionEvent event) {
+        var DEvent = event.get();
+        var guild = DEvent.getGuild();
+        var user = DEvent.getUser();
+        if (guild == null) {
+            DEvent.deferReply(true).setContent("""
+                    Cannot Add Trick. Only works in guilds.
+                    """).queue();
+        } else {
+            var modalID = DEvent.getModalId();
+            if (modalID.equals("trickcreation")) {
+                var trickID = DEvent.getInteraction().getValue("trickid");
+                var content = DEvent.getInteraction().getValue("content");
+                if (trickID != null && content != null) {
+                    var map = TRICKS.computeIfAbsent(guild.getId(), g -> new HashMap<>());
+                    if (map.containsKey(trickID.getAsString())) {
+                        DEvent.reply("Cannot create trick '%s' already exists!".formatted(trickID.getAsString())).queue();
+                    } else {
+                        Trick newTrick = new Trick(trickID.getAsString(), guild.getId());
+                        newTrick.setLastUserEdited(user.getIdLong());
+                        newTrick.setOwnerID(user.getIdLong());
+                        newTrick.setType(TrickType.NORMAL);
+                        newTrick.setContent(content.getAsString());
+                        save(newTrick);
+                        map.put(trickID.getAsString(), newTrick);
+                        DEvent.reply("Created new trick '%s'!".formatted(trickID.getAsString())).queue();
+                    }
+                }
+            }
+        }
     }
 
 
