@@ -430,7 +430,10 @@ public class TrickCommand implements IBasicCommand {
                 details = details + "Script: \n" + trick.getScript();
             }
 
-            dMessage.apply(message.reply(details)).setSuppressedNotifications(true).queue();
+            dMessage.apply(message.reply(details))
+                    .setSuppressedNotifications(true)
+                    .setAllowedMentions(List.of())
+                    .queue();
 
         } else if (type == TrickCMDType.SHOW) {
             if (!exists(trickID, guildID)) {

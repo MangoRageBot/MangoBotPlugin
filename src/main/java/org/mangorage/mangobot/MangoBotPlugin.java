@@ -32,8 +32,10 @@ import static org.mangorage.mangobot.core.BotPermissions.TRICK_ADMIN;
 import java.nio.file.Path;
 import java.util.Date;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Scanner;
 
+import net.dv8tion.jda.api.entities.channel.ChannelType;
 import org.mangorage.basicutils.config.Config;
 import org.mangorage.basicutils.config.ConfigSetting;
 import org.mangorage.basicutils.config.ISetting;
@@ -82,6 +84,7 @@ import org.mangorage.mangobot.modules.music.commands.StopCommand;
 import org.mangorage.mangobot.modules.music.commands.VolumeCommand;
 import org.mangorage.mangobotapi.core.events.LoadEvent;
 import org.mangorage.mangobotapi.core.events.SaveEvent;
+import org.mangorage.mangobotapi.core.events.discord.DMessageReceivedEvent;
 import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
 import org.mangorage.mangobotapi.core.plugin.api.PluginMessageEvent;
 import org.mangorage.mangobotapi.core.plugin.impl.Plugin;
@@ -172,6 +175,17 @@ public class MangoBotPlugin extends CorePlugin {
         getPluginBus().register(new Listeners(this));
     }
 
+    private static final List<Long> AUTO_PUBLISH_CHANNELS = List.of(1129095997461647402L, 1129077934330744882L);
+    public void onMessage(DMessageReceivedEvent event) {
+        var dEvent = event.get();
+        var channel = dEvent.getChannel().getIdLong();
+        if (AUTO_PUBLISH_CHANNELS.contains(channel)) {
+            var msg = dEvent.getMessage();
+            if (dEvent.isFromType(ChannelType.NEWS))
+                msg.crosspost().queue();
+        }
+    }
+
 
     @Override
     public void registration() {
@@ -254,6 +268,7 @@ public class MangoBotPlugin extends CorePlugin {
                 }
             }
         });
+        getPluginBus().addListener(DMessageReceivedEvent.class, this::onMessage);
     }
 
     @Override
