@@ -172,10 +172,7 @@ public class PasteRequestModule {
                     }
                 }
 
-                if (suceeeded.get()) { 
-                	message.addReaction(EMOJI).queue();	
-                }
-            
+                if (suceeeded.get()) message.addReaction(EMOJI).queue();
             });
         }
     }
