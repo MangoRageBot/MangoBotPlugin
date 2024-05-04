@@ -151,12 +151,16 @@ public class Util {
   //Copied from FCIGenUtils.java
     public static String getStringFromInputStream(InputStream inputStream) throws IOException {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+        String nl = System.getProperty("line.separator");
         String line;
         StringBuilder stringBuilder = new StringBuilder();
         while ((line = bufferedReader.readLine()) != null) {
-            stringBuilder.append(line);
+            stringBuilder.append(line+nl);
         }
         return stringBuilder.toString();
     }
+    
+    
+    
     
 }
