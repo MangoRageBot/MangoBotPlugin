@@ -159,12 +159,13 @@ public class PasteRequestModule {
                 var suceeeded = new AtomicBoolean(false);
                 for (Message.Attachment attachment : attachments) {
                     try {
-                        byte[] bytes = getData(attachment.getProxy().download().get());
+                    	InputStream stream = attachment.getProxy().download().get();
+                        byte[] bytes = getData(stream);
                         if (bytes == null) continue;
                         String content = new String(bytes, StandardCharsets.UTF_8);
                         if (containsPrintableCharacters(content)) {
                             suceeeded.set(true);
-                            LogAnalyser.readLog(message, content);
+                            LogAnalyser.readLog(message, stream);
                             break;
                         }
                     } catch (InterruptedException | ExecutionException e) {
