@@ -32,6 +32,7 @@ import org.eclipse.egit.github.core.service.GistService;
 import org.mangorage.basicutils.TaskScheduler;
 import org.mangorage.basicutils.misc.LazyReference;
 import org.mangorage.mangobot.MangoBotPlugin;
+import org.mangorage.mangobot.modules.logs.LogAnalyser;
 import org.mangorage.mangobotapi.core.events.discord.DMessageReceivedEvent;
 import org.mangorage.mangobotapi.core.events.discord.DReactionEvent;
 import org.mangorage.mboteventbus.impl.IEventBus;
@@ -152,6 +153,7 @@ public class PasteRequestModule {
         var dEvent = event.get();
         var message = dEvent.getMessage();
         var attachments = message.getAttachments();
+        LogAnalyser.scanMessage(message);
         if (!attachments.isEmpty()) {
             TaskScheduler.getExecutor().execute(() -> {
                 var suceeeded = new AtomicBoolean(false);
@@ -162,6 +164,7 @@ public class PasteRequestModule {
                         String content = new String(bytes, StandardCharsets.UTF_8);
                         if (containsPrintableCharacters(content)) {
                             suceeeded.set(true);
+                            LogAnalyser.readLog(message, content);
                             break;
                         }
                     } catch (InterruptedException | ExecutionException e) {
@@ -169,7 +172,10 @@ public class PasteRequestModule {
                     }
                 }
 
-                if (suceeeded.get()) message.addReaction(EMOJI).queue();
+                if (suceeeded.get()) { 
+                	message.addReaction(EMOJI).queue();	
+                }
+            
             });
         }
     }
