@@ -26,6 +26,9 @@ jobs:
           MAVEN_PASSWORD: ${{ secrets.PASSWORD }}  # Reference the secret\
         run: ./gradlew publish -DskipTests
 
+  restart:  # Existing publish job
+    runs-on: ubuntu-latest
+    steps:
       - name: Restart
         env:
           SERVER_ID: ${{ secrets.SERVER_ID }}  # Reference the secret\
