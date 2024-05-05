@@ -18,9 +18,14 @@ jobs:
       - name: Fix gradlew permissions (optional)
         run: chmod +x gradlew
 
-      - name: Echo Username from Secret
-        run:
-          echo "Username: ${{ secrets.USERNAME }}"
+      - name: Echo Username from Secret (Assuming String Issue)
+        run: |  # Multi-line command using pipe (|) for conditional logic
+          username=${{ secrets.USERNAME }}
+          if [[ ! -z "$username" ]]; then  # Check if username is not empty
+            echo "Username: $username"
+          else
+            echo "Error: Unable to retrieve username from secret."
+          fi
 
       - name: Set Sonatype Credentials
         env:
