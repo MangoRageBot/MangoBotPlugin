@@ -33,7 +33,7 @@ apply plugin: 'maven-publish'
 
 
 group = 'org.mangorage'
-version = '2.0.0-SNAPSHOTS'
+version = '2.0.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
