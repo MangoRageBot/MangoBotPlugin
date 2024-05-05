@@ -34,4 +34,7 @@ jobs:
         run: ./gradlew test
 
       - name: Publish
+        env:
+          MAVEN_USERNAME: ${{ secrets.USERNAME }}  # Reference the secret\
+          MAVEN_PASSWORD: ${{ secrets.PASSWORD }}  # Reference the secret\
         run: ./gradlew publish -DskipTests
