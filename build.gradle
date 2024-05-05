@@ -74,7 +74,7 @@ task getVersion(type: DefaultTask) {
     int numCommits // Define a property
 
     doLast {
-
+        println System.getenv("MAVEN_USERNAME")
         println "Number of commits within the last $numCommits"
     }
 }
