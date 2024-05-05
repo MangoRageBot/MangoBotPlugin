@@ -72,11 +72,12 @@ test {
 }
 
 
-task getVersion {
+task getVersion(type: DefaultTask) {
+    int numCommits // Define a property
+
     doLast {
-        def gitDescribeOutput = gitDescribe(always: true, abbrev: 0).split('-') // Get full commit hash
-        def numCommits = gitDescribeOutput.size - 1  // Assuming format "v<version>-<number-of-commits>-<commit-hash>"
-        println "Number of commits: ${numCommits}"
+
+        println "Number of commits within the last $numCommits"
     }
 }
 
