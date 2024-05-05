@@ -96,7 +96,10 @@ public class PasteRequestModule {
     public static void createGists(Message msg, User requester) {
         TaskScheduler.getExecutor().execute(() -> {
             if (!msg.isFromGuild()) return;
-            if (!GUILDS.contains(msg.getGuildId())) return;
+            if (!GUILDS.contains(msg.getGuildId())) {
+            	msg.reply("Your server is not on the allowlist for Gist Paste. Please contact the server admin if you use wish to use this functionality.").mentionRepliedUser(false).queue();
+            	return;
+            	}
 
             var attachments = msg.getAttachments();
             if (attachments.isEmpty()) return;
