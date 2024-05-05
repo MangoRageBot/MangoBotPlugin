@@ -210,7 +210,6 @@ public class MangoBotPlugin extends CorePlugin {
         cmdRegistry.addBasicCommand(new PrefixCommand(this));
         cmdRegistry.addBasicCommand(new VersionCommand(this));
 
-
         // Developer Commands
         cmdRegistry.addBasicCommand(new KickBotCommand(this));
         cmdRegistry.addBasicCommand(new RestartCommand());

@@ -8,23 +8,44 @@ package org.mangorage.mangobot.modules.logs;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.mangorage.mangobot.core.Util;
 
 import net.dv8tion.jda.api.entities.Message;
 
 public class LogAnalyser {
-	
-	public LogAnalyserModule[] mods;
-	
-	public LogAnalyser(LogAnalyserModule[] mods) {
-		this.mods=mods;
+
+	public static LogAnalyser of(LogAnalyserModule... modules) {
+		return new LogAnalyser(List.of(modules));
 	}
 
-	public String[] supported_paste_sites = new String[] { "paste.mikumikudance.jp/", "paste.centos.org/",
-			"pastebin.com/", "mclo.gs/" }; // Be sure to include slashes, Paste.ee and other sites without seperate or
-											// only raw URLs will not work, ones with fancy raw URLs like OpenSUSE paste
-											// will also not be included at this time.
+
+	private final Set<LogAnalyserModule> mods = new HashSet<>();
+	
+	private LogAnalyser(List<LogAnalyserModule> mods) {
+		this.mods.addAll(mods);
+	}
+
+	public void add(LogAnalyserModule module) {
+		this.mods.add(module);
+	}
+
+	public void addAll(LogAnalyserModule... modules) {
+		this.mods.addAll(List.of(modules));
+	}
+
+
+	// Be sure to include slashes, Paste.ee and other sites without separate or
+	// only raw URLs will not work, ones with fancy raw URLs like OpenSUSE paste
+	// will also not be included at this time.
+	public String[] supported_paste_sites = new String[] {
+			"paste.mikumikudance.jp/",
+			"paste.centos.org/",
+			"pastebin.com/", "mclo.gs/"
+	};
 
 	public void scanMessage(Message message) {
 		String content = message.getContentStripped();
@@ -76,9 +97,9 @@ public class LogAnalyser {
 		return list;
 	}
 
-	public void readLog(Message messaje, String log) {
+	public void readLog(Message message, String log) {
 		for(LogAnalyserModule mod:mods) {
-		mod.analyse(log, messaje);
+			mod.analyse(log, message);
 		}
 	}
 

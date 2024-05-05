@@ -58,7 +58,19 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 
 public class PasteRequestModule {
-	public static LogAnalyser analyser = new LogAnalyser(new LogAnalyserModule[]{new BrokenDrivers(),new EarlyWindow(), new Java22(), new MissingDeps(), new MissingScheme(), new PerfOSCounters(), new SSLError(), new URLClassLoaderIssue(), new WeRequireAtLeastJava17()});
+    public static final LogAnalyser analyser = LogAnalyser.of(
+            new BrokenDrivers(),
+            new EarlyWindow(),
+            new Java22(),
+            new MissingDeps(),
+            new MissingScheme(),
+            new PerfOSCounters(),
+            new SSLError(),
+            new URLClassLoaderIssue(),
+            new WeRequireAtLeastJava17()
+    );
+
+
     private static final LazyReference<GitHubClient> GITHUB_CLIENT = LazyReference.create(() -> new GitHubClient().setOAuth2Token(MangoBotPlugin.GITHUB_TOKEN.get()));
     private static final List<String> GUILDS = List.of(
             "1129059589325852724",
