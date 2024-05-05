@@ -18,6 +18,10 @@ jobs:
       - name: Fix gradlew permissions (optional)
         run: chmod +x gradlew
 
+      - name: Echo Username from Secret
+        run:
+          echo "Username: ${{ secrets.USERNAME }}"
+
       - name: Set Sonatype Credentials
         env:
           MAVEN_USERNAME: ${{ secrets.USERNAME }}  # Reference the secret
