@@ -20,7 +20,7 @@ jobs:
 
 
       - name: Get commit count using Github API
-        uses: actions/github@v3
+        uses: actions/github@v2
         id: get_commits
         with:
           ref: ${{ github.base_ref }}  # Branch that triggered the workflow
