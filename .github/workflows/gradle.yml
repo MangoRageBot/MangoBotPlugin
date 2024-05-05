@@ -18,6 +18,12 @@ jobs:
       - name: Fix gradlew permissions (optional)
         run: chmod +x gradlew
 
+      - name: Set Sonatype Credentials
+        env:
+          MAVEN_USERNAME: ${{ secrets.USERNAME }}  # Reference the secret
+          MAVEN_PASSWORD: ${{ secrets.PASSWORD }}  # Reference the secret
+        run: echo "Sonatype credentials set"  # Optional for confirmation (won't be visible)
+
       - name: Get Version Info with Specific Commits (using custom task)
         # Pass numCommits from workflow to Gradle task as a property
         run: ./gradlew getVersion -PnumCommits=${{ github.event.commits }}

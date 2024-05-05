@@ -139,8 +139,8 @@ publishing {
             url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
             group "io.github.mangorage"
             credentials {
-                username = findProperty("username")
-                password = findProperty("password")
+                username = findProperty("MAVEN_USERNAME")
+                password = findProperty("MAVEN_PASSWORD")
 
             }
         }
