@@ -14,13 +14,19 @@ import org.mangorage.mangobot.core.Util;
 import net.dv8tion.jda.api.entities.Message;
 
 public class LogAnalyser {
+	
+	public LogAnalyserModule[] mods;
+	
+	public LogAnalyser(LogAnalyserModule[] mods) {
+		this.mods=mods;
+	}
 
-	public static String[] supported_paste_sites = new String[] { "paste.mikumikudance.jp/", "paste.centos.org/",
+	public String[] supported_paste_sites = new String[] { "paste.mikumikudance.jp/", "paste.centos.org/",
 			"pastebin.com/", "mclo.gs/" }; // Be sure to include slashes, Paste.ee and other sites without seperate or
 											// only raw URLs will not work, ones with fancy raw URLs like OpenSUSE paste
 											// will also not be included at this time.
 
-	public static void scanMessage(Message message) {
+	public void scanMessage(Message message) {
 		String content = message.getContentStripped();
 		for (String uri : getLogURLs(content)) {
 			InputStream log = Util.getFileInputStream(uri);
@@ -34,10 +40,10 @@ public class LogAnalyser {
 				}
 			}
 
-		}
+		}			
 	}
 
-	public static ArrayList<String> getLogURLs(String messaje) {
+	public ArrayList<String> getLogURLs(String messaje) {
 		ArrayList<String> list = new ArrayList<String>();
 		for (String word : messaje.split(" ")) {
 
@@ -70,16 +76,10 @@ public class LogAnalyser {
 		return list;
 	}
 
-	public static void readLog(Message messaje, String log) {
-			MissingDeps.analyse(log, messaje);
-			BrokenDrivers.analyse(log, messaje);
-			Java22.analyse(log, messaje);
-			MissingScheme.analyse(log, messaje);
-			PerfOSCounters.analyse(log, messaje);
-			SSLError.analyse(log, messaje);
-			URLClassLoaderIssue.analyse(log, messaje);
-			WeRequireAtLeastJava17.analyse(log, messaje);
-			EarlyWindow.analyse(log, messaje);
+	public void readLog(Message messaje, String log) {
+		for(LogAnalyserModule mod:mods) {
+		mod.analyse(log, messaje);
+		}
 	}
 
 }

@@ -6,13 +6,13 @@ package org.mangorage.mangobot.modules.logs;
 
 import net.dv8tion.jda.api.entities.Message;
 
-public class BrokenDrivers {
+public class BrokenDrivers implements LogAnalyserModule{
 
-	public static void analyse(String str, Message messaje) {
+	public void analyse(String str, Message messaje) {
 
 		if (str.contains("EXCEPTION_ACCESS_VIOLATION") && str.contains("atio6axx.dll")) {
 			messaje.reply(
-					"You have broken AMD or ATI Graphics Drivers, updating from Device Manager wont fix it. Read this guide to fix them: https://forums.minecraftforge.net/topic/125488-rules-and-frequently-asked-questions-faq/#:~:text=How%20do%20I%20update%20my%20drivers%3F")
+					"You have broken AMD or ATI Graphics Drivers, updating from Device Manager wont fix this issue. Read this guide to fix them: https://forums.minecraftforge.net/topic/125488-rules-and-frequently-asked-questions-faq/#:~:text=How%20do%20I%20update%20my%20drivers%3F")
 					.setSuppressEmbeds(true).mentionRepliedUser(true).queue();
 		} else if (str.contains("EXCEPTION_ACCESS_VIOLATION") && str.contains("nouveau")) { // FUCKK I forgot the name
 																							// of the full file that

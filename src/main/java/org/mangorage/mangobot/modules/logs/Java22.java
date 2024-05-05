@@ -6,9 +6,9 @@ package org.mangorage.mangobot.modules.logs;
 
 import net.dv8tion.jda.api.entities.Message;
 
-public class Java22 {
+public class Java22  implements LogAnalyserModule{
 
-	public static void analyse(String str, Message messaje) {
+	public void analyse(String str, Message messaje) {
 
 		String out ="Please use Java 17 for 1.17-1.20.4 and Java 21 for Anything newer, Java 8 for anything older. [Guide](https://mikumikudance.jp/index.php?title=Installing_Java_For_Minecraft). If you still have issues it could be because some mod has too new or old of files.";
 		if (str.contains("java.lang.IllegalArgumentException: Unsupported class file major version")) {

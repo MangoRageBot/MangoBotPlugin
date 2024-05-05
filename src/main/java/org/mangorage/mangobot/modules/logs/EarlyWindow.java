@@ -6,9 +6,9 @@ package org.mangorage.mangobot.modules.logs;
 
 import net.dv8tion.jda.api.entities.Message;
 
-public class EarlyWindow {
+public class EarlyWindow  implements LogAnalyserModule{
 
-	public static void analyse(String str, Message messaje) {
+	public void analyse(String str, Message messaje) {
 
 
 			String last = null;

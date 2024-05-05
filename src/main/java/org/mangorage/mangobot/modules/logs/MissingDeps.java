@@ -6,9 +6,9 @@ package org.mangorage.mangobot.modules.logs;
 
 import net.dv8tion.jda.api.entities.Message;
 
-public class MissingDeps {
+public class MissingDeps  implements LogAnalyserModule{
 
-	public static void analyse(String str, Message messaje) {
+	public void analyse(String str, Message messaje) {
 
 		if (str.contains("Missing or unsupported mandatory dependencies:")) {
 			String nl = System.getProperty("line.separator");
