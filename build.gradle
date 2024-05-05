@@ -80,16 +80,11 @@ task getVersion() {
     }
 }
 
-task testv() {
+task testv(type: Exec) {
+    commandLine 'git', 'rev-list', '--count', 'origin/master'
+    standardOutput = new ByteArrayOutputStream()
     doLast {
-        def result = "git rev-list HEAD --count".execute().text.trim()
-        if (result.empty) {
-            throw new RuntimeException("Failed to retrieve commit count")
-        } else {
-            def commitCount = result.toInteger()
-            // Use the commitCount variable further in your script
-            println commitCount
-        }
+        println "Total commits: ${standardOutput.toString().trim()}"
     }
 }
 
