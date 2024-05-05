@@ -411,11 +411,11 @@ public class TrickCommand implements IBasicCommand {
                             trick.getTrickID(),
                             trick.getType(),
                             trick.getOwnerID(),
-                            trick.getCreated(),
-                            trick.getCreated(),
+                            trick.getCreated() / 1000, // Discord expects it to be in Epoch Seconds, not ms
+                            trick.getCreated() / 1000, // Discord expects it to be in Epoch Seconds, not ms
                             trick.getLastUserEdited(),
-                            trick.getLastEdited(),
-                            trick.getLastEdited(),
+                            trick.getLastEdited() / 1000, // Discord expects it to be in Epoch Seconds, not ms
+                            trick.getLastEdited() / 1000, // Discord expects it to be in Epoch Seconds, not ms
                             trick.isLocked(),
                             trick.isSuppressed(),
                             trick.getTimesUsed()
@@ -432,6 +432,7 @@ public class TrickCommand implements IBasicCommand {
 
             dMessage.apply(message.reply(details))
                     .setSuppressedNotifications(true)
+                    .setSuppressEmbeds(true)
                     .setAllowedMentions(List.of())
                     .queue();
 

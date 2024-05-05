@@ -11,12 +11,19 @@ buildscript {
         maven {
             url = 'https://repo.mattmalec.com/repository/releases'
         }
+        maven {
+            url = 'https://maven.minecraftforge.net/'
+        }
     }
 
     dependencies {
         classpath 'gradle.plugin.com.github.johnrengelman:shadow:7.1.2'
         classpath 'io.github.realmangorage:gradleutils:3.0.3'
     }
+}
+
+plugins {
+    id 'net.minecraftforge.gradleutils' version '[2.3.0,2.4.0)'
 }
 
 apply plugin: 'com.github.johnrengelman.shadow'
