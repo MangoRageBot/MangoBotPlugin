@@ -18,23 +18,11 @@ jobs:
       - name: Fix gradlew permissions (optional)
         run: chmod +x gradlew
 
-      - name: Echo Username from Secret (Assuming String Issue)
-        run: |  # Multi-line command using pipe (|) for conditional logic
-          username=${{ secrets.USERNAME }}
-          if [[ ! -z "$username" ]]; then  # Check if username is not empty
-            echo "Username: $username"
-          else
-            echo "Error: Unable to retrieve username from secret."
-          fi
-
-      - name: Set Sonatype Credentials
-        env:
-          MAVEN_USERNAME: ${{ secrets.USERNAME }}  # Reference the secret
-          MAVEN_PASSWORD: ${{ secrets.PASSWORD }}  # Reference the secret
-        run: echo "Sonatype credentials set"  # Optional for confirmation (won't be visible)
 
       - name: Get Version Info with Specific Commits (using custom task)
         # Pass numCommits from workflow to Gradle task as a property
+        env:
+          MAVEN_USERNAME: ${{ secrets.USERNAME }}  # Reference the secret\
         run: ./gradlew getVersion -PnumCommits=${{ github.event.commits }}
 
       # Optional: Get Current Version (consider modifying for clarity)
