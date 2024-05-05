@@ -2,7 +2,7 @@ name: Bump Patch and Publish (Gradle)
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
 
 jobs:
   publish:
