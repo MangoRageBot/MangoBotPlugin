@@ -71,15 +71,12 @@ test {
 }
 
 
-task getVersion(type: DefaultTask) {
-    int numCommits // Define a property
+task getVersion() {
 
     doLast {
 
         println "Username -> " + System.getenv("MAVEN_USERNAME")
         println "GH Commits ->" + System.getenv("GITHUB_COMMITS")
-
-        println "Number of commits within the last $numCommits"
     }
 }
 
