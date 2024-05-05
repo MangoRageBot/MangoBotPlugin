@@ -13,7 +13,10 @@ jobs:
       - name: Install Java and Gradle
         uses: actions/setup-java@v1
         with:
-          java-version: 8
+          java-version: 17
+
+      - name: Fix gradlew permissions (optional)
+        run: chmod +x gradlew
 
       # Modified command (assuming gradlew script is executable)
       - name: Increase Version with Commits
