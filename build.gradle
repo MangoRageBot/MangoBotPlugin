@@ -75,7 +75,7 @@ task getVersion(type: DefaultTask) {
 
     doLast {
 
-        println System.getenv("MAVEN_USERNAME")
+        println System.getenv("secrets.USERNAME")
         println "Number of commits within the last $numCommits"
     }
 }
