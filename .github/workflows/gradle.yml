@@ -15,10 +15,12 @@ jobs:
         with:
           java-version: 8
 
+      # Modified command (assuming gradlew script is executable)
       - name: Increase Version with Commits
-        run: ./gradlew -q properties --properties com.example.version=$(git describe --always --abbrev-commit)
+        run: ./gradlew -q properties --properties com.example.version=$(git describe --always --abbrev=6)
 
-      - name: Get Current Version (optional)
+      # Optional: Get Current Version (consider modifying for clarity)
+      - name: Get Current Version
         id: get_version
         run: echo "::set-output name=CURRENT_VERSION=$(./gradlew properties -q | grep version | cut -d= -f2)"
 
@@ -27,5 +29,3 @@ jobs:
 
       - name: Publish
         run: ./gradlew publish -DskipTests
-
-
