@@ -71,6 +71,15 @@ test {
     useJUnitPlatform()
 }
 
+
+task getVersion {
+    doLast {
+        def gitDescribeOutput = gitDescribe(always: true, abbrev: 0).split('-') // Get full commit hash
+        def numCommits = gitDescribeOutput.size - 1  // Assuming format "v<version>-<number-of-commits>-<commit-hash>"
+        println "Number of commits: ${numCommits}"
+    }
+}
+
 MangoBotConfig {
     setJarTask(jar)
     setReleaseTask(() -> getTasks().getByName("publish"))
