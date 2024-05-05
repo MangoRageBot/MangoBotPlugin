@@ -31,7 +31,7 @@ jobs:
 
       - name: Print Commit Count
         run:
-          echo "Total number of commits in $GITHUB_REPOSITORY / $GITHUB_REF: $(( $(echo ${{ steps.commit_count.outputs.data.commit.commitCount }}) ))"
+          echo "Total number of commits in : $(( $(echo ${{ steps.commit_count.outputs.data.commit.commitCount }}) ))"
 
       - name: Get Version Info with Specific Commits (using custom task)
         # Pass numCommits from workflow to Gradle task as an environment variable
