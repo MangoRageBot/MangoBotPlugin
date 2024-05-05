@@ -21,7 +21,7 @@ jobs:
       - name: Get Version Info with Specific Commits (using custom task)
         # Pass numCommits from workflow to Gradle task as an environment variable
         env:
-          GITHUB_COMMITS: ${{ github.event.commits }}
+          GITHUB_COMMITS: ${{ github.event.commits.length }}
         run: ./gradlew getVersion
 
 
