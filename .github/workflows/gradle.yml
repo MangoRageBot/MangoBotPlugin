@@ -1,4 +1,4 @@
-name: Bump Patch and Publish (Gradle)
+name: Bump Patch, Publish and Restart Discord Bot (Gradle)
 
 on:
   push:
@@ -25,3 +25,9 @@ jobs:
           MAVEN_USERNAME: ${{ secrets.USERNAME }}  # Reference the secret\
           MAVEN_PASSWORD: ${{ secrets.PASSWORD }}  # Reference the secret\
         run: ./gradlew publish -DskipTests
+
+      - name: Restart
+        env:
+          SERVER_ID: ${{ secrets.SERVER_ID }}  # Reference the secret\
+          SERVER_TOKEN: ${{ secrets.SERVER_TOKEN }}  # Reference the secret\
+        run: ./gradlew restartServer

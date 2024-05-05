@@ -84,17 +84,15 @@ test {
 MangoBotConfig {
     setJarTask(jar)
     setReleaseTask(() -> getTasks().getByName("publish"))
-
-    /**
-    if (props != null && props.containsKey("SERVER_TOKEN")) {
+    
+    if (System.getenv().containsKey("SERVER_TOKEN") && System.getenv().containsKey("SERVER_ID")) {
         enableRestartServerTask(
-                "f32263f3",
+                System.getenv("SERVER_ID") as String,
                 "https://panel.sodiumhosting.com/",
-                props.get("SERVER_TOKEN") as String,
+                System.getenv("SERVER_TOKEN") as String,
                 null
         )
     }
- **/
 
     addResolver(e -> {
         if (e.versionID2().equals("afec211f05c9dcf0b6ee44276a02f0316ea2458a-SNAPSHOT"))
