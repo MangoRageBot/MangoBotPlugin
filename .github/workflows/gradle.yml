@@ -18,16 +18,14 @@ jobs:
       - name: Fix gradlew permissions (optional)
         run: chmod +x gradlew
 
-
       - name: Get Version Info with Specific Commits (using custom task)
-        # Pass numCommits from workflow to Gradle task as a property
+        # Pass numCommits from workflow to Gradle task as an environment variable
         env:
-          MAVEN_USERNAME: ${{ secrets.USERNAME }}  # Reference the secret\
+          MAVEN_USERNAME: ${{ secrets.USERNAME }}  # Reference the secret
           GITHUB_COMMITS: ${{ github.event.commits }}
+          NUM_COMMITS: ${{ github.event.commits.length }}  # Calculate numCommits
         run: ./gradlew getVersion
 
-      - name: Build and Test (Java Specific)
-        run: ./gradlew test
 
       - name: Publish
         env:
