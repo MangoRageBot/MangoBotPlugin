@@ -22,20 +22,6 @@
 
 package org.mangorage.mangobot.modules.github;
 
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
-import org.eclipse.egit.github.core.Gist;
-import org.eclipse.egit.github.core.GistFile;
-import org.eclipse.egit.github.core.client.GitHubClient;
-import org.eclipse.egit.github.core.service.GistService;
-import org.mangorage.basicutils.TaskScheduler;
-import org.mangorage.basicutils.misc.LazyReference;
-import org.mangorage.mangobot.MangoBotPlugin;
-import org.mangorage.mangobotapi.core.events.discord.DMessageReceivedEvent;
-import org.mangorage.mangobotapi.core.events.discord.DReactionEvent;
-import org.mangorage.mboteventbus.impl.IEventBus;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -45,7 +31,34 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.eclipse.egit.github.core.Gist;
+import org.eclipse.egit.github.core.GistFile;
+import org.eclipse.egit.github.core.client.GitHubClient;
+import org.eclipse.egit.github.core.service.GistService;
+import org.mangorage.basicutils.TaskScheduler;
+import org.mangorage.basicutils.misc.LazyReference;
+import org.mangorage.mangobot.MangoBotPlugin;
+import org.mangorage.mangobot.modules.logs.BrokenDrivers;
+import org.mangorage.mangobot.modules.logs.EarlyWindow;
+import org.mangorage.mangobot.modules.logs.Java22;
+import org.mangorage.mangobot.modules.logs.LogAnalyser;
+import org.mangorage.mangobot.modules.logs.LogAnalyserModule;
+import org.mangorage.mangobot.modules.logs.MissingDeps;
+import org.mangorage.mangobot.modules.logs.MissingScheme;
+import org.mangorage.mangobot.modules.logs.PerfOSCounters;
+import org.mangorage.mangobot.modules.logs.SSLError;
+import org.mangorage.mangobot.modules.logs.URLClassLoaderIssue;
+import org.mangorage.mangobot.modules.logs.WeRequireAtLeastJava17;
+import org.mangorage.mangobotapi.core.events.discord.DMessageReceivedEvent;
+import org.mangorage.mangobotapi.core.events.discord.DReactionEvent;
+import org.mangorage.mboteventbus.impl.IEventBus;
+
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+
 public class PasteRequestModule {
+	public static LogAnalyser analyser = new LogAnalyser(new LogAnalyserModule[]{new BrokenDrivers(),new EarlyWindow(), new Java22(), new MissingDeps(), new MissingScheme(), new PerfOSCounters(), new SSLError(), new URLClassLoaderIssue(), new WeRequireAtLeastJava17()});
     private static final LazyReference<GitHubClient> GITHUB_CLIENT = LazyReference.create(() -> new GitHubClient().setOAuth2Token(MangoBotPlugin.GITHUB_TOKEN.get()));
     private static final List<String> GUILDS = List.of(
             "1129059589325852724",
@@ -95,7 +108,10 @@ public class PasteRequestModule {
     public static void createGists(Message msg, User requester) {
         TaskScheduler.getExecutor().execute(() -> {
             if (!msg.isFromGuild()) return;
-            if (!GUILDS.contains(msg.getGuildId())) return;
+            if (!GUILDS.contains(msg.getGuildId())) {
+            	msg.reply("Your server is not on the allowlist for Gist Paste. Please contact the server admin if you use wish to use this functionality.").mentionRepliedUser(false).queue();
+            	return;
+            	}
 
             var attachments = msg.getAttachments();
             if (attachments.isEmpty()) return;
@@ -152,6 +168,7 @@ public class PasteRequestModule {
         var dEvent = event.get();
         var message = dEvent.getMessage();
         var attachments = message.getAttachments();
+        analyser.scanMessage(message);
         if (!attachments.isEmpty()) {
             TaskScheduler.getExecutor().execute(() -> {
                 var suceeeded = new AtomicBoolean(false);
@@ -162,6 +179,7 @@ public class PasteRequestModule {
                         String content = new String(bytes, StandardCharsets.UTF_8);
                         if (containsPrintableCharacters(content)) {
                             suceeeded.set(true);
+                            analyser.readLog(message, content);
                             break;
                         }
                     } catch (InterruptedException | ExecutionException e) {

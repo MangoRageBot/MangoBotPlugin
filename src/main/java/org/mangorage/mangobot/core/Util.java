@@ -32,8 +32,17 @@ import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandPrefix;
 import org.mangorage.mangobotapi.core.events.BasicCommandEvent;
 import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UncheckedIOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -107,4 +116,51 @@ public class Util {
         }
         return true;
     }
+    
+    //Copied from FCIGenUtils.java
+    public static InputStream getFileInputStream(String fileUrl) {  
+        try {  
+            URL url = new URL(fileUrl);  
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();  
+            connection.setRequestMethod("GET");  
+  
+            int responseCode = connection.getResponseCode();  
+            if (responseCode == HttpURLConnection.HTTP_OK) {  
+                InputStream inputStream = new BufferedInputStream(connection.getInputStream());  
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();  
+                byte[] buffer = new byte[1024];  
+                int bytesRead;  
+                while ((bytesRead = inputStream.read(buffer)) != -1) {  
+                    byteArrayOutputStream.write(buffer, 0, bytesRead);  
+                }  
+                byte[] byteArray = byteArrayOutputStream.toByteArray();  
+                  
+                byteArrayOutputStream.close();  
+                inputStream.close();  
+                  
+                return new ByteArrayInputStream(byteArray);  
+            } else {  
+                throw new IOException("Server response code: " + responseCode);  
+            }  
+        } catch (IOException e) {  
+            e.printStackTrace();  
+            return null;
+        }  
+    }
+    
+  //Copied from FCIGenUtils.java
+    public static String getStringFromInputStream(InputStream inputStream) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+        String nl = System.getProperty("line.separator");
+        String line;
+        StringBuilder stringBuilder = new StringBuilder();
+        while ((line = bufferedReader.readLine()) != null) {
+            stringBuilder.append(line+nl);
+        }
+        return stringBuilder.toString();
+    }
+    
+    
+    
+    
 }
