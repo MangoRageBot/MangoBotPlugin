@@ -13,7 +13,10 @@ jobs:
       - name: Install Java and Gradle
         uses: actions/setup-java@v1
         with:
-          java-version: 8
+          java-version: 17
+
+      - name: Fix gradlew permissions (optional)
+        run: chmod +x gradlew
 
       - name: Get Version Info (using custom task)
         run: ./gradlew getVersion
