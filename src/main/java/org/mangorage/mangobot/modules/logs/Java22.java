@@ -15,9 +15,11 @@ public class Java22  implements LogAnalyserModule{
 			if (str.contains("--fml.forgeVersion, 4") || str.contains("--fml.forgeVersion, 3")) {
 				if (str.contains("java version 2") && !str.contains("java version 20") && !str.contains("java version 21")) {
 				out = "Java 22 and above do not work on Minecraft Versions bellow 1.20.5 for most modloaders due to ASM being outdated." + out ;
+				messaje.reply(out).setSuppressEmbeds(true).mentionRepliedUser(true).queue();
 				}
 			}
-			messaje.reply(out).setSuppressEmbeds(true).mentionRepliedUser(true).queue();
+		}else if(str.contains("has been compiled by a more recent version of the Java Runtime")){
+			messaje.reply("You are using an outdated version of Java "+out).setSuppressEmbeds(true).mentionRepliedUser(true).queue();
 		}
 	}
 
