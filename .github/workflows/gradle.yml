@@ -1,0 +1,31 @@
+name: Bump Patch and Publish (Gradle)
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Java and Gradle
+        uses: actions/setup-java@v1
+        with:
+          java-version: 8
+
+      - name: Increase Version with Commits
+        run: ./gradlew -q properties --properties com.example.version=$(git describe --always --abbrev-commit)
+
+      - name: Get Current Version (optional)
+        id: get_version
+        run: echo "::set-output name=CURRENT_VERSION=$(./gradlew properties -q | grep version | cut -d= -f2)"
+
+      - name: Build and Test (Java Specific)
+        run: ./gradlew test
+
+      - name: Publish
+        run: ./gradlew publish -DskipTests
+
+
