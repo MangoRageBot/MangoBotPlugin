@@ -18,8 +18,11 @@ jobs:
       - name: Fix gradlew permissions (optional)
         run: chmod +x gradlew
 
-      - name: Print commit count
-        run: echo "## The branch has $(git rev-list --count --all) commits"
+      - name: Get commit count for entire branch (public repo)
+        run: |
+          url="https://api.github.com/repos/${{ github.repository }}/commits?sha=${{ github.base_ref }}"
+          response=$(curl -sSL "$url")
+          echo "## The branch has $(echo "$response" | jq '. | length')"  # Parse JSON with jq
 
       - name: Get Version Info with Specific Commits (using custom task)
         # Pass numCommits from workflow to Gradle task as an environment variable
