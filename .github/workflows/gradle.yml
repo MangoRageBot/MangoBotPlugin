@@ -23,12 +23,8 @@ jobs:
         # Pass numCommits from workflow to Gradle task as a property
         env:
           MAVEN_USERNAME: ${{ secrets.USERNAME }}  # Reference the secret\
+          GITHUB_COMMITS: $(./gradlew properties -q | grep numCommits | cut -d= -f2)
         run: ./gradlew getVersion -PnumCommits=${{ github.event.commits }}
-
-      # Optional: Get Current Version (consider modifying for clarity)
-      - name: Get Current Version (optional)
-        id: get_version  # Assuming the task sets a 'numCommits' property after filtering
-        run: echo "::set-output name=CURRENT_VERSION=$(./gradlew properties -q | grep numCommits | cut -d= -f2)"
 
       - name: Build and Test (Java Specific)
         run: ./gradlew test
