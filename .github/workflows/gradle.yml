@@ -24,7 +24,7 @@ jobs:
         env:
           MAVEN_USERNAME: ${{ secrets.USERNAME }}  # Reference the secret\
           GITHUB_COMMITS: ${{ github.event.commits }}
-        run: ./gradlew getVersion -PnumCommits=${{ github.event.commits }}
+        run: ./gradlew getVersion
 
       - name: Build and Test (Java Specific)
         run: ./gradlew test
