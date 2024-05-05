@@ -19,7 +19,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Print commit count
-        run: echo "## The branch has $(git rev-list --count HEAD) commits"
+        run: echo "## The branch has $(git rev-list --count --all) commits"
 
       - name: Get Version Info with Specific Commits (using custom task)
         # Pass numCommits from workflow to Gradle task as an environment variable
