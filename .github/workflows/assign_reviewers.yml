@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: wow-actions/auto-assign@v3
         with:
-          GITHUB_TOKEN: ${{ secrets.GHT }}
+          GITHUB_TOKEN: d ${{ secrets.GHT }}
           reviewers: |
             PaintNinja
             RealMangoRage
