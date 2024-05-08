@@ -4,9 +4,13 @@ on:
     types: [opened, ready_for_review]
 
 jobs:
-  add-reviews:
+  addreviewers:
     runs-on: ubuntu-latest
     steps:
-      - uses: kentaro-m/auto-assign-action@v2.0.0
+      - name: Add Reviewers
+        uses: madrapps/add-reviewers@v1
         with:
-          configuration-path: '.github/assign_reviewers.yml' # Only needed if you use something other than .github/auto_assign.yml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          reviewers: PaintNinja, RealMangoRage
+          re-request-when-approved: true
+          re-request-when-changes-requested: true
