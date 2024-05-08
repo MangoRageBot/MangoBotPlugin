@@ -1,0 +1,18 @@
+name: Assign Reviewers
+
+on:
+  pull_request:
+    types: [opened]
+
+jobs:
+  assign:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Assign reviewers (modify as needed)
+        uses: delivery-much/actions-assigner@v1
+        with:
+          github-token: ${{ secrets.GHT }}
+          # Add reviewers by username
+          reviewers: RealMangoRage, PaintNinja
