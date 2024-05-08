@@ -11,7 +11,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Assign reviewers (modify as needed)
-        uses: delivery-much/actions-assigner@v1
+        uses: AveryCameronUofR/add-reviewer-gh-action@1.0.3
         with:
           token: ${{ secrets.GHT }}
           # Add reviewers by username
