@@ -12,7 +12,7 @@ public class BrokenDrivers implements LogAnalyserModule{
 
 		if (str.contains("EXCEPTION_ACCESS_VIOLATION") && str.contains("atio6axx.dll")) {
 			message.reply(
-					"You have broken AMD or ATI Graphics Drivers, updating from Device Manager wont fix this issue. Read this guide to fix them: https://forums.minecraftforge.net/topic/125488-rules-and-frequently-asked-questions-faq/#:~:text=How%20do%20I%20update%20my%20drivers%3F")
+					"Updating your drivers might help. Please bear in mind that checking for updates the usual ways won't find any updates when drivers are in a broken state, so it's important you follow the linked guide. Important: If you have Nvidia graphics, also make sure you've set anything Minecraft-related (such as Java and launchers) to prioritise high performance graphics in both the Windows settings and Nvidia control panel. Read this guide to fix them: https://forums.minecraftforge.net/topic/125488-rules-and-frequently-asked-questions-faq/#:~:text=How%20do%20I%20update%20my%20drivers%3F")
 					.setSuppressEmbeds(true).mentionRepliedUser(true).queue();
 		} else if (str.contains("EXCEPTION_ACCESS_VIOLATION") && str.contains("nouveau")) { // FUCKK I forgot the name
 																							// of the full file that
