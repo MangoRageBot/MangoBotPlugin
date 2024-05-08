@@ -4,5 +4,5 @@ import net.dv8tion.jda.api.entities.Message;
 
 public interface LogAnalyserModule {
 
-	void analyse(String str, Message message);
+	void analyse(String str, Message message); 
 }
