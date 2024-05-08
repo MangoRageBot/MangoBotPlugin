@@ -14,8 +14,6 @@ jobs:
       - uses: wow-actions/auto-assign@v3
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          reviewers: |
-            PaintNinja
-            RealMangoRage
+          reviewers: RealMangoRage, PaintNinja
           assignees: PaintNinja, RealMangoRage
           skipKeywords: wip, draft
