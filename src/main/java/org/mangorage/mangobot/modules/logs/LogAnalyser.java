@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 
 import org.mangorage.mangobot.core.Util;
 
@@ -20,6 +23,28 @@ public class LogAnalyser {
 
 	public static LogAnalyser of(LogAnalyserModule... modules) {
 		return new LogAnalyser(List.of(modules));
+	}
+
+	public static LogAnalyserModule createModule(LogAnalyserModule module, List<String> strings) {
+		return createModule(module, String::contains, strings);
+	}
+
+	public static LogAnalyserModule createModule(LogAnalyserModule module, BiPredicate<String, String> comparePredicate, List<String> strings) {
+		return new LogAnalyserModule() {
+			private final List<String> stringsList = strings;
+			@Override
+			public void analyse(String str, Message message) {
+				boolean foundAll = true;
+				for (String string : stringsList) {
+					if (!comparePredicate.test(str, string)) {
+						foundAll = false;
+						break;
+					}
+				}
+				if (foundAll)
+					module.analyse(str, message);
+			}
+		};
 	}
 
 
@@ -64,9 +89,9 @@ public class LogAnalyser {
 		}			
 	}
 
-	public ArrayList<String> getLogURLs(String messaje) {
-		ArrayList<String> list = new ArrayList<String>();
-		for (String word : messaje.split(" ")) {
+	public ArrayList<String> getLogURLs(String message) {
+		ArrayList<String> list = new ArrayList<>();
+		for (String word : message.split(" ")) {
 
 			for (String paste : supported_paste_sites) {
 				if (word.contains(paste)) {
@@ -98,7 +123,7 @@ public class LogAnalyser {
 	}
 
 	public void readLog(Message message, String log) {
-		for(LogAnalyserModule mod:mods) {
+		for(LogAnalyserModule mod : mods) {
 			mod.analyse(log, message);
 		}
 	}

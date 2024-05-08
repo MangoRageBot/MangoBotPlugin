@@ -8,8 +8,7 @@ import net.dv8tion.jda.api.entities.Message;
 
 public class MissingDeps  implements LogAnalyserModule{
 
-	public void analyse(String str, Message messaje) {
-
+	public void analyse(String str, Message message) {
 		if (str.contains("Missing or unsupported mandatory dependencies:")) {
 			String nl = System.getProperty("line.separator");
 			
@@ -20,14 +19,7 @@ public class MissingDeps  implements LogAnalyserModule{
 						out = out + line + nl;
 					}
 			}
-			messaje.reply(out).setSuppressEmbeds(true).mentionRepliedUser(true).queue();
+			message.reply(out).setSuppressEmbeds(true).mentionRepliedUser(true).queue();
 		}
-	
-
-			
-
-		}
-
-	
-
+	}
 }
