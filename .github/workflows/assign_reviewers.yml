@@ -1,16 +1,18 @@
-name: 'Auto Assign'
+name: Auto Assign
 on:
+  issues:
+    types: [opened, edited, labeled, unlabeled]
   pull_request:
-    types: [opened, ready_for_review]
-
+    types: [opened, edited, labeled, unlabeled]
 jobs:
-  addreviewers:
+  run:
     runs-on: ubuntu-latest
     steps:
-      - name: Add Reviewers
-        uses: madrapps/add-reviewers@v1
+      - uses: wow-actions/auto-assign@v3
         with:
-          token: ${{ secrets.GHT }}
-          reviewers: PaintNinja, RealMangoRage
-          re-request-when-approved: true
-          re-request-when-changes-requested: true
+          GITHUB_TOKEN: ${{ secrets.GHT }}
+          reviewers: |
+            PaintNinja
+            RealMangoRage
+          assignees: PaintNinja, RealMangoRage
+          skipKeywords: wip, draft
