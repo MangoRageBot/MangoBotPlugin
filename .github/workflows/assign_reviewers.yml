@@ -13,6 +13,6 @@ jobs:
       - name: Assign reviewers (modify as needed)
         uses: delivery-much/actions-assigner@v1
         with:
-          github-token: ${{ secrets.GHT }}
+          token: ${{ secrets.GHT }}
           # Add reviewers by username
           reviewers: RealMangoRage, PaintNinja
