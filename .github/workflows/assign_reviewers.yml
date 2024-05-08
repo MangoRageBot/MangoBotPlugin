@@ -16,9 +16,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: wow-actions/auto-assign@v3
-        env:
-          GITHUB_TOKEN: ${{ secrets.GHT }}
         with:
+          GITHUB_TOKEN: ${{ secrets.GHT }}
           reviewers: |
             PaintNinja
             RealMangoRage
