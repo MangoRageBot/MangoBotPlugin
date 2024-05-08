@@ -1,18 +1,12 @@
-name: Assign Reviewers
-
+name: 'Auto Assign'
 on:
   pull_request:
-    types: [opened]
+    types: [opened, ready_for_review]
 
 jobs:
-  assign:
+  add-reviews:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Assign reviewers (modify as needed)
-        uses: AveryCameronUofR/add-reviewer-gh-action@1.0.3
+      - uses: kentaro-m/auto-assign-action@v2.0.0
         with:
-          token: ${{ secrets.GHT }}
-          # Add reviewers by username
-          reviewers: RealMangoRage, PaintNinja
+          configuration-path: '.github/assign_reviewers.yml' # Only needed if you use something other than .github/auto_assign.yml
