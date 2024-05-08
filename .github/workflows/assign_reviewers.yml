@@ -1,24 +1,19 @@
 name: Auto Assign
 on:
-  issues:
-    types: [opened, edited, labeled, unlabeled]
-  pull_request:
-    types: [opened, edited, labeled, unlabeled]
-
-permissions:
-  contents: read
-  issues: write
-  pull-requests: write
-  discussions: write
+  pull_request_target:
 
 jobs:
   run:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+      discussions: write
     steps:
       - uses: wow-actions/auto-assign@v3
-        env:
-          GITHUB_TOKEN: ${{ secrets.GHT }}
         with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           reviewers: |
             PaintNinja
             RealMangoRage
