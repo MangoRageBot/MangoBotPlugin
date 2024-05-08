@@ -58,7 +58,7 @@ public class PasteRequestModule {
             new MissingDeps(),
             LogAnalyser.createModule(
                     (s, m) -> {
-                        m.reply("This is a common issue on Modrinth Theseus. Do not use Modrinth or their launcher, it is not good, especially on Forge. If you need to download a Modrinth format modpack you can use Prism Launcher, GDLauncher, ATLauncher, SKLauncher, or others which are far more reliable.").setSuppressEmbeds(true).mentionRepliedUser(true).queue();
+                        m.reply("This is a common issue on Modrinth Theseus. Modrinth's launcher has been known to be problematic in some cases, especially on Forge. If you need to download a Modrinth format modpack you can use Prism Launcher, GDLauncher, ATLauncher, SKLauncher, or others which are far more reliable.").setSuppressEmbeds(true).mentionRepliedUser(true).queue();
                     },
                     List.of(
                             "Invalid registry value type detected for PerfOS counters",
