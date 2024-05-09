@@ -14,7 +14,7 @@ public class Java22  implements LogAnalyserModule{
 		if (str.contains("java.lang.IllegalArgumentException: Unsupported class file major version")) {
 			if (str.contains("--fml.forgeVersion, 4") || str.contains("--fml.forgeVersion, 3")) {
 				if (str.contains("java version 2") && !str.contains("java version 20") && !str.contains("java version 21")) {
-					message.reply("Update MinecraftForge to a newer build number. Older ones bundle an old version of ASM which does not work on Java 22 and newer.").setSuppressEmbeds(true).mentionRepliedUser(true).queue();
+					message.reply("Update MinecraftForge to the latest build for your MC version to fix your issue. Older builds bundle an old version of the ASM library which does not work on Java 22+.").setSuppressEmbeds(true).mentionRepliedUser(true).queue();
 				}
 			}
 		} else if (str.contains("has been compiled by a more recent version of the Java Runtime")) {
