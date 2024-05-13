@@ -164,7 +164,7 @@ public class MangoBotPlugin extends CorePlugin {
                         .build()
         );
 
-        new ServerAuthorizer(this);
+        //new ServerAuthorizer(this);
 
         getJDA().addEventListener(new BotEventListener(this));
     }
