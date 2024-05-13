@@ -45,7 +45,7 @@ repositories {
         url = 'https://s01.oss.sonatype.org/content/repositories/releases/'
     }
     maven {
-        url = 'https://s01.oss.sonatype.org/content/repositories/releases/'
+        url = 'https://maven.minecraftforge.net/'
     }
     maven {
         url 'https://m2.dv8tion.net/releases'
@@ -62,8 +62,8 @@ dependencies {
     testImplementation platform('org.junit:junit-bom:5.9.1')
     testImplementation 'org.junit.jupiter:junit-jupiter'
 
-    installer('io.github.realmangorage:installer:2.2.4')
-    bot('io.github.realmangorage:mangobot:10.0.+')
+    installer('org.mangorage:installer:3.0.22')
+    bot('org.mangorage:mangobot:10.0.+')
 
     library('org.eclipse.mylyn.github:org.eclipse.egit.github.core:2.1.5')
     library('org.kohsuke:github-api:1.321')
