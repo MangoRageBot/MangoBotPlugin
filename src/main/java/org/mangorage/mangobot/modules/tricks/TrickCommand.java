@@ -232,7 +232,7 @@ public class TrickCommand implements IBasicCommand {
 
 
     private void delete(Trick trick) {
-        //TRICK_DATA_HANDLER.deleteFile("%s.json".formatted(trick.getTrickID()), trick.getGuildID());
+        TRICK_DATA_HANDLER.delete(plugin.getPluginDirectory(), trick);
     }
 
     private void save(Trick trick) {
