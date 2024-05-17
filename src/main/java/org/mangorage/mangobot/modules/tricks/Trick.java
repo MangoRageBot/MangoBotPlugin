@@ -1,8 +1,10 @@
 package org.mangorage.mangobot.modules.tricks;
 
 import com.google.gson.annotations.Expose;
+import org.mangorage.mangobotapi.core.data.FileName;
+import org.mangorage.mangobotapi.core.data.IFileNameResolver;
 
-public class Trick {
+public class Trick implements IFileNameResolver {
     @Expose
     private long ownerID;
 
@@ -140,5 +142,10 @@ public class Trick {
 
     protected void use() {
         timesUsed++;
+    }
+
+    @Override
+    public FileName resolve() {
+        return new FileName(guildID, trickID);
     }
 }

@@ -28,6 +28,7 @@ import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
 import org.mangorage.mangobotapi.core.commands.IBasicCommand;
 import org.mangorage.mangobotapi.core.data.DataHandler;
+import org.mangorage.mangobotapi.core.data.IEmptyFileNameResolver;
 import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
 
 import java.io.BufferedReader;
@@ -37,21 +38,15 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class VersionCommand implements IBasicCommand {
-    public record Version(String version) {
-    }
+    public record Version(String version) implements IEmptyFileNameResolver {}
 
     private static final AtomicReference<Version> VERSION = new AtomicReference<>();
-    private static final DataHandler<Version> VERSION_DATA_HANDLER = DataHandler.create(
-            VERSION::set,
-            Version.class,
-            "installer/",
-            DataHandler.Properties.create()
-                    .setFileName("version.json")
-                    .useDefaultFileNamePredicate()
-    );
+    private static final DataHandler<Version> VERSION_DATA_HANDLER = DataHandler.create()
+            .path("version")
+            .build(Version.class);
 
     public static void init() {
-        VERSION_DATA_HANDLER.loadAll();
+
     }
 
     public static String findVersion(String key, String filePath) {
@@ -80,9 +75,6 @@ public class VersionCommand implements IBasicCommand {
     public VersionCommand(CorePlugin corePlugin) {
         this.corePlugin = corePlugin;
     }
-
-
-
 
     @NotNull
     @Override

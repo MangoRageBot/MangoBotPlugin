@@ -45,23 +45,19 @@ import java.util.stream.Stream;
 public class TrickCommand implements IBasicCommand {
     private static final boolean ALLOW_SCRIPT_TRICKS = true;
     private final CorePlugin plugin;
-    private final DataHandler<Trick> TRICK_DATA_HANDLER;
+
+    private final DataHandler<Trick> TRICK_DATA_HANDLER = DataHandler.create()
+            .path("data/tricksV2")
+            .build(Trick.class);
+
     private final Map<String, Map<String, Trick>> TRICKS = new HashMap<>();
     private final Map<String, PagedList<String>> PAGES = new ConcurrentHashMap<>();
+
     private TrickScriptable SCRIPT_RUNNER;
 
     public TrickCommand(CorePlugin plugin) {
         this.plugin = plugin;
         this.SCRIPT_RUNNER = new TrickScriptable(plugin);
-        this.TRICK_DATA_HANDLER = DataHandler.create(
-                (data) -> {
-                    TRICKS.computeIfAbsent(data.getGuildID(), (k) -> new HashMap<>()).put(data.getTrickID(), data);
-                },
-                Trick.class,
-                "plugins/%s/data/tricksV2".formatted(plugin.getId()),
-                DataHandler.Properties.create()
-                        .setFileNamePredicate(e -> true)
-        );
 
         plugin.getPluginBus().addListener(LoadEvent.class, this::onLoadEvent);
         plugin.getPluginBus().addListener(SaveEvent.class, this::onSaveEvent);
@@ -204,7 +200,9 @@ public class TrickCommand implements IBasicCommand {
 
     public void onLoadEvent(LoadEvent event) {
         LogHelper.info("Loading Tricks Data!");
-        TRICK_DATA_HANDLER.loadAll();
+        TRICK_DATA_HANDLER.load(plugin.getPluginDirectory()).forEach(data -> {
+            TRICKS.computeIfAbsent(data.getGuildID(), (k) -> new HashMap<>()).put(data.getTrickID(), data);
+        });
         LogHelper.info("Finished loading Tricks Data!");
     }
 
@@ -233,11 +231,11 @@ public class TrickCommand implements IBasicCommand {
 
 
     private void delete(Trick trick) {
-        TRICK_DATA_HANDLER.deleteFile("%s.json".formatted(trick.getTrickID()), trick.getGuildID());
+        //TRICK_DATA_HANDLER.deleteFile("%s.json".formatted(trick.getTrickID()), trick.getGuildID());
     }
 
     private void save(Trick trick) {
-        TRICK_DATA_HANDLER.save("%s.json".formatted(trick.getTrickID()), trick, trick.getGuildID());
+        TRICK_DATA_HANDLER.save(plugin.getPluginDirectory(), trick);
     }
 
     private boolean exists(String trickID, String guildID) {
