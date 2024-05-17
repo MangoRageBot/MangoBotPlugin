@@ -48,6 +48,7 @@ public class TrickCommand implements IBasicCommand {
 
     private final DataHandler<Trick> TRICK_DATA_HANDLER = DataHandler.create()
             .path("data/tricksV2")
+            .maxDepth(3)
             .build(Trick.class);
 
     private final Map<String, Map<String, Trick>> TRICKS = new HashMap<>();
