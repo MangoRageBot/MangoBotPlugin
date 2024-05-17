@@ -28,6 +28,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.utils.TimeUtil;
 import org.mangorage.basicutils.LogHelper;
+import org.mangorage.mangobot.loader.CoreMain;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandPrefix;
 import org.mangorage.mangobotapi.core.events.BasicCommandEvent;
@@ -60,15 +61,17 @@ public class Util {
 
     public static boolean handleMessage(CorePlugin plugin, MessageReceivedEvent event) {
         // Handle Message and prefix
-        String Prefix = event.isFromGuild() ? CommandPrefix.getPrefix(event.getGuild().getId()) : plugin.getCommandPrefix();
+        String cmdPrefix = event.isFromGuild() ? CommandPrefix.getPrefix(event.getGuild().getId()) : plugin.getCommandPrefix();
+        if (CoreMain.isDevMode()) // Special clause for dev mode!
+            cmdPrefix = "dev" + cmdPrefix;
 
         Message message = event.getMessage();
         String rawMessage = message.getContentRaw();
 
-        if (rawMessage.length() > 1 && rawMessage.startsWith(Prefix)) {
+        if (rawMessage.length() > 1 && rawMessage.startsWith(cmdPrefix)) {
             if (event.getAuthor().isBot()) return true;
             String[] command_pre = rawMessage.split(" ");
-            String command = command_pre[0].replaceFirst(Prefix, "");
+            String command = command_pre[0].replaceFirst(cmdPrefix, "");
             Arguments arguments = Arguments.of(Arguments.of(command_pre).getFrom(1).split(" "));
 
             var commandEvent = new BasicCommandEvent(event.getMessage(), command, arguments);
