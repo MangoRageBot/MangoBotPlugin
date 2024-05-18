@@ -51,10 +51,24 @@ public class TrickCommand implements IBasicCommand {
             .maxDepth(3)
             .build(Trick.class);
 
-    private final Map<String, Map<String, Trick>> TRICKS = new HashMap<>();
+    private final Map<TrickKey, Trick> TRICKS = new HashMap<>();
     private final Map<String, PagedList<String>> PAGES = new ConcurrentHashMap<>();
 
     private TrickScriptable SCRIPT_RUNNER;
+
+
+    private Trick getTrick(String trickId, long guildId) {
+        return TRICKS.get(new TrickKey(trickId, guildId));
+    }
+
+    private List<Trick> getTricksForGuild(long guildId) {
+        return TRICKS.entrySet()
+                .stream()
+                .filter(e -> e.getKey().guildId() == guildId)
+                .map(Map.Entry::getValue)
+                .toList();
+    }
+
 
     public TrickCommand(CorePlugin plugin) {
         this.plugin = plugin;
@@ -74,16 +88,14 @@ public class TrickCommand implements IBasicCommand {
                         if (valueOption != null) {
                             var g = e.getGuild();
                             if (g != null) {
-                                var gid = g.getId();
-                                var gTricks = TRICKS.get(gid);
-                                if (gTricks != null) {
-                                    var trick = gTricks.get(valueOption.getAsString());
-                                    if (trick != null) {
-                                        useTrick(trick, null, e.getChannel(), gid, Arguments.of());
-                                        e.reply("Executed Trick!").setEphemeral(true).queue();
-                                        return;
-                                    }
+                                var gid = g.getIdLong();
+                                var trick = getTrick(valueOption.getAsString(), gid);
+                                if (trick != null) {
+                                    useTrick(trick, null, e.getChannel(), gid, Arguments.of());
+                                    e.reply("Executed Trick!").setEphemeral(true).queue();
+                                    return;
                                 }
+
                             }
                         }
                         e.reply("Failed to execute trick!").setEphemeral(true).queue();
@@ -93,13 +105,13 @@ public class TrickCommand implements IBasicCommand {
                                     .onAutoComplete(e -> {
                                         var guild = e.getGuild();
                                         if (guild != null) {
-                                            var id = guild.getId();
-                                            var entries = TRICKS.get(id);
+                                            var id = guild.getIdLong();
+                                            var entries = getTricksForGuild(id);
                                             if (entries != null) {
                                                 e.replyChoiceStrings(
-                                                        entries.entrySet().stream()
-                                                                .filter(k -> k.getValue().getType() == TrickType.NORMAL)
-                                                                .map(Map.Entry::getKey)
+                                                        entries.stream()
+                                                                .filter(k -> k.getType() == TrickType.NORMAL)
+                                                                .map(Trick::getTrickID)
                                                                 .limit(25)
                                                                 .toList()
                                                 ).queue();
@@ -180,17 +192,16 @@ public class TrickCommand implements IBasicCommand {
                 var trickID = DEvent.getInteraction().getValue("trickid");
                 var content = DEvent.getInteraction().getValue("content");
                 if (trickID != null && content != null) {
-                    var map = TRICKS.computeIfAbsent(guild.getId(), g -> new HashMap<>());
-                    if (map.containsKey(trickID.getAsString())) {
+                    if (exists(trickID.getAsString(), guild.getIdLong())) {
                         DEvent.reply("Cannot create trick '%s' already exists!".formatted(trickID.getAsString())).queue();
                     } else {
-                        Trick newTrick = new Trick(trickID.getAsString(), guild.getId());
+                        Trick newTrick = new Trick(trickID.getAsString(), guild.getIdLong());
                         newTrick.setLastUserEdited(user.getIdLong());
                         newTrick.setOwnerID(user.getIdLong());
                         newTrick.setType(TrickType.NORMAL);
                         newTrick.setContent(content.getAsString());
                         save(newTrick);
-                        map.put(trickID.getAsString(), newTrick);
+                        TRICKS.put(new TrickKey(trickID.getAsString(), guild.getIdLong()), newTrick);
                         DEvent.reply("Created new trick '%s'!".formatted(trickID.getAsString())).queue();
                     }
                 }
@@ -202,7 +213,7 @@ public class TrickCommand implements IBasicCommand {
     public void onLoadEvent(LoadEvent event) {
         LogHelper.info("Loading Tricks Data!");
         TRICK_DATA_HANDLER.load(plugin.getPluginDirectory()).forEach(data -> {
-            TRICKS.computeIfAbsent(data.getGuildID(), (k) -> new HashMap<>()).put(data.getTrickID(), data);
+            TRICKS.put(new TrickKey(data.getTrickID(), data.getGuildID()), data);
         });
         LogHelper.info("Finished loading Tricks Data!");
     }
@@ -211,7 +222,7 @@ public class TrickCommand implements IBasicCommand {
         LogHelper.info("Saving Tricks Data!");
 
         TRICKS.forEach((k, v) -> {
-            v.forEach((k2, v2) -> save(v2));
+            save(v);
         });
     }
 
@@ -219,13 +230,13 @@ public class TrickCommand implements IBasicCommand {
         if (!event.isHandled()) {
             Message message = event.getMessage();
             if (!message.isFromGuild()) return;
-            String guildID = message.getGuild().getId();
+            long guildID = message.getGuild().getIdLong();
             String command = event.getCommand().toLowerCase();
             String args = event.getArguments().getFrom(0);
 
             // We have found something that works, make sure we do this so that "Invalid Command" doesn't occur
             // event.setHandled() insures that the command has been handled!
-            if (TRICKS.containsKey(guildID) && TRICKS.get(guildID).containsKey(command))
+            if (exists(command, guildID))
                 event.setHandled(execute(message, Arguments.of("-s", command, args)));
         }
     }
@@ -239,11 +250,8 @@ public class TrickCommand implements IBasicCommand {
         TRICK_DATA_HANDLER.save(plugin.getPluginDirectory(), trick);
     }
 
-    private boolean exists(String trickID, String guildID) {
-        var map = TRICKS.get(guildID);
-        if (map != null)
-            return map.containsKey(trickID);
-        return false;
+    private boolean exists(String trickID, long guildID) {
+        return getTrick(trickID, guildID) != null;
     }
 
     private boolean isOwnerAndUnlocked(Trick trick, Member member) {
@@ -259,7 +267,7 @@ public class TrickCommand implements IBasicCommand {
         Member member = message.getMember();
         if (member == null)
             return CommandResult.PASS;
-        String guildID = message.getGuild().getId();
+        long guildID = message.getGuild().getIdLong();
         String typeString = args.get(0);
         TrickCMDType type = typeString == null ? TrickCMDType.NONE : TrickCMDType.getType(typeString);
         String trickID = args.get(1);
@@ -316,14 +324,14 @@ public class TrickCommand implements IBasicCommand {
             trick.setLastUserEdited(member.getIdLong());
             trick.setLastEdited(System.currentTimeMillis());
 
-            TRICKS.computeIfAbsent(guildID, (k) -> new HashMap<>()).put(trickID, trick);
+            TRICKS.put(new TrickKey(trickID, guildID), trick);
             save(trick);
 
             dMessage.apply(message.reply("Added New Trick '%s'!".formatted(trickID))).queue();
 
         } else if (type == TrickCMDType.MODIFY) {
             if (exists(trickID, guildID)) {
-                var trick = TRICKS.get(guildID).get(trickID);
+                var trick = getTrick(trickID, guildID);
 
                 if (!isOwnerAndUnlocked(trick, member)) {
                     dMessage.apply(message.reply("Cannot modify/remove Trick '%s' as your not the owner of this trick and its locked.".formatted(trickID))).queue();
@@ -374,7 +382,7 @@ public class TrickCommand implements IBasicCommand {
             }
         } else if (type == TrickCMDType.REMOVE) {
             if (exists(trickID, guildID)) {
-                var trick = TRICKS.get(guildID).get(trickID);
+                var trick = getTrick(trickID, guildID);
 
                 if (!isOwnerAndUnlocked(trick, member)) {
                     dMessage.apply(message.reply("Cannot modify/remove Trick '%s' as your not the owner of this trick and its locked.".formatted(trickID))).queue();
@@ -382,7 +390,7 @@ public class TrickCommand implements IBasicCommand {
                 }
 
                 delete(trick);
-                TRICKS.get(guildID).remove(trickID);
+                TRICKS.remove(new TrickKey(trickID, guildID));
                 dMessage.apply(message.reply("Removed Trick %s.".formatted(trickID))).queue();
             }
         } else if (type == TrickCMDType.INFO) {
@@ -391,7 +399,7 @@ public class TrickCommand implements IBasicCommand {
                 return CommandResult.PASS;
             }
 
-            var trick = TRICKS.get(guildID).get(trickID);
+            var trick = getTrick(trickID, guildID);
 
             String details = """
                     Details for Trick %s
@@ -441,7 +449,7 @@ public class TrickCommand implements IBasicCommand {
                 return CommandResult.PASS;
             }
 
-            var trick = TRICKS.get(guildID).get(trickID);
+            var trick = getTrick(trickID, guildID);
             useTrick(trick, message, message.getChannel(), guildID, args);
         } else if (type == TrickCMDType.LIST) {
             int length;
@@ -457,7 +465,7 @@ public class TrickCommand implements IBasicCommand {
             }
 
             MessageChannelUnion channel = message.getChannel();
-            if (TRICKS.containsKey(guildID) && !TRICKS.get(guildID).isEmpty()) {
+            if (!getTricksForGuild(guildID).isEmpty()) {
 
                 PagedList<String> tricks = createTricks(guildID, length);
 
@@ -477,7 +485,7 @@ public class TrickCommand implements IBasicCommand {
                 return CommandResult.PASS;
             }
 
-            var trick = TRICKS.get(guildID).get(trickID);
+            var trick = getTrick(trickID, guildID);
             if (trick.getOwnerID() == member.getIdLong()) {
                 dMessage.apply(
                         message.reply((trick.isLocked() ? "Unlocked" : "Locked") + " Trick '%s'".formatted(trickID))
@@ -510,7 +518,7 @@ public class TrickCommand implements IBasicCommand {
         return CommandResult.PASS;
     }
 
-    private void useTrick(Trick trick, Message message, MessageChannel channel, String guildID, Arguments args) {
+    private void useTrick(Trick trick, Message message, MessageChannel channel, long guildID, Arguments args) {
         MessageSettings dMessage = plugin.getMessageSettings();
         var type = trick.getType();
         if (type == TrickType.NORMAL) {
@@ -519,7 +527,7 @@ public class TrickCommand implements IBasicCommand {
             save(trick);
         } else if (type == TrickType.ALIAS) {
             if (exists(trick.getAliasTarget(), guildID)) {
-                var alias = TRICKS.get(guildID).get(trick.getAliasTarget());
+                var alias = getTrick(trick.getAliasTarget(), guildID);
                 trick.use();
                 useTrick(alias, message, channel, guildID, args);
             }
@@ -629,10 +637,10 @@ public class TrickCommand implements IBasicCommand {
         return result;
     }
 
-    private PagedList<String> createTricks(String guildID, int entries) {
+    private PagedList<String> createTricks(long guildID, int entries) {
         PagedList<String> tricks = new PagedList<>();
 
-        Object[] LIST = TRICKS.get(guildID).keySet().toArray();
+        Object[] LIST = getTricksForGuild(guildID).stream().map(Trick::getTrickID).toArray();
         tricks.rebuild(Arrays.copyOf(LIST, LIST.length, String[].class), entries);
 
         return tricks;

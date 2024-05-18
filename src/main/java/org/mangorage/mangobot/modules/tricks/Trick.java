@@ -39,7 +39,7 @@ public class Trick implements IFileNameResolver {
     private final String trickID;
 
     @Expose
-    private final String guildID;
+    private final long guildID;
 
     @Expose
     private final long created;
@@ -47,7 +47,7 @@ public class Trick implements IFileNameResolver {
     @Expose
     private TrickType type;
 
-    protected Trick(String trickID, String guildID) {
+    protected Trick(String trickID, long guildID) {
         this.trickID = trickID;
         this.guildID = guildID;
         this.created = System.currentTimeMillis();
@@ -128,7 +128,7 @@ public class Trick implements IFileNameResolver {
         return created;
     }
 
-    public String getGuildID() {
+    public long getGuildID() {
         return guildID;
     }
 
@@ -146,6 +146,6 @@ public class Trick implements IFileNameResolver {
 
     @Override
     public FileName resolve() {
-        return new FileName(guildID, trickID);
+        return new FileName(guildID + "", trickID);
     }
 }
