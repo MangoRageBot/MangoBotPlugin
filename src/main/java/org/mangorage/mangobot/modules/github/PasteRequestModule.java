@@ -30,6 +30,9 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import org.eclipse.egit.github.core.Gist;
 import org.eclipse.egit.github.core.GistFile;
 import org.eclipse.egit.github.core.client.GitHubClient;
@@ -42,8 +45,7 @@ import org.mangorage.mangobot.modules.logs.EarlyWindow;
 import org.mangorage.mangobot.modules.logs.Java22;
 import org.mangorage.mangobot.modules.logs.LogAnalyser;
 import org.mangorage.mangobot.modules.logs.MissingDeps;
-import org.mangorage.mangobotapi.core.events.discord.DMessageReceivedEvent;
-import org.mangorage.mangobotapi.core.events.discord.DReactionEvent;
+import org.mangorage.mangobotapi.core.events.DiscordEvent;
 import org.mangorage.mboteventbus.impl.IEventBus;
 
 import net.dv8tion.jda.api.entities.Message;
@@ -121,8 +123,8 @@ public class PasteRequestModule {
     private static final Emoji EMOJI = Emoji.fromUnicode("\uD83D\uDCCB");
 
     public static void register(IEventBus bus) {
-        bus.addListener(DMessageReceivedEvent.class, PasteRequestModule::onMessage);
-        bus.addListener(DReactionEvent.class, PasteRequestModule::onReact);
+        bus.addGenericListener(10, MessageReceivedEvent.class, DiscordEvent.class, PasteRequestModule::onMessage);
+        bus.addGenericListener(10, MessageReactionAddEvent.class, DiscordEvent.class, PasteRequestModule::onReact);
     }
 
     private static byte[] getData(InputStream stream) {
@@ -217,8 +219,8 @@ public class PasteRequestModule {
         });
     }
 
-    public static void onMessage(DMessageReceivedEvent event) {
-        var dEvent = event.get();
+    public static void onMessage(DiscordEvent<MessageReceivedEvent> event) {
+        var dEvent = event.getInstance();
         var message = dEvent.getMessage();
         var attachments = message.getAttachments();
         analyser.scanMessage(message);
@@ -245,8 +247,8 @@ public class PasteRequestModule {
         }
     }
 
-    public static void onReact(DReactionEvent event) {
-        var dEvent = event.get();
+    public static void onReact(DiscordEvent<MessageReactionAddEvent> event) {
+        var dEvent = event.getInstance();
 
         if (!dEvent.isFromGuild()) return;
         if (dEvent.getUser() == null) return;

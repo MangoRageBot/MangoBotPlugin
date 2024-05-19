@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Scanner;
 
 import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.mangorage.basicutils.config.Config;
 import org.mangorage.basicutils.config.ConfigSetting;
 import org.mangorage.basicutils.config.ISetting;
@@ -44,7 +45,6 @@ import org.mangorage.mangobot.config.GuildConfig;
 import org.mangorage.mangobot.core.BotEventListener;
 import org.mangorage.mangobot.core.BotPermissions;
 import org.mangorage.mangobot.core.Listeners;
-import org.mangorage.mangobot.loader.CoreMain;
 import org.mangorage.mangobot.modules.basic.commands.GetEmbedsCommand;
 import org.mangorage.mangobot.modules.basic.commands.HelpCommand;
 import org.mangorage.mangobot.modules.basic.commands.InfoCommand;
@@ -83,9 +83,9 @@ import org.mangorage.mangobot.modules.music.commands.PlayingCommand;
 import org.mangorage.mangobot.modules.music.commands.QueueCommand;
 import org.mangorage.mangobot.modules.music.commands.StopCommand;
 import org.mangorage.mangobot.modules.music.commands.VolumeCommand;
+import org.mangorage.mangobotapi.core.events.DiscordEvent;
 import org.mangorage.mangobotapi.core.events.LoadEvent;
 import org.mangorage.mangobotapi.core.events.SaveEvent;
-import org.mangorage.mangobotapi.core.events.discord.DMessageReceivedEvent;
 import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
 import org.mangorage.mangobotapi.core.plugin.api.PluginMessageEvent;
 import org.mangorage.mangobotapi.core.plugin.impl.Plugin;
@@ -173,12 +173,12 @@ public class MangoBotPlugin extends CorePlugin {
     @Override
     public void startup() {
         BotPermissions.init();
-        getPluginBus().register(new Listeners(this));
     }
 
     private static final List<Long> AUTO_PUBLISH_CHANNELS = List.of(1129095997461647402L, 1129077934330744882L);
-    public void onMessage(DMessageReceivedEvent event) {
-        var dEvent = event.get();
+
+    public void onMessage(DiscordEvent<MessageReceivedEvent> event) {
+        var dEvent = event.getInstance();
         var channel = dEvent.getChannel().getIdLong();
         if (AUTO_PUBLISH_CHANNELS.contains(channel)) {
             var msg = dEvent.getMessage();
@@ -260,7 +260,7 @@ public class MangoBotPlugin extends CorePlugin {
         new GHIssueStatus(this);
         
 
-        getPluginBus().addListener(PluginMessageEvent.class, pm -> {
+        getPluginBus().addListener(10, PluginMessageEvent.class, pm -> {
             if (pm.getMethod().equals("getDate")) {
                 if (pm.getObject().get() == null) return;
                 if (pm.getObject().get() instanceof Date date) {
@@ -268,7 +268,9 @@ public class MangoBotPlugin extends CorePlugin {
                 }
             }
         });
-        getPluginBus().addListener(DMessageReceivedEvent.class, this::onMessage);
+
+        new Listeners(this);
+        getPluginBus().addGenericListener(10,  MessageReceivedEvent.class, DiscordEvent.class, this::onMessage);
     }
 
     @Override

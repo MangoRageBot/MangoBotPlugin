@@ -22,21 +22,21 @@
 
 package org.mangorage.mangobot.core;
 
-import org.mangorage.mangobotapi.core.events.discord.DButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.mangorage.mangobotapi.core.events.DiscordEvent;
 import org.mangorage.mangobotapi.core.modules.buttonactions.ButtonActions;
 import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
-import org.mangorage.mboteventbus.annotations.SubscribeEvent;
 
 public class Listeners {
     private final CorePlugin plugin;
 
     public Listeners(CorePlugin plugin) {
         this.plugin = plugin;
+        plugin.getPluginBus().addGenericListener(10, ButtonInteractionEvent.class, DiscordEvent.class, this::onButtonInteraction);
     }
 
-    @SubscribeEvent
-    public void onButtonInteraction(DButtonInteractionEvent event) {
-        var dEvent = event.get();
+    public void onButtonInteraction(DiscordEvent<ButtonInteractionEvent> event) {
+        var dEvent = event.getInstance();
         ButtonActions.post(dEvent.getInteraction());
     }
 
