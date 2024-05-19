@@ -37,22 +37,14 @@ import net.dv8tion.jda.api.events.session.SessionResumeEvent;
 import net.dv8tion.jda.api.hooks.SubscribeEvent;
 import org.mangorage.basicutils.LogHelper;
 import org.mangorage.jdautils.WatcherManager;
-import org.mangorage.mangobotapi.core.events.discord.DButtonInteractionEvent;
-import org.mangorage.mangobotapi.core.events.discord.DMessageDeleteEvent;
-
+import org.mangorage.mangobotapi.core.events.DiscordEvent;
 import org.mangorage.mangobotapi.core.events.discord.DMessageReceivedEvent;
-import org.mangorage.mangobotapi.core.events.discord.DMessageUpdateEvent;
-import org.mangorage.mangobotapi.core.events.discord.DModalInteractionEvent;
-import org.mangorage.mangobotapi.core.events.discord.DReactionEvent;
-import org.mangorage.mangobotapi.core.events.discord.DStringSelectInteractionEvent;
-import org.mangorage.mangobotapi.core.events.discord.DVoiceUpdateEvent;
 import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
 import org.mangorage.mboteventbus.impl.IEventBus;
 
 
 @SuppressWarnings("unused")
 public class BotEventListener {
-
     private final CorePlugin plugin;
     private final IEventBus bus;
 
@@ -61,16 +53,18 @@ public class BotEventListener {
         this.bus = plugin.getPluginBus();
     }
 
-
     @SubscribeEvent
     public void modalInteraction(ModalInteractionEvent event) {
-        bus.post(new DModalInteractionEvent(event));
+        bus.post(new DiscordEvent<>(event));
     }
 
     @SubscribeEvent
-    public void messageRecieved(MessageReceivedEvent event) {
+    public void messageReceived(MessageReceivedEvent event) {
         var isCommand = Util.handleMessage(plugin, event);
-        bus.post(new DMessageReceivedEvent(event, isCommand));
+        if (isCommand)
+            bus.post(new DMessageReceivedEvent(event, isCommand));
+        else
+            bus.post(new DiscordEvent<>(event));
     }
 
     @SubscribeEvent
@@ -95,31 +89,31 @@ public class BotEventListener {
 
     @SubscribeEvent
     public void messageReact(MessageReactionAddEvent event) {
-        bus.post(new DReactionEvent(event));
+        bus.post(new DiscordEvent<>(event));
     }
 
     @SubscribeEvent
     public void interact(ButtonInteractionEvent event) {
-        bus.post(new DButtonInteractionEvent(event));
+        bus.post(new DiscordEvent<>(event));
     }
 
     @SubscribeEvent
     public void messageUpdate(MessageUpdateEvent event) {
-        bus.post(new DMessageUpdateEvent(event));
+        bus.post(new DiscordEvent<>(event));
     }
 
     @SubscribeEvent
     public void messageDelete(MessageDeleteEvent event) {
-        bus.post(new DMessageDeleteEvent(event));
+        bus.post(new DiscordEvent<>(event));
     }
 
     @SubscribeEvent
     public void messageStringSelect(StringSelectInteractionEvent event) {
-        bus.post(new DStringSelectInteractionEvent(event));
+        bus.post(new DiscordEvent<>(event));
     }
 
     @SubscribeEvent
     public void voiceUpdate(GuildVoiceUpdateEvent event) {
-        bus.post(new DVoiceUpdateEvent(event));
+        bus.post(new DiscordEvent<>(event));
     }
 }
