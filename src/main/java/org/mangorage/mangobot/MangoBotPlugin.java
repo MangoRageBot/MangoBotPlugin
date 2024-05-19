@@ -86,6 +86,8 @@ import org.mangorage.mangobot.modules.music.commands.VolumeCommand;
 import org.mangorage.mangobotapi.core.events.DiscordEvent;
 import org.mangorage.mangobotapi.core.events.LoadEvent;
 import org.mangorage.mangobotapi.core.events.SaveEvent;
+import org.mangorage.mangobotapi.core.modules.action.ButtonActionRegistry;
+import org.mangorage.mangobotapi.core.modules.action.TrashButtonAction;
 import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
 import org.mangorage.mangobotapi.core.plugin.api.PluginMessageEvent;
 import org.mangorage.mangobotapi.core.plugin.impl.Plugin;
@@ -140,6 +142,7 @@ public class MangoBotPlugin extends CorePlugin {
     public static final ISetting<String> GITHUB_TOKEN = ConfigSetting.create(CONFIG, "PASTE_TOKEN", "empty");
     public static final ISetting<String> GITHUB_USERNAME = ConfigSetting.create(CONFIG, "GITHUB_USERNAME", "RealMangoRage");
     public static final ISetting<String> DEEPL_TOKEN = ConfigSetting.create(CONFIG, "DEEPL_TOKEN", "empty");
+    public static final ButtonActionRegistry ACTION_REGISTRY = new ButtonActionRegistry();
 
 
     public MangoBotPlugin() {
@@ -192,6 +195,8 @@ public class MangoBotPlugin extends CorePlugin {
     public void registration() {
         var cmdRegistry = getCommandRegistry();
         var permRegistry = getPermissionRegistry();
+
+        ACTION_REGISTRY.register(new TrashButtonAction());
 
         permRegistry.register(PLAYING);
         permRegistry.register(TRICK_ADMIN);

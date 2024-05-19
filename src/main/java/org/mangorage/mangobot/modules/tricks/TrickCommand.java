@@ -8,7 +8,9 @@ import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.Component;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
@@ -16,6 +18,7 @@ import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.MarkdownSanitizer;
 import net.dv8tion.jda.api.utils.MarkdownUtil;
+import net.dv8tion.jda.internal.interactions.component.ButtonImpl;
 import org.jetbrains.annotations.NotNull;
 import org.mangorage.basicutils.LogHelper;
 import org.mangorage.basicutils.TaskScheduler;
@@ -23,6 +26,7 @@ import org.mangorage.basicutils.misc.PagedList;
 import org.mangorage.basicutils.misc.RunnableTask;
 import org.mangorage.jdautils.command.Command;
 import org.mangorage.jdautils.command.CommandOption;
+import org.mangorage.mangobot.MangoBotPlugin;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandAlias;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
@@ -34,12 +38,14 @@ import org.mangorage.mangobotapi.core.events.LoadEvent;
 import org.mangorage.mangobotapi.core.events.SaveEvent;
 import org.mangorage.mangobotapi.core.events.discord.DButtonInteractionEvent;
 import org.mangorage.mangobotapi.core.events.discord.DModalInteractionEvent;
+import org.mangorage.mangobotapi.core.modules.action.TrashButtonAction;
 import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
 import org.mangorage.mangobotapi.core.util.MessageSettings;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.lang.runtime.SwitchBootstraps;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -85,18 +91,6 @@ public class TrickCommand implements IBasicCommand {
         plugin.getPluginBus().addListener(10, BasicCommandEvent.class, this::onCommandEvent);
         plugin.getPluginBus().addGenericListener(10, ButtonInteractionEvent.class, DiscordEvent.class, this::onButton);
         plugin.getPluginBus().addGenericListener(10, ModalInteractionEvent.class, DiscordEvent.class, this::onModal);
-
-
-        Command.slash("testmango", "woops!")
-                .executes(e -> {
-                    FileUpload upload = FileUpload.fromData(new File("F:\\Downloads\\Projects\\mangobotplugin\\testing\\a.png"));
-                    FileUpload upload2 =  FileUpload.fromData(new File("F:\\Downloads\\Projects\\mangobotplugin\\testing\\b.webm"));
-
-                    e.replyFiles(upload).complete()
-                            .editOriginalAttachments(upload2)
-                            .complete();
-                })
-                .buildAndRegister();
 
         Command.slash("trick", "The Trick System")
                 .addSubCommand("execute", "Execute a trick!")
@@ -539,7 +533,10 @@ public class TrickCommand implements IBasicCommand {
         MessageSettings dMessage = plugin.getMessageSettings();
         var type = trick.getType();
         if (type == TrickType.NORMAL) {
-            dMessage.apply(channel.sendMessage(trick.getContent())).setSuppressEmbeds(trick.isSuppressed()).queue();
+            dMessage.withButton(
+                    dMessage.apply(channel.sendMessage(trick.getContent())).setSuppressEmbeds(trick.isSuppressed()),
+                        MangoBotPlugin.ACTION_REGISTRY.get(TrashButtonAction.class).createForUser(message.getAuthor())
+                    ).queue();
             trick.use();
             save(trick);
         } else if (type == TrickType.ALIAS) {

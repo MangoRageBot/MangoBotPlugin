@@ -23,8 +23,8 @@
 package org.mangorage.mangobot.core;
 
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import org.mangorage.mangobot.MangoBotPlugin;
 import org.mangorage.mangobotapi.core.events.DiscordEvent;
-import org.mangorage.mangobotapi.core.modules.buttonactions.ButtonActions;
 import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
 
 public class Listeners {
@@ -36,8 +36,7 @@ public class Listeners {
     }
 
     public void onButtonInteraction(DiscordEvent<ButtonInteractionEvent> event) {
-        var dEvent = event.getInstance();
-        ButtonActions.post(dEvent.getInteraction());
+        MangoBotPlugin.ACTION_REGISTRY.post(event.getInstance());
     }
 
 }
