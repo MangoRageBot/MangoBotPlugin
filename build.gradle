@@ -67,7 +67,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
 
     installer('org.mangorage:installer:3.0.22')
-    bot('org.mangorage:mangobot:10.0.399')
+    bot('org.mangorage:mangobot:+')
 
     library('org.eclipse.mylyn.github:org.eclipse.egit.github.core:2.1.5')
     library('org.kohsuke:github-api:1.321')
