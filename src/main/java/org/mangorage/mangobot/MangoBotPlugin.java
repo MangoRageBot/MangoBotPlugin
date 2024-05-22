@@ -183,7 +183,8 @@ public class MangoBotPlugin extends CorePlugin {
         var m = i.getMessage();
         var r = m.getReferencedMessage();
         if (r != null && r.getAuthor().getIdLong() == 134030797756694528L) {
-            m.replyEmbeds(PingCommand.EMBED).setSuppressedNotifications(true).queue();
+            if (!m.getMentions().isMentioned(r.getAuthor())) return;
+            m.replyEmbeds(PingCommand.EMBED).setSuppressedNotifications(true).mentionRepliedUser(false).queue();
         }
     }
 
