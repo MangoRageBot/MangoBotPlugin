@@ -29,12 +29,15 @@ import static org.mangorage.mangobot.core.BotPermissions.PLAYING;
 import static org.mangorage.mangobot.core.BotPermissions.PREFIX_ADMIN;
 import static org.mangorage.mangobot.core.BotPermissions.TRICK_ADMIN;
 
+import java.awt.*;
 import java.nio.file.Path;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Scanner;
+import java.util.function.Consumer;
 
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.mangorage.basicutils.config.Config;
@@ -171,6 +174,17 @@ public class MangoBotPlugin extends CorePlugin {
         new ServerAuthorizer(this);
 
         getJDA().addEventListener(new BotEventListener(this));
+
+        getPluginBus().addGenericListener(100, MessageReceivedEvent.class, DiscordEvent.class, this::onMessage2);
+    }
+
+    public void onMessage2(DiscordEvent<MessageReceivedEvent> event) {
+        var i = event.getInstance();
+        var m = i.getMessage();
+        var r = m.getReferencedMessage();
+        if (r != null && r.getAuthor().getIdLong() == 134030797756694528L) {
+            m.replyEmbeds(PingCommand.EMBED).setSuppressedNotifications(true).queue();
+        }
     }
 
     @Override
