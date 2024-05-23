@@ -36,11 +36,11 @@ import net.dv8tion.jda.api.events.session.SessionDisconnectEvent;
 import net.dv8tion.jda.api.events.session.SessionResumeEvent;
 import net.dv8tion.jda.api.hooks.SubscribeEvent;
 import org.mangorage.basicutils.LogHelper;
+import org.mangorage.eventbus.interfaces.IEventBus;
 import org.mangorage.jdautils.WatcherManager;
 import org.mangorage.mangobotapi.core.events.DiscordEvent;
 import org.mangorage.mangobotapi.core.events.discord.DMessageReceivedEvent;
 import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
-import org.mangorage.mboteventbus.impl.IEventBus;
 
 
 @SuppressWarnings("unused")

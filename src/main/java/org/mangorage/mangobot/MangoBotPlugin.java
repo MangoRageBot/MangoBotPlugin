@@ -34,8 +34,6 @@ import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Scanner;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -174,7 +172,7 @@ public class MangoBotPlugin extends CorePlugin {
 
         getJDA().addEventListener(new BotEventListener(this));
 
-        getPluginBus().addGenericListener(100, MessageReceivedEvent.class, DiscordEvent.class, this::onMessage2);
+        getPluginBus().addGenericListener(10, MessageReceivedEvent.class, DiscordEvent.class, this::onMessage2);
     }
 
     public void onMessage2(DiscordEvent<MessageReceivedEvent> event) {
@@ -289,7 +287,7 @@ public class MangoBotPlugin extends CorePlugin {
         });
 
         new Listeners(this);
-        getPluginBus().addGenericListener(10,  MessageReceivedEvent.class, DiscordEvent.class, this::onMessage);
+        getPluginBus().addGenericListener(10, MessageReceivedEvent.class, DiscordEvent.class, this::onMessage);
     }
 
     @Override

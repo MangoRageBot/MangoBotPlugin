@@ -39,6 +39,7 @@ import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.GistService;
 import org.mangorage.basicutils.TaskScheduler;
 import org.mangorage.basicutils.misc.LazyReference;
+import org.mangorage.eventbus.interfaces.IEventBus;
 import org.mangorage.mangobot.MangoBotPlugin;
 import org.mangorage.mangobot.modules.logs.BrokenDrivers;
 import org.mangorage.mangobot.modules.logs.EarlyWindow;
@@ -46,8 +47,6 @@ import org.mangorage.mangobot.modules.logs.Java22;
 import org.mangorage.mangobot.modules.logs.LogAnalyser;
 import org.mangorage.mangobot.modules.logs.MissingDeps;
 import org.mangorage.mangobotapi.core.events.DiscordEvent;
-import org.mangorage.mboteventbus.impl.IEventBus;
-
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
