@@ -113,7 +113,7 @@ public class PasteRequestModule {
     );
 
 
-    private static final LazyReference<GitHubClient> GITHUB_CLIENT = LazyReference.create(() -> new GitHubClient().setOAuth2Token(MangoBotPlugin.GITHUB_TOKEN.get()));
+    static final LazyReference<GitHubClient> GITHUB_CLIENT = LazyReference.create(() -> new GitHubClient().setOAuth2Token(MangoBotPlugin.GITHUB_TOKEN.get()));
     private static final List<String> GUILDS = List.of(
             "1129059589325852724",
             "834300742864601088",
