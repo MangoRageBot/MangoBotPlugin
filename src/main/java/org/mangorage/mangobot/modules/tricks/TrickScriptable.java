@@ -33,8 +33,8 @@ import org.luaj.vm2.lib.PackageLib;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.luaj.vm2.lib.jse.JseBaseLib;
 import org.luaj.vm2.lib.jse.JseMathLib;
-import org.mangorage.mangobot.modules.tricks.lua.LuaActions;
-import org.mangorage.mangobot.modules.tricks.lua.LuaPrimitiveStringArray;
+import org.mangorage.mangobot.modules.tricks.lua.LuaJDA;
+import org.mangorage.mangobot.modules.tricks.lua.objects.LuaStringArray;
 import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
 
 import java.util.concurrent.Executors;
@@ -76,7 +76,7 @@ public class TrickScriptable {
         return server_globals;
     }
 
-    public void execute(String script, Message message, MessageChannel messageChannel, String[] args) {
+    public void execute(Trick trick, String script, Message message, MessageChannel messageChannel, String[] args) {
         // Create a ScheduledExecutorService
         ScheduledExecutorService executor = Executors.newScheduledThreadPool(2);
         AtomicReference<ScheduledFuture<?>> TASK = new AtomicReference<>();
@@ -97,8 +97,8 @@ public class TrickScriptable {
 
                 if (!method.isnil()) {
                     method.call(
-                            CoerceJavaToLua.coerce(new LuaActions(plugin, message, messageChannel)),
-                            CoerceJavaToLua.coerce(new LuaPrimitiveStringArray(args))
+                            CoerceJavaToLua.coerce(new LuaJDA(plugin, trick, message, messageChannel)),
+                            CoerceJavaToLua.coerce(new LuaStringArray(args))
                     );
                 }
                 if (TASK.get() != null) {

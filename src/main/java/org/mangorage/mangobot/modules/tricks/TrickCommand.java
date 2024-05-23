@@ -43,7 +43,7 @@ public class TrickCommand implements IBasicCommand {
     private static final boolean ALLOW_SCRIPT_TRICKS = true;
     private final CorePlugin plugin;
 
-    private final DataHandler<Trick> TRICK_DATA_HANDLER = DataHandler.create()
+    public static final DataHandler<Trick> TRICK_DATA_HANDLER = DataHandler.create()
             .path("data/tricksV2")
             .maxDepth(3)
             .build(Trick.class);
@@ -426,11 +426,13 @@ public class TrickCommand implements IBasicCommand {
 
 
             if (trick.getType() == TrickType.NORMAL) {
-                details = details + "Content: \n" + trick.getContent();
+                if (trick.getContent().length() < 2000)
+                    details = details + "Content: \n" + trick.getContent();
             } else if (trick.getType() == TrickType.ALIAS) {
                 details = details + "Alias -> " + trick.getAliasTarget();
             } else if (trick.getType() == TrickType.SCRIPT) {
-                details = details + "Script: \n" + trick.getScript();
+                if (trick.getScript().length() < 2000)
+                    details = details + "Script: \n" + trick.getScript();
             }
 
             dMessage.apply(message.reply(details))
@@ -519,9 +521,17 @@ public class TrickCommand implements IBasicCommand {
         var type = trick.getType();
         if (type == TrickType.NORMAL) {
             dMessage.withButton(
-                    dMessage.apply(channel.sendMessage(trick.getContent())).setSuppressEmbeds(trick.isSuppressed()),
-                        MangoBotPlugin.ACTION_REGISTRY.get(TrashButtonAction.class).createForUser(message.getAuthor())
-                    ).queue();
+                    dMessage.apply(channel.sendMessage(trick.getContent()))
+                            .setSuppressEmbeds(trick.isSuppressed()), MangoBotPlugin.ACTION_REGISTRY.get(TrashButtonAction.class).createForUser(message.getAuthor())
+            ).setAllowedMentions(
+                    Arrays.stream(Message.MentionType.values())
+                            .filter(t -> {
+                                if (t == Message.MentionType.EVERYONE) return false;
+                                if (t == Message.MentionType.HERE) return  false;
+                                return true;
+                            })
+                            .toList()
+            ).queue();
             trick.use();
             save(trick);
         } else if (type == TrickType.ALIAS) {
@@ -539,10 +549,11 @@ public class TrickCommand implements IBasicCommand {
                 trick.use();
                 var script = MarkdownSanitizer.sanitize(trick.getScript());
                 SCRIPT_RUNNER.execute(
+                        trick,
                         script,
                         message,
                         channel,
-                        args.getArgs().length > 1 ? args.getFrom(2).split(" ") : new String[]{}
+                        args.getArgs().length > 0 ? args.getFrom(2).split(" ") : new String[]{}
                 );
             }
         }
