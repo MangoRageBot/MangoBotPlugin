@@ -35,6 +35,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Scanner;
 
+import it.unimi.dsi.fastutil.longs.LongSet;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.mangorage.basicutils.config.Config;
@@ -175,13 +176,29 @@ public class MangoBotPlugin extends CorePlugin {
         getPluginBus().addGenericListener(10, MessageReceivedEvent.class, DiscordEvent.class, this::onMessage2);
     }
 
+
+    private final LongSet PINGS = LongSet.of(
+            134030797756694528L, // Lex
+            194596094200643584L, // MangoRage
+            1129615044833976451L // MangoBot
+    );
+
     public void onMessage2(DiscordEvent<MessageReceivedEvent> event) {
         var i = event.getInstance();
         var m = i.getMessage();
         var r = m.getReferencedMessage();
-        if (r != null && r.getAuthor().getIdLong() == 134030797756694528L) {
-            if (!m.getMentions().isMentioned(r.getAuthor())) return;
-            m.replyEmbeds(PingCommand.EMBED).setSuppressedNotifications(true).mentionRepliedUser(false).queue();
+        if (r != null) {
+            var authorPinged = r.getAuthor();
+            var whoPinged = m.getAuthor();
+
+            if (!m.getMentions().isMentioned(authorPinged)) return;
+
+            if (PINGS.contains(authorPinged.getIdLong())) {
+                whoPinged.openPrivateChannel().queue(pc -> {
+                    pc.sendMessageEmbeds(PingCommand.EMBED).setContent("").setContent("Please do not ping this person -> %s".formatted(r.getJumpUrl())).queue();
+                });
+            }
+
         }
     }
 
