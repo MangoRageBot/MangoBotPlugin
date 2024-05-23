@@ -149,6 +149,8 @@ public class Trick implements IFileNameResolver {
     }
 
     public MemoryBank getMemoryBank() {
+        if (memoryBank == null)
+            memoryBank = new MemoryBank(new HashMap<>());
         return memoryBank;
     }
 
