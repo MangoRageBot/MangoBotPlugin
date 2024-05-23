@@ -1,5 +1,17 @@
 package org.mangorage.mangobot.modules.tricks.lua;
 
+import java.util.HashMap;
 import java.util.Map;
 
-public record MemoryBank(Map<String, Object> bank)  { }
+public final class MemoryBank  {
+    private HashMap<String, Object> bank;
+
+    public MemoryBank(HashMap<String, Object> bank) {
+        this.bank = bank;
+    }
+
+    public Map<String, Object> bank() {
+        return bank;
+    }
+
+}
