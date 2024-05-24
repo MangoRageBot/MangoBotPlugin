@@ -115,9 +115,10 @@ public class PasteRequestModule {
 
     static final LazyReference<GitHubClient> GITHUB_CLIENT = LazyReference.create(() -> new GitHubClient().setOAuth2Token(MangoBotPlugin.GITHUB_TOKEN.get()));
     private static final List<String> GUILDS = List.of(
-            "1129059589325852724",
+            "1129059589325852724", // Forge Discord
             "834300742864601088",
-            "1179586337431633991"
+            "1179586337431633991",
+            "716249661798612992" // BenBenLaw Server
     );
     private static final Emoji EMOJI = Emoji.fromUnicode("\uD83D\uDCCB");
 
