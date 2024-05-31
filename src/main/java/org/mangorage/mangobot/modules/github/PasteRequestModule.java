@@ -31,8 +31,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import org.eclipse.egit.github.core.Gist;
 import org.eclipse.egit.github.core.GistFile;
 import org.eclipse.egit.github.core.client.GitHubClient;
@@ -46,10 +44,14 @@ import org.mangorage.mangobot.modules.logs.EarlyWindow;
 import org.mangorage.mangobot.modules.logs.Java22;
 import org.mangorage.mangobot.modules.logs.LogAnalyser;
 import org.mangorage.mangobot.modules.logs.MissingDeps;
+import org.mangorage.mangobot.modules.logs.ModrinthBug;
 import org.mangorage.mangobotapi.core.events.DiscordEvent;
+
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 
 public class PasteRequestModule {
     public static final LogAnalyser analyser = LogAnalyser.of(
@@ -57,15 +59,7 @@ public class PasteRequestModule {
             new EarlyWindow(),
             new Java22(),
             new MissingDeps(),
-            LogAnalyser.createModule(
-                    (s, m) -> {
-                        m.reply("This is a common issue on Modrinth Theseus. Modrinth's launcher has been known to be problematic in some cases with Forge. If you need to download a Modrinth format modpack you can use Prism Launcher, GDLauncher, ATLauncher, SKLauncher, or others which are far more reliable.").setSuppressEmbeds(true).mentionRepliedUser(true).queue();
-                    },
-                    List.of(
-                            "Invalid registry value type detected for PerfOS counters",
-                            "com.modrinth.theseus"
-                    )
-            ),
+            new ModrinthBug(),
             LogAnalyser.createModule(
                     (s, m) -> {
                         m.reply("This issue is in most cases caused by an outdated version of Java with issues with Let's Encrypt SSL. Please Update to a newer build of Java [Guide](https://mikumikudance.jp/index.php?title=Installing_Java_For_Minecraft). It can also be caused by networking issues.").setSuppressEmbeds(true).mentionRepliedUser(true).queue();
