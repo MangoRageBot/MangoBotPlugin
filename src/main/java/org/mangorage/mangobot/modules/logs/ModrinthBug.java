@@ -15,7 +15,7 @@ public class ModrinthBug  implements LogAnalyserModule{
 		if (lines.length > 0) {
 			String last = lines[lines.length - 1];
 			if (last.contains("Invalid registry value type detected for PerfOS counters") && str.contains("com.modrinth.theseus")) {
-				message.reply("This is a common issue on Modrinth Theseus. Modrinth's launcher has been known to be problematic in some cases with Forge. If you need to download a Modrinth format modpack you can use a launcher more reliable with Forge which supports it's format.")
+				message.reply("This is a common issue on Modrinth Theseus. Modrinth's launcher has been known to be problematic in some cases with Forge. If you need to download a Modrinth format modpack you can use a launcher more reliable with Forge which supports mrpacks.")
 						.setSuppressEmbeds(true).mentionRepliedUser(true).queue();
 			}
 		}
