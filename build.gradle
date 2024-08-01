@@ -15,7 +15,7 @@ buildscript {
 
     dependencies {
         classpath 'gradle.plugin.com.github.johnrengelman:shadow:7.1.2'
-        classpath 'org.mangorage:MangoBotGradle:4.0.9'
+        classpath 'org.mangorage:MangoBotGradle:4.0.10'
     }
 }
 
@@ -58,7 +58,7 @@ repositories {
         url 'https://jitpack.io'
     }
     maven {
-        url 'https://maven.lavalink.dev/snapshots/'
+        url "https://maven.lavalink.dev/releases/"
     }
 }
 
@@ -66,17 +66,21 @@ dependencies {
     testImplementation platform('org.junit:junit-bom:5.9.1')
     testImplementation 'org.junit.jupiter:junit-jupiter'
 
-    installer('org.mangorage:installer:3.0.22')
+    installer('org.mangorage:installer:3.0.27')
     bot('org.mangorage:mangobot:10.0.410')
+
+    compileOnly('org.mangorage:MangoBotGradle:4.0.5')
 
     library('org.eclipse.mylyn.github:org.eclipse.egit.github.core:2.1.5')
     library('org.kohsuke:github-api:1.321')
-    library('dev.arbjerg:lavaplayer:afec211f05c9dcf0b6ee44276a02f0316ea2458a-SNAPSHOT')
+    library('dev.arbjerg:lavaplayer:2.2.1')
+    library('dev.lavalink.youtube:common:1.5.1')
 }
 
 test {
     useJUnitPlatform()
 }
+
 
 MangoBotConfig {
     setJarTask(jar)
