@@ -59,7 +59,9 @@ public class Util {
     }
 
 
-    public static boolean handleMessage(CorePlugin plugin, MessageReceivedEvent event) {
+    public record MessageType(boolean cmd, boolean silent) {}
+
+    public static MessageType handleMessage(CorePlugin plugin, MessageReceivedEvent event) {
         // Handle Message and prefix
         String cmdPrefix = event.isFromGuild() ? CommandPrefix.getPrefix(event.getGuild().getId()) : plugin.getCommandPrefix();
         if (CoreMain.isDevMode()) // Special clause for dev mode!
@@ -68,8 +70,13 @@ public class Util {
         Message message = event.getMessage();
         String rawMessage = message.getContentRaw();
 
+
+        boolean silent = rawMessage.startsWith("s");
+        if (silent)
+            rawMessage = rawMessage.replaceFirst("s", "");
+
         if (rawMessage.length() > 1 && rawMessage.startsWith(cmdPrefix)) {
-            if (event.getAuthor().isBot()) return true;
+            if (event.getAuthor().isBot()) return new MessageType(false, false);
             String[] command_pre = rawMessage.split(" ");
             String command = command_pre[0].replaceFirst(cmdPrefix, "");
             Arguments arguments = Arguments.of(Arguments.of(command_pre).getFrom(1).split(" "));
@@ -92,10 +99,10 @@ public class Util {
                 plugin.getMessageSettings().apply(message.reply("Invalid Command")).queue();
             }
 
-            return true;
+            return new MessageType(true, silent);
         }
 
-        return false;
+        return new MessageType(false, false);
     }
 
     public static Integer parseStringIntoInteger(String s) {

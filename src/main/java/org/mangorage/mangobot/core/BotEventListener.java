@@ -42,6 +42,8 @@ import org.mangorage.mangobotapi.core.events.DiscordEvent;
 import org.mangorage.mangobotapi.core.events.discord.DMessageReceivedEvent;
 import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
 
+import java.util.concurrent.TimeUnit;
+
 
 @SuppressWarnings("unused")
 public class BotEventListener {
@@ -61,10 +63,14 @@ public class BotEventListener {
     @SubscribeEvent
     public void messageReceived(MessageReceivedEvent event) {
         var isCommand = Util.handleMessage(plugin, event);
-        if (isCommand)
-            bus.post(new DMessageReceivedEvent(event, isCommand));
-        else
+        if (isCommand.cmd()) {
+            bus.post(new DMessageReceivedEvent(event, isCommand.cmd()));
+
+            if (isCommand.silent())
+                event.getMessage().delete().queueAfter(500, TimeUnit.MILLISECONDS);
+        } else {
             bus.post(new DiscordEvent<>(event));
+        }
     }
 
     @SubscribeEvent
