@@ -59,7 +59,8 @@ public class AntiPingCommand  implements IBasicCommand {
 
             if (!msg.getMentions().isMentioned(authorPinged)) return;
 
-            if (FLAGS.containsKey(new Key(guildID, authorPinged.getIdLong()))) {
+            var key = new Key(guildID, authorPinged.getIdLong());
+            if (FLAGS.containsKey(key) && FLAGS.get(key)) {
                 whoPinged.openPrivateChannel().queue(pc -> {
                     pc.sendMessageEmbeds(PingCommand.EMBED).setContent("").setContent("Please do not ping this person -> %s".formatted(msgReference.getJumpUrl())).queue();
                 });
