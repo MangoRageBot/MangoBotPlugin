@@ -50,7 +50,6 @@ public class PingCommand implements IBasicCommand {
     @Override
     public CommandResult execute(Message message, Arguments args) {
         message.getChannel().sendMessageEmbeds(EMBED).queue();
-
         return CommandResult.PASS;
     }
 
