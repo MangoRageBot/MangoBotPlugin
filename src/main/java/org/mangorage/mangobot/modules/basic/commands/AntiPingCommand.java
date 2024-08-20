@@ -68,6 +68,12 @@ public class AntiPingCommand  implements IBasicCommand {
         }
     }
 
+    public static void main(String[] args) {
+        record Key(int id, int tool) {}
+
+        System.out.println(new Key(-Integer.MAX_VALUE, Integer.MAX_VALUE).hashCode());
+    }
+
     @NotNull
     @Override
     public CommandResult execute(Message message, Arguments args) {
