@@ -40,6 +40,7 @@ import org.eclipse.egit.github.core.service.GistService;
 import org.mangorage.basicutils.TaskScheduler;
 import org.mangorage.basicutils.misc.LazyReference;
 import org.mangorage.eventbus.interfaces.IEventBus;
+import org.mangorage.eventbus.interfaces.IEventType;
 import org.mangorage.mangobot.MangoBotPlugin;
 import org.mangorage.mangobot.modules.logs.BrokenDrivers;
 import org.mangorage.mangobot.modules.logs.EarlyWindow;
@@ -122,7 +123,7 @@ public class PasteRequestModule {
     );
     private static final Emoji EMOJI = Emoji.fromUnicode("\uD83D\uDCCB");
 
-    public static void register(IEventBus bus) {
+    public static void register(IEventBus<IEventType.INormalBusEvent> bus) {
         bus.addGenericListener(10, MessageReceivedEvent.class, DiscordEvent.class, PasteRequestModule::onMessage);
         bus.addGenericListener(10, MessageReactionAddEvent.class, DiscordEvent.class, PasteRequestModule::onReact);
     }
