@@ -67,7 +67,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
 
     installer('org.mangorage:installer:3.0.27')
-    bot('org.mangorage:mangobot:10.0.415')
+    bot('org.mangorage:mangobot:10.0.417')
 
     compileOnly('org.mangorage:MangoBotGradle:4.0.5')
 
