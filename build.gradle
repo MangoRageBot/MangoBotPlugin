@@ -77,6 +77,12 @@ dependencies {
     library('dev.lavalink.youtube:common:1.5.1')
 }
 
+configurations.all {
+    resolutionStrategy {
+        force 'com.google.code.gson:gson:2.10.1'
+    }
+}
+
 test {
     useJUnitPlatform()
 }
