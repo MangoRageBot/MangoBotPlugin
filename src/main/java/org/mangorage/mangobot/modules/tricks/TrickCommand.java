@@ -54,7 +54,7 @@ public class TrickCommand implements IBasicCommand {
     private final Map<TrickKey, Trick> TRICKS = new HashMap<>();
     private final Map<String, PagedList<String>> PAGES = new ConcurrentHashMap<>();
 
-    private TrickScriptable SCRIPT_RUNNER;
+    private final TrickScriptable SCRIPT_RUNNER;
 
 
     private Trick getTrick(String trickId, long guildId) {

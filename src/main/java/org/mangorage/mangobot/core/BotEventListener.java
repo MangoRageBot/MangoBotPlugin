@@ -22,6 +22,7 @@
 
 package org.mangorage.mangobot.core;
 
+import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
@@ -37,6 +38,7 @@ import net.dv8tion.jda.api.events.session.SessionResumeEvent;
 import net.dv8tion.jda.api.hooks.SubscribeEvent;
 import org.mangorage.basicutils.LogHelper;
 import org.mangorage.eventbus.interfaces.IEventBus;
+import org.mangorage.eventbus.interfaces.IEventType;
 import org.mangorage.jdautils.WatcherManager;
 import org.mangorage.mangobotapi.core.events.DiscordEvent;
 import org.mangorage.mangobotapi.core.events.discord.DMessageReceivedEvent;
@@ -48,7 +50,7 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("unused")
 public class BotEventListener {
     private final CorePlugin plugin;
-    private final IEventBus bus;
+    private final IEventBus<IEventType.INormalBusEvent> bus;
 
     public BotEventListener(CorePlugin plugin) {
         this.plugin = plugin;
@@ -61,10 +63,15 @@ public class BotEventListener {
     }
 
     @SubscribeEvent
+    public void onUserJoin(GuildMemberJoinEvent event) {
+        bus.post(new DiscordEvent<>(event));
+    }
+
+    @SubscribeEvent
     public void messageReceived(MessageReceivedEvent event) {
         var isCommand = Util.handleMessage(plugin, event);
         if (isCommand.cmd()) {
-            bus.post(new DMessageReceivedEvent(event, isCommand.cmd()));
+            bus.post(new DMessageReceivedEvent(event, true));
 
             if (isCommand.silent())
                 event.getMessage().delete().queueAfter(500, TimeUnit.MILLISECONDS);

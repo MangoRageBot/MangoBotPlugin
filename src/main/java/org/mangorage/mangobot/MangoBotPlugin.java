@@ -34,9 +34,11 @@ import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 import it.unimi.dsi.fastutil.longs.LongSet;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.mangorage.basicutils.config.Config;
 import org.mangorage.basicutils.config.ConfigSetting;
@@ -57,7 +59,7 @@ import org.mangorage.mangobot.modules.basic.commands.PermissionCommand;
 import org.mangorage.mangobot.modules.basic.commands.PingCommand;
 import org.mangorage.mangobot.modules.basic.commands.PrefixCommand;
 import org.mangorage.mangobot.modules.basic.commands.VersionCommand;
-import org.mangorage.mangobot.modules.developer.ServerAuthorizer;
+import org.mangorage.mangobot.modules.developer.WhitelistBotCommand;
 import org.mangorage.mangobot.modules.tricks.TrickCommand;
 import org.mangorage.mangobot.modules.developer.EchoCommand;
 import org.mangorage.mangobot.modules.developer.KickBotCommand;
@@ -170,9 +172,25 @@ public class MangoBotPlugin extends CorePlugin {
                         .build()
         );
 
-        new ServerAuthorizer(this);
-
         getJDA().addEventListener(new BotEventListener(this));
+        getPluginBus().addGenericListener(100, GuildMemberJoinEvent.class, DiscordEvent.class, this::onUserJoin);
+    }
+
+    public void onUserJoin(DiscordEvent<GuildMemberJoinEvent> event) {
+        var e = event.getInstance();
+
+        System.out.println(e.getUser().getGlobalName());
+        System.out.println(e.getUser().getName());
+        System.out.println(e.getUser().getEffectiveName());
+
+        var gn = e.getUser().getName();
+
+        if (gn.contains("lexlover") && e.getGuild().getIdLong() == 1129059589325852724L) {
+            e.getMember()
+                    .ban(6, TimeUnit.DAYS)
+                    .reason("Spam")
+                    .queue();
+        }
     }
 
     @Override
@@ -225,6 +243,7 @@ public class MangoBotPlugin extends CorePlugin {
         cmdRegistry.addBasicCommand(new SpeakCommand(this));
         cmdRegistry.addBasicCommand(new TerminateCommand());
         cmdRegistry.addBasicCommand(new EchoCommand());
+        cmdRegistry.addBasicCommand(new WhitelistBotCommand(this));
 
         // Music Commands
         cmdRegistry.addBasicCommand(new PlayCommand());
