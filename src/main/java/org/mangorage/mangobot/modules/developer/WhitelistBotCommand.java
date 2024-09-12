@@ -8,7 +8,7 @@ import org.mangorage.mangobotapi.core.commands.IBasicCommand;
 import org.mangorage.mangobotapi.core.data.DataHandler;
 import org.mangorage.mangobotapi.core.data.IEmptyFileNameResolver;
 import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
-import java.util.Collections;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -20,7 +20,7 @@ public class WhitelistBotCommand implements IBasicCommand {
     private static final List<String> ALLOWED_USERS = List.of(
                 "194596094200643584"
     );
-    private record SaveData(Set<String> serverIds, boolean whiteliston) implements IEmptyFileNameResolver {}
+    private record SaveData(HashSet<String> serverIds, boolean whiteliston) implements IEmptyFileNameResolver {}
 
     private static final DataHandler<SaveData> WHITELIST_DATA = DataHandler.create()
             .path("data/serverwl/data")
@@ -66,7 +66,7 @@ public class WhitelistBotCommand implements IBasicCommand {
         if (arguments.hasArg("toggle")) {
             whitelistOn = !whitelistOn;
             message.reply("Set Server Whitelist to " + (whitelistOn ? "On" : "Off")).queue();
-            WHITELIST_DATA.save(plugin.getPluginDirectory(), new SaveData(SERVERS, whitelistOn));
+            WHITELIST_DATA.save(plugin.getPluginDirectory(), new SaveData(new HashSet<>(SERVERS), whitelistOn));
             if (whitelistOn) runTask();
         } else if (arguments.hasArg("add")) {
             handle(true, arguments.findArg("add"), message);
@@ -102,7 +102,7 @@ public class WhitelistBotCommand implements IBasicCommand {
             SERVERS.remove(id);
         }
 
-        WHITELIST_DATA.save(plugin.getPluginDirectory(), new SaveData(SERVERS, whitelistOn));
+        WHITELIST_DATA.save(plugin.getPluginDirectory(), new SaveData(new HashSet<>(SERVERS), whitelistOn));
     }
 
     @Override
