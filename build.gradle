@@ -36,7 +36,6 @@ def getLatestGitTag() {
     }
 }
 
-
 def getLatestGitVersion() {
     def result = "git describe --long --tags".execute().text.trim()
     if (result.empty) {
