@@ -35,12 +35,14 @@ jobs:
     needs: publish
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 22
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
