@@ -34,11 +34,7 @@ import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Scanner;
-import java.util.concurrent.TimeUnit;
-
-import it.unimi.dsi.fastutil.longs.LongSet;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
-import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.mangorage.basicutils.config.Config;
 import org.mangorage.basicutils.config.ConfigSetting;
@@ -72,16 +68,6 @@ import org.mangorage.mangobot.modules.github.GHPRStatus;
 import org.mangorage.mangobot.modules.github.IssueScanCommand;
 import org.mangorage.mangobot.modules.github.PRScanCommand;
 import org.mangorage.mangobot.modules.github.PasteRequestModule;
-import org.mangorage.mangobot.modules.mappings.ClassMapCommand;
-import org.mangorage.mangobot.modules.mappings.DefMapCommand;
-import org.mangorage.mangobot.modules.mappings.FCICommand;
-import org.mangorage.mangobot.modules.mappings.MCPCommand;
-import org.mangorage.mangobot.modules.mappings.MappingsMainCommand;
-import org.mangorage.mangobot.modules.mappings.MappingsManager;
-import org.mangorage.mangobot.modules.mappings.VarMapCommand;
-import org.mangorage.mangobot.modules.mappings.YCCommand;
-import org.mangorage.mangobot.modules.mappings.YFCommand;
-import org.mangorage.mangobot.modules.mappings.YMCommand;
 import org.mangorage.mangobot.modules.music.commands.PauseCommand;
 import org.mangorage.mangobot.modules.music.commands.PlayCommand;
 import org.mangorage.mangobot.modules.music.commands.PlayingCommand;
@@ -141,11 +127,9 @@ public class MangoBotPlugin extends CorePlugin {
     public final static Config CONFIG = new Config(Path.of("plugins/%s/.env".formatted(MangoBotPlugin.ID)));
 
     // Where we create Settings for said Config
-    public static final ISetting<String> MAPPINGS_VERSION = ConfigSetting.create(CONFIG, "MAPPINGS_VERSION", "empty");
     public static final ISetting<String> BOT_TOKEN = ConfigSetting.create(CONFIG, "BOT_TOKEN", "empty");
     public static final ISetting<String> GITHUB_TOKEN = ConfigSetting.create(CONFIG, "PASTE_TOKEN", "empty");
     public static final ISetting<String> GITHUB_USERNAME = ConfigSetting.create(CONFIG, "GITHUB_USERNAME", "RealMangoRage");
-    public static final ISetting<String> DEEPL_TOKEN = ConfigSetting.create(CONFIG, "DEEPL_TOKEN", "empty");
     public static final ButtonActionRegistry ACTION_REGISTRY = new ButtonActionRegistry();
 
 
@@ -173,24 +157,6 @@ public class MangoBotPlugin extends CorePlugin {
         );
 
         getJDA().addEventListener(new BotEventListener(this));
-        getPluginBus().addGenericListener(100, GuildMemberJoinEvent.class, DiscordEvent.class, this::onUserJoin);
-    }
-
-    public void onUserJoin(DiscordEvent<GuildMemberJoinEvent> event) {
-        var e = event.getInstance();
-
-        System.out.println(e.getUser().getGlobalName());
-        System.out.println(e.getUser().getName());
-        System.out.println(e.getUser().getEffectiveName());
-
-        var gn = e.getUser().getName();
-
-        if (gn.contains("lexlover") && e.getGuild().getIdLong() == 1129059589325852724L) {
-            e.getMember()
-                    .ban(6, TimeUnit.DAYS)
-                    .reason("Spam")
-                    .queue();
-        }
     }
 
     @Override
@@ -256,21 +222,6 @@ public class MangoBotPlugin extends CorePlugin {
 
         // Tricks
         cmdRegistry.addBasicCommand(new TrickCommand(this));
-
-
-        // Mappings
-        MappingsManager latest_mappings_manager = MappingsManager.new_(); // Soon we need to do for multiple versions but not ATM
-        latest_mappings_manager.init(MAPPINGS_VERSION);
-        cmdRegistry.addBasicCommand(new MappingsMainCommand(latest_mappings_manager,this));
-        cmdRegistry.addBasicCommand(new ClassMapCommand(latest_mappings_manager,this));
-        cmdRegistry.addBasicCommand(new DefMapCommand(latest_mappings_manager,this));
-        cmdRegistry.addBasicCommand(new VarMapCommand(latest_mappings_manager,this));
-        cmdRegistry.addBasicCommand(new MCPCommand(latest_mappings_manager,this));
-        cmdRegistry.addBasicCommand(new FCICommand(latest_mappings_manager,this));
-        cmdRegistry.addBasicCommand(new YCCommand(latest_mappings_manager,this));
-        cmdRegistry.addBasicCommand(new YMCommand(latest_mappings_manager,this));
-        cmdRegistry.addBasicCommand(new YFCommand(latest_mappings_manager,this));
-
         
         // Test
         cmdRegistry.addBasicCommand(new RunCode());
