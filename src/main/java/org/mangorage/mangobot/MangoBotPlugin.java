@@ -224,7 +224,7 @@ public class MangoBotPlugin extends CorePlugin {
         cmdRegistry.addBasicCommand(new TrickCommand(this));
         
         // Test
-        cmdRegistry.addBasicCommand(new RunCode());
+        cmdRegistry.addBasicCommand(new RunCode(this));
         cmdRegistry.addBasicCommand(new GetEmbedsCommand());
 
 

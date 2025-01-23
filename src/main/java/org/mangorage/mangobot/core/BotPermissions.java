@@ -43,8 +43,11 @@ public class BotPermissions {
         PREFIX_ADMIN.addPermission(Permission.ADMINISTRATOR);
         MOD_MAIL.addPermission(Permission.ADMINISTRATOR);
         PERMISSION_ADMIN.addPermission(Permission.ADMINISTRATOR);
-        PERMISSION_ADMIN.addUser("194596094200643584");
         CUSTOM_VC_ADMIN.addPermission(Permission.ADMINISTRATOR);
+
+
+        PERMISSION_ADMIN.addUser("194596094200643584");
+
 
         TRICK_ADMIN.addRole("1129059589325852724", "1129067881842360381");
         TRICK_ADMIN.addRole("1129059589325852724", "1129070272302022656");

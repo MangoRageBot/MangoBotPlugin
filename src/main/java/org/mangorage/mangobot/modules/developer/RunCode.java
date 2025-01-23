@@ -24,12 +24,21 @@ package org.mangorage.mangobot.modules.developer;
 
 import net.dv8tion.jda.api.entities.Message;
 import org.jetbrains.annotations.NotNull;
+import org.mangorage.mangobot.modules.tricks.EmptyTrick;
 import org.mangorage.mangobot.modules.tricks.TrickScriptable;
+import org.mangorage.mangobot.modules.tricks.lua.LuaJDA;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
 import org.mangorage.mangobotapi.core.commands.IBasicCommand;
+import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
 
 public class RunCode implements IBasicCommand {
+
+    private final TrickScriptable scriptable;
+    public RunCode(CorePlugin plugin) {
+        this.scriptable = new TrickScriptable(plugin);
+    }
+
     /**
      * @param message
      * @param args
@@ -43,7 +52,14 @@ public class RunCode implements IBasicCommand {
             return CommandResult.PASS;
         }
         String script = args.getFrom(0);
-        System.out.println(script);
+
+        scriptable.execute(
+                EmptyTrick.INSTANCE,
+                script,
+                message,
+                message.getChannel(),
+                args.getArgs()
+        );
 
         return CommandResult.PASS;
     }
