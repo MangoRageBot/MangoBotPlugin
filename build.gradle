@@ -77,14 +77,14 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
 
     installer('org.mangorage:installer:3.0.27')
-    bot('org.mangorage:mangobot:11.0.+')
+    bot('org.mangorage:mangobot:11.0.3')
 
     compileOnly('org.mangorage:MangoBotGradle:4.0.5')
 
     library('org.eclipse.mylyn.github:org.eclipse.egit.github.core:2.1.5')
     library('org.kohsuke:github-api:1.321')
-    library('dev.arbjerg:lavaplayer:2.2.1')
-    library('dev.lavalink.youtube:common:1.5.1')
+    library('dev.arbjerg:lavaplayer:2.2.2')
+    library('dev.lavalink.youtube:common:1.11.3')
 }
 
 configurations.all {
