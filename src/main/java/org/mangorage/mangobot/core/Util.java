@@ -32,7 +32,7 @@ import org.mangorage.mangobot.loader.CoreMain;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandPrefix;
 import org.mangorage.mangobotapi.core.events.BasicCommandEvent;
-import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
+import org.mangorage.mangobotapi.core.plugin.api.JDAPlugin;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -61,7 +61,7 @@ public class Util {
 
     public record MessageType(boolean cmd, boolean silent) {}
 
-    public static MessageType handleMessage(CorePlugin plugin, MessageReceivedEvent event) {
+    public static MessageType handleMessage(JDAPlugin plugin, MessageReceivedEvent event) {
         // Handle Message and prefix
         String cmdPrefix = event.isFromGuild() ? CommandPrefix.getPrefix(event.getGuild().getId()) : plugin.getCommandPrefix();
         if (CoreMain.isDevMode()) // Special clause for dev mode!

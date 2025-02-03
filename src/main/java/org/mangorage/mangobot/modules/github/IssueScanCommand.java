@@ -8,7 +8,7 @@ import org.mangorage.mangobot.core.BotPermissions;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
 import org.mangorage.mangobotapi.core.commands.IBasicCommand;
-import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
+import org.mangorage.mangobotapi.core.plugin.api.JDAPlugin;
 import org.mangorage.mangobotapi.core.util.MessageSettings;
 
 import net.dv8tion.jda.api.entities.Message;
@@ -16,9 +16,9 @@ import net.dv8tion.jda.api.entities.Message;
 
 public class IssueScanCommand implements IBasicCommand {
 
-	private final CorePlugin plugin;
+	private final JDAPlugin plugin;
 
-	public IssueScanCommand(CorePlugin plugin) {
+	public IssueScanCommand(JDAPlugin plugin) {
 		this.plugin = plugin;
 	}
 

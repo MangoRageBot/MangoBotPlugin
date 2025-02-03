@@ -11,8 +11,8 @@ import org.mangorage.mangobotapi.core.data.IEmptyFileNameResolver;
 import org.mangorage.mangobotapi.core.events.DiscordEvent;
 import org.mangorage.mangobotapi.core.events.LoadEvent;
 import org.mangorage.mangobotapi.core.events.SaveEvent;
-import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
-
+import org.mangorage.mangobotapi.core.plugin.api.JDAPlugin;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,27 +20,47 @@ import java.util.Map;
 public class AntiPingCommand  implements IBasicCommand {
 
     record Key(long serverID, long userID) {}
-    record SaveData(Map<Key, Boolean> data) implements IEmptyFileNameResolver {}
 
-    private static final Map<Key, Boolean> FLAGS = new HashMap<>();
+    public record SaveData(List<Entry> entries) implements IEmptyFileNameResolver {
+        public static SaveData fromMap(Map<Key, Boolean> map) {
+            List<Entry> entryList = new ArrayList<>();
+            for (Map.Entry<Key, Boolean> e : map.entrySet()) {
+                entryList.add(new Entry(e.getKey(), e.getValue()));
+            }
+            return new SaveData(entryList);
+        }
+
+        public Map<Key, Boolean> toMap() {
+            Map<Key, Boolean> map = new HashMap<>();
+            for (Entry entry : entries) {
+                map.put(entry.key(), entry.value());
+            }
+            return map;
+        }
+
+        public record Entry(Key key, Boolean value) {}
+    }
+
+    private static final HashMap<Key, Boolean> FLAGS = new HashMap<>();
 
     private static final DataHandler<SaveData> HANDLER = DataHandler.create()
-            .path("data/pingsData")
+            .path("data/antiping/config")
             .file()
             .build(SaveData.class);
 
-    public AntiPingCommand(CorePlugin plugin) {
+    private final JDAPlugin plugin;
+
+    public AntiPingCommand(JDAPlugin plugin) {
+        this.plugin = plugin;
         plugin.getPluginBus().addGenericListener(0, MessageReceivedEvent.class, DiscordEvent.class, this::onMessage2);
         plugin.getPluginBus().addListener(0, LoadEvent.class, loadEvent -> {
             var data = HANDLER.loadFile(plugin.getPluginDirectory());
             data.ifPresent(save -> {
-                var result = save.data();
-                FLAGS.clear();
-                FLAGS.putAll(result);
+                FLAGS.putAll(save.toMap());
             });
         });
         plugin.getPluginBus().addListener(0, SaveEvent.class, save -> {
-            HANDLER.save(plugin.getPluginDirectory(), new SaveData(Map.copyOf(FLAGS)));
+            HANDLER.save(plugin.getPluginDirectory(), SaveData.fromMap(FLAGS));
         });
     }
 
@@ -68,12 +88,6 @@ public class AntiPingCommand  implements IBasicCommand {
         }
     }
 
-    public static void main(String[] args) {
-        record Key(int id, int tool) {}
-
-        System.out.println(new Key(-Integer.MAX_VALUE, Integer.MAX_VALUE).hashCode());
-    }
-
     @NotNull
     @Override
     public CommandResult execute(Message message, Arguments args) {
@@ -86,6 +100,7 @@ public class AntiPingCommand  implements IBasicCommand {
             message.reply("Set Anti Ping Reponse " + (!returnValue ? "Off" : "On")).queue();
             return returnValue;
         });
+        HANDLER.save(plugin.getPluginDirectory(), SaveData.fromMap(FLAGS));
         return CommandResult.PASS;
     }
 

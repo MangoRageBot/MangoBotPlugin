@@ -42,17 +42,18 @@ import org.mangorage.eventbus.interfaces.IEventType;
 import org.mangorage.jdautils.WatcherManager;
 import org.mangorage.mangobotapi.core.events.DiscordEvent;
 import org.mangorage.mangobotapi.core.events.discord.DMessageReceivedEvent;
-import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
+import org.mangorage.mangobotapi.core.plugin.api.JDAPlugin;
+import org.mangorage.mangobotapi.core.plugin.api.JDAPlugin;
 
 import java.util.concurrent.TimeUnit;
 
 
 @SuppressWarnings("unused")
 public class BotEventListener {
-    private final CorePlugin plugin;
+    private final JDAPlugin plugin;
     private final IEventBus<IEventType.INormalBusEvent> bus;
 
-    public BotEventListener(CorePlugin plugin) {
+    public BotEventListener(JDAPlugin plugin) {
         this.plugin = plugin;
         this.bus = plugin.getPluginBus();
     }

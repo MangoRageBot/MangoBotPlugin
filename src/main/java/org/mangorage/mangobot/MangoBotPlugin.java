@@ -77,8 +77,10 @@ import org.mangorage.mangobot.modules.music.commands.VolumeCommand;
 import org.mangorage.mangobotapi.core.events.DiscordEvent;
 import org.mangorage.mangobotapi.core.events.LoadEvent;
 import org.mangorage.mangobotapi.core.events.SaveEvent;
+import org.mangorage.mangobotapi.core.events.ShutdownEvent;
+import org.mangorage.mangobotapi.core.events.StartupEvent;
 import org.mangorage.mangobotapi.core.modules.action.ButtonActionRegistry;
-import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
+import org.mangorage.mangobotapi.core.plugin.api.JDAPlugin;
 import org.mangorage.mangobotapi.core.plugin.api.PluginMessageEvent;
 import org.mangorage.mangobotapi.core.plugin.impl.Plugin;
 
@@ -91,7 +93,7 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
 @Plugin(id = MangoBotPlugin.ID)
-public class MangoBotPlugin extends CorePlugin {
+public class MangoBotPlugin extends JDAPlugin {
     public static final String ID = "mangobot";
     private static final EnumSet<GatewayIntent> intents = EnumSet.of(
             // Enables MessageReceivedEvent for guild (also known as servers)
@@ -157,9 +159,9 @@ public class MangoBotPlugin extends CorePlugin {
         );
 
         getJDA().addEventListener(new BotEventListener(this));
+        init();
     }
 
-    @Override
     public void startup() {
         BotPermissions.init();
     }
@@ -176,8 +178,6 @@ public class MangoBotPlugin extends CorePlugin {
         }
     }
 
-
-    @Override
     public void registration() {
         var cmdRegistry = getCommandRegistry();
         var permRegistry = getPermissionRegistry();
@@ -249,9 +249,12 @@ public class MangoBotPlugin extends CorePlugin {
 
         new Listeners(this);
         getPluginBus().addGenericListener(10, MessageReceivedEvent.class, DiscordEvent.class, this::onMessage);
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            getPluginBus().post(new ShutdownEvent(ShutdownEvent.Phase.PRE));
+        }));
     }
 
-    @Override
+
     public void finished() {
         getPluginBus().post(new LoadEvent());
         getJDA()
@@ -260,20 +263,29 @@ public class MangoBotPlugin extends CorePlugin {
                 .queue();
     }
 
-    @Override
     public void shutdownPre() {
         getPluginBus().post(new SaveEvent());
-    }
-
-
-    @Override
-    public void shutdownPost() {
-
     }
 
     @Override
     public String getCommandPrefix() {
         return "mb?";
+    }
+
+    @Override
+    public void startup(StartupEvent.Phase phase) {
+        switch (phase) {
+            case STARTUP -> startup();
+            case REGISTRATION -> registration();
+            case FINISHED -> finished();
+        }
+    }
+
+    @Override
+    public void shutdown(ShutdownEvent.Phase phase) {
+        switch (phase) {
+            case PRE -> shutdownPre();
+        }
     }
 
     public static String getToken() {

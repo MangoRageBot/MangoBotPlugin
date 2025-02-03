@@ -27,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
 import org.mangorage.mangobotapi.core.commands.IBasicCommand;
-import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
+import org.mangorage.mangobotapi.core.plugin.api.JDAPlugin;
 
 import java.util.List;
 
@@ -35,9 +35,9 @@ public class KickBotCommand implements IBasicCommand {
     private static final List<String> USERS = List.of("194596094200643584");
 
 
-    private final CorePlugin plugin;
+    private final JDAPlugin plugin;
 
-    public KickBotCommand(CorePlugin plugin) {
+    public KickBotCommand(JDAPlugin plugin) {
         this.plugin = plugin;
     }
 

@@ -33,7 +33,7 @@ import org.mangorage.mangobotapi.core.events.BasicCommandEvent;
 import org.mangorage.mangobotapi.core.events.DiscordEvent;
 import org.mangorage.mangobotapi.core.events.LoadEvent;
 import org.mangorage.mangobotapi.core.events.SaveEvent;
-import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
+import org.mangorage.mangobotapi.core.plugin.api.JDAPlugin;
 import org.mangorage.mangobotapi.core.util.MessageSettings;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -44,7 +44,7 @@ import java.util.concurrent.TimeUnit;
 
 public class TrickCommand implements IBasicCommand {
     private static final boolean ALLOW_SCRIPT_TRICKS = true;
-    private final CorePlugin plugin;
+    private final JDAPlugin plugin;
 
     public static final DataHandler<Trick> TRICK_DATA_HANDLER = DataHandler.create()
             .path("data/tricksV2")
@@ -70,7 +70,7 @@ public class TrickCommand implements IBasicCommand {
     }
 
 
-    public TrickCommand(CorePlugin plugin) {
+    public TrickCommand(JDAPlugin plugin) {
         this.plugin = plugin;
         this.SCRIPT_RUNNER = new TrickScriptable(plugin);
 

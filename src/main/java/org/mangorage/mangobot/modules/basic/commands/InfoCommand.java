@@ -27,17 +27,17 @@ import org.jetbrains.annotations.NotNull;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
 import org.mangorage.mangobotapi.core.commands.IBasicCommand;
-import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
+import org.mangorage.mangobotapi.core.plugin.api.JDAPlugin;
 
 import java.util.List;
 
 public class InfoCommand implements IBasicCommand {
 
 
-    private final CorePlugin corePlugin;
+    private final JDAPlugin JDAPlugin;
 
-    public InfoCommand(CorePlugin corePlugin) {
-        this.corePlugin = corePlugin;
+    public InfoCommand(JDAPlugin JDAPlugin) {
+        this.JDAPlugin = JDAPlugin;
     }
 
 
@@ -47,14 +47,14 @@ public class InfoCommand implements IBasicCommand {
     @SuppressWarnings("unchecked")
     @Override
     public CommandResult execute(Message message, Arguments args) {
-        var settings = corePlugin.getMessageSettings();
+        var settings = JDAPlugin.getMessageSettings();
         String cmd = args.get(0);
         if (cmd == null) {
             settings.apply(message.reply(usage())).queue();
             return CommandResult.PASS;
         }
 
-        var command = corePlugin.getCommandRegistry().getCommand(cmd);
+        var command = JDAPlugin.getCommandRegistry().getCommand(cmd);
         if (command == null) {
             settings.apply(message.reply("Command not found!")).queue();
             return CommandResult.PASS;

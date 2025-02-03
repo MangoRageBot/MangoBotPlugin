@@ -8,18 +8,18 @@ import org.mangorage.mangobot.modules.tricks.lua.builders.LuaEmbedBuilder;
 import org.mangorage.mangobot.modules.tricks.lua.builders.LuaMessageResponseBuilder;
 import org.mangorage.mangobot.modules.tricks.lua.helpers.LuaInfoHelper;
 import org.mangorage.mangobot.modules.tricks.lua.helpers.LuaObjectHelper;
-import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
+import org.mangorage.mangobotapi.core.plugin.api.JDAPlugin;
 
 
 public final class LuaJDA {
-    private final CorePlugin corePlugin;
+    private final JDAPlugin JDAPlugin;
     private final Message message;
     private final MessageChannel messageChannel;
     private final Trick trick;
 
 
-    public LuaJDA(CorePlugin plugin, Trick trick, Message message, MessageChannel channel) {
-        this.corePlugin = plugin;
+    public LuaJDA(JDAPlugin plugin, Trick trick, Message message, MessageChannel channel) {
+        this.JDAPlugin = plugin;
         this.message = message;
         this.messageChannel = channel;
         this.trick = trick;
@@ -40,7 +40,7 @@ public final class LuaJDA {
 
     public void storeValue(String key, Object o) {
         trick.getMemoryBank().bank().put(key, o);
-        TrickCommand.TRICK_DATA_HANDLER.save(corePlugin.getPluginDirectory(), trick);
+        TrickCommand.TRICK_DATA_HANDLER.save(JDAPlugin.getPluginDirectory(), trick);
     }
 
     public LuaEmbedBuilder createEmbed() {

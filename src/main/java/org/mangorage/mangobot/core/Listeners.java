@@ -25,12 +25,12 @@ package org.mangorage.mangobot.core;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.mangorage.mangobot.MangoBotPlugin;
 import org.mangorage.mangobotapi.core.events.DiscordEvent;
-import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
+import org.mangorage.mangobotapi.core.plugin.api.JDAPlugin;
 
 public class Listeners {
-    private final CorePlugin plugin;
+    private final JDAPlugin plugin;
 
-    public Listeners(CorePlugin plugin) {
+    public Listeners(JDAPlugin plugin) {
         this.plugin = plugin;
         plugin.getPluginBus().addGenericListener(10, ButtonInteractionEvent.class, DiscordEvent.class, this::onButtonInteraction);
     }

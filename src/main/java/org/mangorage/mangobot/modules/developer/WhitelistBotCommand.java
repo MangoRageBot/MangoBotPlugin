@@ -7,7 +7,7 @@ import org.mangorage.mangobotapi.core.commands.CommandResult;
 import org.mangorage.mangobotapi.core.commands.IBasicCommand;
 import org.mangorage.mangobotapi.core.data.DataHandler;
 import org.mangorage.mangobotapi.core.data.IEmptyFileNameResolver;
-import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
+import org.mangorage.mangobotapi.core.plugin.api.JDAPlugin;
 
 import java.util.HashSet;
 import java.util.List;
@@ -29,7 +29,7 @@ public class WhitelistBotCommand implements IBasicCommand {
 
 
     private final Set<String> SERVERS = new CopyOnWriteArraySet<>();
-    private final CorePlugin plugin;
+    private final JDAPlugin plugin;
     private final Timer timer = new Timer();
     private final TimerTask TASK = new TimerTask() {
         @Override
@@ -48,7 +48,7 @@ public class WhitelistBotCommand implements IBasicCommand {
     private boolean whitelistOn = false;
 
 
-    public WhitelistBotCommand(CorePlugin plugin) {
+    public WhitelistBotCommand(JDAPlugin plugin) {
         this.plugin = plugin;
         var data = WHITELIST_DATA.loadFile(plugin.getPluginDirectory());
 

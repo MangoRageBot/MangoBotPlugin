@@ -35,7 +35,7 @@ import org.luaj.vm2.lib.jse.JseBaseLib;
 import org.luaj.vm2.lib.jse.JseMathLib;
 import org.mangorage.mangobot.modules.tricks.lua.LuaJDA;
 import org.mangorage.mangobot.modules.tricks.lua.objects.LuaStringArray;
-import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
+import org.mangorage.mangobotapi.core.plugin.api.JDAPlugin;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -46,9 +46,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 public class TrickScriptable {
-    private final CorePlugin plugin;
+    private final JDAPlugin plugin;
 
-    public TrickScriptable(CorePlugin plugin) {
+    public TrickScriptable(JDAPlugin plugin) {
         this.plugin = plugin;
     }
 

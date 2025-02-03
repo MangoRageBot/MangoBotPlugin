@@ -18,7 +18,7 @@ import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
 import org.mangorage.mangobot.MangoBotPlugin;
 import org.mangorage.mangobot.config.GuildConfig;
-import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
+import org.mangorage.mangobotapi.core.plugin.api.JDAPlugin;
 
 
 public class GHIssueStatus extends TimerTask {
@@ -65,10 +65,10 @@ public class GHIssueStatus extends TimerTask {
 		return result;
 	}
 
-	private final CorePlugin corePlugin;
+	private final JDAPlugin JDAPlugin;
 
-	public GHIssueStatus(CorePlugin corePlugin) {
-		this.corePlugin = corePlugin;
+	public GHIssueStatus(JDAPlugin JDAPlugin) {
+		this.JDAPlugin = JDAPlugin;
 		new Timer().scheduleAtFixedRate(this, 15 * 1000, 60 * 60 * 1000); // 60 minutes/1hr
 	}
 
@@ -80,7 +80,7 @@ public class GHIssueStatus extends TimerTask {
 			GitHub github = GitHub.connect(MangoBotPlugin.GITHUB_USERNAME.get(), token);
 
 			for (String chan: indexed_channels) {
-				String guild = corePlugin.getJDA().getTextChannelById(chan).getGuild().getId();
+				String guild = JDAPlugin.getJDA().getTextChannelById(chan).getGuild().getId();
 				GuildConfig config = GuildConfig.guildsConfig(guild);
 				String[] repos = config.GIT_REPOS_ISSUE_SCANNED.get().contains(",") ? config.GIT_REPOS_ISSUE_SCANNED.get().split(",") : new String[]{config.GIT_REPOS_ISSUE_SCANNED.get()};
 				if (repos.length == 0) continue;
@@ -121,7 +121,7 @@ public class GHIssueStatus extends TimerTask {
 				}
 
 				if (!builder.isEmpty()) {
-					var channel = corePlugin.getJDA().getTextChannelById(chan);
+					var channel = JDAPlugin.getJDA().getTextChannelById(chan);
 					if (channel == null) return;
 					channel.sendMessage(builder).setSuppressEmbeds(true).queue();
 				}
@@ -134,7 +134,7 @@ public class GHIssueStatus extends TimerTask {
 	}
 
 	public Path getFile(String repo) {
-		return corePlugin.getPluginDirectory().resolve("ghissuestatus/" + repo.replace("/", ".") + ".txt");
+		return JDAPlugin.getPluginDirectory().resolve("ghissuestatus/" + repo.replace("/", ".") + ".txt");
 	}
 
 }

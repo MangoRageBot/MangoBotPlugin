@@ -30,12 +30,12 @@ import org.mangorage.mangobot.modules.tricks.lua.LuaJDA;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
 import org.mangorage.mangobotapi.core.commands.IBasicCommand;
-import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
+import org.mangorage.mangobotapi.core.plugin.api.JDAPlugin;
 
 public class RunCode implements IBasicCommand {
 
     private final TrickScriptable scriptable;
-    public RunCode(CorePlugin plugin) {
+    public RunCode(JDAPlugin plugin) {
         this.scriptable = new TrickScriptable(plugin);
     }
 

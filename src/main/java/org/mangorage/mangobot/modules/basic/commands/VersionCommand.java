@@ -29,7 +29,7 @@ import org.mangorage.mangobotapi.core.commands.CommandResult;
 import org.mangorage.mangobotapi.core.commands.IBasicCommand;
 import org.mangorage.mangobotapi.core.data.DataHandler;
 import org.mangorage.mangobotapi.core.data.IEmptyFileNameResolver;
-import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
+import org.mangorage.mangobotapi.core.plugin.api.JDAPlugin;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -70,16 +70,16 @@ public class VersionCommand implements IBasicCommand {
         return VERSION.get().version();
     }
 
-    private final CorePlugin corePlugin;
+    private final JDAPlugin JDAPlugin;
 
-    public VersionCommand(CorePlugin corePlugin) {
-        this.corePlugin = corePlugin;
+    public VersionCommand(JDAPlugin JDAPlugin) {
+        this.JDAPlugin = JDAPlugin;
     }
 
     @NotNull
     @Override
     public CommandResult execute(Message message, Arguments args) {
-        var settings = corePlugin.getMessageSettings();
+        var settings = JDAPlugin.getMessageSettings();
         settings.apply(message.reply("Bot is running on Version: " + VERSION.get().version())).queue();
         return CommandResult.PASS;
     }

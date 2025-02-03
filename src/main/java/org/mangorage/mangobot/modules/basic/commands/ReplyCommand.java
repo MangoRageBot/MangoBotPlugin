@@ -27,14 +27,14 @@ import org.jetbrains.annotations.NotNull;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
 import org.mangorage.mangobotapi.core.commands.IBasicCommand;
-import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
+import org.mangorage.mangobotapi.core.plugin.api.JDAPlugin;
 
 
 public abstract class ReplyCommand implements IBasicCommand {
     private final String MESSAGE_RESPONSE;
-    private final CorePlugin plugin;
+    private final JDAPlugin plugin;
 
-    public ReplyCommand(CorePlugin plugin, String message) {
+    public ReplyCommand(JDAPlugin plugin, String message) {
         this.plugin = plugin;
         this.MESSAGE_RESPONSE = message;
     }

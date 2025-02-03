@@ -23,11 +23,11 @@
 package org.mangorage.mangobot.modules.developer;
 
 import org.mangorage.mangobot.modules.basic.commands.ReplyCommand;
-import org.mangorage.mangobotapi.core.plugin.api.CorePlugin;
+import org.mangorage.mangobotapi.core.plugin.api.JDAPlugin;
 
 public class SpeakCommand extends ReplyCommand {
 
-    public SpeakCommand(CorePlugin plugin) {
+    public SpeakCommand(JDAPlugin plugin) {
         super(plugin, "I have Spoken! Which means I am working as intended.");
     }
 
