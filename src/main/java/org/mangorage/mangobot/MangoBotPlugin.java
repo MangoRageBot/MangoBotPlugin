@@ -53,6 +53,7 @@ import org.mangorage.mangobot.modules.basic.commands.JoinCommand;
 import org.mangorage.mangobot.modules.basic.commands.LeaveCommand;
 import org.mangorage.mangobot.modules.basic.commands.PermissionCommand;
 import org.mangorage.mangobot.modules.basic.commands.PingCommand;
+import org.mangorage.mangobot.modules.basic.commands.PluginsCommand;
 import org.mangorage.mangobot.modules.basic.commands.PrefixCommand;
 import org.mangorage.mangobot.modules.basic.commands.VersionCommand;
 import org.mangorage.mangobot.modules.developer.WhitelistBotCommand;
@@ -202,6 +203,7 @@ public class MangoBotPlugin extends JDAPlugin {
         cmdRegistry.addBasicCommand(new PrefixCommand(this));
         cmdRegistry.addBasicCommand(new VersionCommand(this));
         cmdRegistry.addBasicCommand(new AntiPingCommand(this));
+        cmdRegistry.addBasicCommand(new PluginsCommand());
 
         // Developer Commands
         cmdRegistry.addBasicCommand(new KickBotCommand(this));

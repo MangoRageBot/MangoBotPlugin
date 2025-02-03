@@ -1,5 +1,11 @@
 {
   "id": "mangobot",
-  "version": "11.0.9",
-  "name": "MangoBot"
+  "version": "${mangobot_version}",
+  "name": "MangoBot",
+  "dependencies": [
+    {
+      "id": "mangobotcore",
+      "type": "required"
+    }
+  ]
 }

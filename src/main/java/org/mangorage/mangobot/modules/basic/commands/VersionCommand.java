@@ -27,47 +27,13 @@ import org.jetbrains.annotations.NotNull;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
 import org.mangorage.mangobotapi.core.commands.IBasicCommand;
-import org.mangorage.mangobotapi.core.data.DataHandler;
-import org.mangorage.mangobotapi.core.data.IEmptyFileNameResolver;
+import org.mangorage.mangobotapi.core.plugin.PluginManager;
 import org.mangorage.mangobotapi.core.plugin.api.JDAPlugin;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.concurrent.atomic.AtomicReference;
-
 public class VersionCommand implements IBasicCommand {
-    public record Version(String version) implements IEmptyFileNameResolver {}
-
-    private static final AtomicReference<Version> VERSION = new AtomicReference<>();
-    private static final DataHandler<Version> VERSION_DATA_HANDLER = DataHandler.create()
-            .path("version")
-            .build(Version.class);
-
-    public static void init() {
-
-    }
-
-    public static String findVersion(String key, String filePath) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split("=");
-                if (parts.length == 2 && parts[0].trim().equals(key)) {
-                    return parts[1].trim();
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return "Undefined Version"; // Key not found or file error occurred
-    }
 
     public static String getVersion() {
-        if (VERSION.get() == null)
-            VERSION.set(new Version(findVersion("mangobotplugin.jar", "installer/installed.txt")));
-        return VERSION.get().version();
+        return PluginManager.getPluginContainer("mangobot").getMetadata().version();
     }
 
     private final JDAPlugin JDAPlugin;
@@ -80,7 +46,7 @@ public class VersionCommand implements IBasicCommand {
     @Override
     public CommandResult execute(Message message, Arguments args) {
         var settings = JDAPlugin.getMessageSettings();
-        settings.apply(message.reply("Bot is running on Version: " + VERSION.get().version())).queue();
+        settings.apply(message.reply("Bot is running on Version: " + getVersion())).queue();
         return CommandResult.PASS;
     }
 
