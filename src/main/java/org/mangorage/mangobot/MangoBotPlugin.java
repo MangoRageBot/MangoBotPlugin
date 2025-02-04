@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Scanner;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.mangorage.basicutils.LogHelper;
 import org.mangorage.basicutils.config.Config;
 import org.mangorage.basicutils.config.ConfigSetting;
 import org.mangorage.basicutils.config.ISetting;
@@ -75,6 +76,7 @@ import org.mangorage.mangobot.modules.music.commands.PlayingCommand;
 import org.mangorage.mangobot.modules.music.commands.QueueCommand;
 import org.mangorage.mangobot.modules.music.commands.StopCommand;
 import org.mangorage.mangobot.modules.music.commands.VolumeCommand;
+import org.mangorage.mangobot.website.WebServer;
 import org.mangorage.mangobotapi.core.events.DiscordEvent;
 import org.mangorage.mangobotapi.core.events.LoadEvent;
 import org.mangorage.mangobotapi.core.events.SaveEvent;
@@ -263,6 +265,13 @@ public class MangoBotPlugin extends JDAPlugin {
                 .updateCommands()
                 .addCommands(Command.globalCommands)
                 .queue();
+
+        try {
+            WebServer.startWebServer();
+        } catch (Exception e) {
+            LogHelper.error("Failed to start WebServer");
+            LogHelper.trace(e.getMessage());
+        }
     }
 
     public void shutdownPre() {
