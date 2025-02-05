@@ -1,5 +1,6 @@
 package org.mangorage.mangobot.website;
 
+import htmlflow.HtmlFlow;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
@@ -8,13 +9,13 @@ import org.mangorage.mangobot.modules.tricks.Trick;
 import org.mangorage.mangobot.modules.tricks.TrickCommand;
 import org.mangorage.mangobot.website.impl.AbstractServlet;
 import org.mangorage.mangobot.website.impl.ObjectMap;
+import org.xmlet.htmlapifaster.EnumRelType;
 
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Date;
 
 public class TricksServlet extends AbstractServlet {
-
 
     public static String getUser(JDA jda, long id) {
         var user = jda.getUserById(id);
@@ -43,132 +44,105 @@ public class TricksServlet extends AbstractServlet {
         var guildId = request.getParameter("guildId");
         var trickId = request.getParameter("trickId");
 
-        var str3 = "<html><body><h2>%s</h2></body></html>";
-        var str4 = "<html><body><h4>%s</h4></body></html>";
-
-
-        response.getWriter().write(
-                """
-                <!DOCTYPE html>
-                <html lang="en">
-                <head>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <link rel="stylesheet" href="styles.css">
-                </head>
-                </html>
-                """
-        );
+        var html = HtmlFlow
+                .doc(response.getWriter())
+                .html()
+                .head()
+                .link()
+                .attrRel(
+                        EnumRelType.STYLESHEET
+                )
+                .attrHref(
+                        getStyles()
+                )
+                .__().__().body();
 
         if (guildId != null && trickId != null) {
             try {
                 Trick trick = command.getTrick(trickId, Long.parseLong(guildId));
                 if (trick != null) {
-
-                    response.getWriter().write(
-                            str3.formatted(
-                                    STR."Id: \{trick.getTrickID()}"
-                            )
+                    html.h2().text(
+                            STR."Id: \{trick.getTrickID()}"
                     );
 
-                    response.getWriter().write(
-                            str3.formatted(
-                                    STR."Type: \{trick.getType()}"
-                            )
+                    html.h2().text(
+                            STR."Type: \{trick.getType()}"
                     );
 
-                    response.getWriter().write(
-                            str3.formatted(
-                                    STR."GuildId: \{trick.getGuildID()} \{getGuild(jda, trick.getGuildID())}"
-                            )
+                    html.h2().text(
+                            STR."GuildId: \{trick.getGuildID()} \{getGuild(jda, trick.getGuildID())}"
                     );
 
                     switch (trick.getType()) {
                         case ALIAS -> {
-                            response.getWriter().write(
-                                    str3.formatted(
-                                            "Alias Target:"
-                                    )
+                            html.h2().text(
+                                    "Alias Target:"
                             );
-                            response.getWriter().write(
-                                    str3.formatted(
-                                            trick.getAliasTarget()
-                                    )
+
+                            html.h2().text(
+                                    trick.getAliasTarget()
                             );
                             break;
                         }
                         case NORMAL -> {
-                            response.getWriter().write(
-                                    str3.formatted(
-                                            "Content:"
-                                    )
+                            html.h2().text(
+                                    "Content:"
                             );
-                            response.getWriter().write(
-                                    str3.formatted(
-                                            trick.getContent()
-                                    )
+
+                            html.h2().text(
+                                    trick.getContent()
                             );
+
                             break;
                         }
                         case SCRIPT -> {
-                            response.getWriter().write(
-                                    str3.formatted(
-                                           "Script:"
-                                    )
+                            html.h2().text(
+                                    "Script:"
                             );
-                            response.getWriter().write(
-                                    str3.formatted(
-                                            trick.getScript()
-                                    )
+
+                            html.h2().text(
+                                    trick.getScript()
                             );
                             break;
                         }
                     }
 
-                    response.getWriter().write(
-                            str4.formatted(
-                                    STR."Trick Owner: \{trick.getOwnerID()} \{getUser(jda, trick.getOwnerID())}"
-                            )
+
+                    html.h4().text(
+                            STR."Trick Owner: \{trick.getOwnerID()} \{getUser(jda, trick.getOwnerID())}"
                     );
 
-                    response.getWriter().write(
-                            str4.formatted(
-                                    STR."Last User to edit: \{trick.getLastUserEdited()} \{getUser(jda, trick.getLastUserEdited())}"
-                            )
+                    html.h4().text(
+                            STR."Last User to edit: \{trick.getLastUserEdited()} \{getUser(jda, trick.getLastUserEdited())}"
                     );
 
-                    response.getWriter().write(
-                            str4.formatted(
-                                    STR."Trick Creation Date: \{Date.from(Instant.ofEpochMilli(trick.getCreated()))}"
-                            )
+                    html.h4().text(
+                            STR."Trick Creation Date: \{Date.from(Instant.ofEpochMilli(trick.getCreated()))}"
                     );
 
-                    response.getWriter().write(
-                            str4.formatted(
-                                    STR."Trick Last Edited: \{Date.from(Instant.ofEpochMilli(trick.getLastEdited()))}"
-                            )
+                    html.h4().text(
+                            STR."Trick Last Edited: \{Date.from(Instant.ofEpochMilli(trick.getLastEdited()))}"
                     );
 
-                    response.getWriter().write(
-                            str4.formatted(
-                                    STR."Times Used: \{trick.getTimesUsed()}"
-                            )
+                    html.h4().text(
+                            STR."Times Used: \{trick.getTimesUsed()}"
                     );
 
                 } else {
-                    response.getWriter().write(
-                            str3.formatted("Invalid Trick %s Supplied for Guild %s".formatted(trickId, guildId))
+                    html.h1().text(
+                            "Invalid Trick %s Supplied for Guild %s".formatted(trickId, guildId)
                     );
                 }
-            } catch (Exception ignored) {
-                ignored.printStackTrace();
-            }
+            } catch (Exception ignored) {}
         } else {
-            response.getWriter().write(
-                    str3.formatted(
-                            "URL Format /trick?guildId=1234&trickId=example"
-                    )
+            html.h1().text(
+                    "URL Format /trick?guildId=1234&trickId=example"
             );
         }
+    }
+
+    @Override
+    public boolean useDefaultStyles() {
+        return false;
     }
 }

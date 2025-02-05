@@ -21,11 +21,22 @@ public abstract class AbstractServlet implements Servlet {
 
     @Override
     public String getServletInfo() {
-        return getClass().getName();
+        return getClass().getSimpleName();
     }
 
     @Override
     public void destroy() {
         System.out.println(STR."\{getServletInfo()} destroyed!");
+    }
+
+    /**
+     * Use Default (styles.css) or getServletInfo().css
+     */
+    public boolean useDefaultStyles() {
+        return true;
+    }
+
+    public String getStyles() {
+        return useDefaultStyles() ? "styles.css" : STR."\{getServletInfo()}.css";
     }
 }

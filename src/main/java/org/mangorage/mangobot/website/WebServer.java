@@ -9,12 +9,12 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.DefaultServlet;
 
-import org.eclipse.jetty.servlet.ServletContainerInitializerHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
-import org.mangorage.mangobot.modules.tricks.TrickCommand;
 import org.mangorage.mangobot.website.impl.ObjectMap;
+
+import java.lang.runtime.TemplateRuntime;
 
 
 public final class WebServer {
@@ -29,7 +29,7 @@ public final class WebServer {
         context.setResourceBase("webpage"); // Serve files from "webpage" directory
         context.addServlet(DefaultServlet.class, "/*"); // Serve all webpage files
 
-        context.addServlet(new ServletHolder(MyServlet.class), "/info");
+        context.addServlet(new ServletHolder(InfoServlet.class), "/info");
         context.addServlet(new ServletHolder(TricksServlet.class), "/trick");
         context.setAttribute("map", objectMap);
 
@@ -50,6 +50,8 @@ public final class WebServer {
         sslContextFactory.setKeyStorePath("keystore.jks"); // Path to your keystore
         sslContextFactory.setKeyStorePassword("mango12"); // Keystore password
         sslContextFactory.setKeyManagerPassword("mango12"); // Key manager password
+        sslContextFactory.setCertAlias("mangobot");
+        sslContextFactory.setTrustAll(true);
 
         // HTTP/1.1 Connection Factory
         HttpConnectionFactory http1ConnectionFactory = new HttpConnectionFactory(httpConfig);
