@@ -1,4 +1,4 @@
-package org.mangorage.mangobot.website;
+package org.mangorage.mangobot.website.servlet;
 
 import htmlflow.HtmlFlow;
 import jakarta.servlet.ServletException;
@@ -89,9 +89,13 @@ public class TricksServlet extends AbstractServlet {
                                     "Content:"
                             );
 
-                            html.h2().text(
-                                    trick.getContent()
-                            );
+                            html
+                                    .div()
+                                    .textarea()
+                                    .attrCols(50l)
+                                    .attrRows(20L)
+                                    .text(trick.getContent())
+                                    .__();
 
                             break;
                         }

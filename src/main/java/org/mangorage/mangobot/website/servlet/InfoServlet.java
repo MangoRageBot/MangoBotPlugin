@@ -1,9 +1,9 @@
-package org.mangorage.mangobot.website;
+package org.mangorage.mangobot.website.servlet;
 import htmlflow.HtmlFlow;
-import jakarta.servlet.Servlet;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
+import jakarta.servlet.annotation.WebServlet;
 import org.mangorage.mangobot.website.impl.AbstractServlet;
 import org.mangorage.mangobotapi.core.plugin.PluginContainer;
 import org.mangorage.mangobotapi.core.plugin.PluginManager;
@@ -11,7 +11,7 @@ import org.xmlet.htmlapifaster.EnumRelType;
 
 import java.io.IOException;
 
-
+@WebServlet
 public class InfoServlet extends AbstractServlet {
     @Override
     public void service(ServletRequest request, ServletResponse response) throws ServletException, IOException {

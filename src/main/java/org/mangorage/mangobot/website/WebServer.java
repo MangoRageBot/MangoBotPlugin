@@ -8,13 +8,12 @@ import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.DefaultServlet;
-
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.mangorage.mangobot.website.impl.ObjectMap;
-
-import java.lang.runtime.TemplateRuntime;
+import org.mangorage.mangobot.website.servlet.InfoServlet;
+import org.mangorage.mangobot.website.servlet.TricksServlet;
 
 
 public final class WebServer {
@@ -31,8 +30,8 @@ public final class WebServer {
 
         context.addServlet(new ServletHolder(InfoServlet.class), "/info");
         context.addServlet(new ServletHolder(TricksServlet.class), "/trick");
-        context.setAttribute("map", objectMap);
 
+        context.setAttribute("map", objectMap);
         server.setHandler(context);
 
         // HTTP Configuration
@@ -53,7 +52,6 @@ public final class WebServer {
         sslContextFactory.setCertAlias("mangobot");
         sslContextFactory.setTrustStorePath("keystore.jks");
         sslContextFactory.setTrustStorePassword("mango12");
-
         sslContextFactory.setTrustAll(true);
 
         // HTTP/1.1 Connection Factory
