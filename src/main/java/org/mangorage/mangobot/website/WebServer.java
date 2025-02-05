@@ -9,23 +9,17 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.DefaultServlet;
 
+import org.eclipse.jetty.servlet.ServletContainerInitializerHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.mangorage.mangobot.modules.tricks.TrickCommand;
+import org.mangorage.mangobot.website.impl.ObjectMap;
 
 
 public final class WebServer {
-    private static TrickCommand trickCommand;
 
-    public static TrickCommand getTrickCommand() {
-        return trickCommand;
-    }
-
-    public static void startWebServer(TrickCommand trickCommand) throws Exception {
-        // Create a Jetty server instance
-        WebServer.trickCommand = trickCommand;
-
+    public static void startWebServer(ObjectMap objectMap) throws Exception {
         Server server = new Server();
 
 
@@ -34,8 +28,10 @@ public final class WebServer {
         context.setContextPath("/");
         context.setResourceBase("webpage"); // Serve files from "webpage" directory
         context.addServlet(DefaultServlet.class, "/*"); // Serve all webpage files
-        context.addServlet(new ServletHolder(new MyServlet()), "/info");
-        context.addServlet(new ServletHolder(new TricksServlet()), "/trick");
+
+        context.addServlet(new ServletHolder(MyServlet.class), "/info");
+        context.addServlet(new ServletHolder(TricksServlet.class), "/trick");
+        context.setAttribute("map", objectMap);
 
         server.setHandler(context);
 

@@ -77,6 +77,7 @@ import org.mangorage.mangobot.modules.music.commands.QueueCommand;
 import org.mangorage.mangobot.modules.music.commands.StopCommand;
 import org.mangorage.mangobot.modules.music.commands.VolumeCommand;
 import org.mangorage.mangobot.website.WebServer;
+import org.mangorage.mangobot.website.impl.ObjectMap;
 import org.mangorage.mangobotapi.core.events.DiscordEvent;
 import org.mangorage.mangobotapi.core.events.LoadEvent;
 import org.mangorage.mangobotapi.core.events.SaveEvent;
@@ -137,6 +138,7 @@ public class MangoBotPlugin extends JDAPlugin {
     public static final ISetting<String> GITHUB_USERNAME = ConfigSetting.create(CONFIG, "GITHUB_USERNAME", "RealMangoRage");
     public static final ButtonActionRegistry ACTION_REGISTRY = new ButtonActionRegistry();
 
+    private final ObjectMap objectMap = new ObjectMap(); // Used for WebServer!
 
     public MangoBotPlugin() {
         super(
@@ -162,6 +164,7 @@ public class MangoBotPlugin extends JDAPlugin {
         );
 
         getJDA().addEventListener(new BotEventListener(this));
+        objectMap.put("jda", getJDA());
         init();
     }
 
@@ -225,7 +228,7 @@ public class MangoBotPlugin extends JDAPlugin {
 
 
         // Tricks
-        cmdRegistry.addBasicCommand(new TrickCommand(this));
+        cmdRegistry.addBasicCommand(objectMap.putAndReturn("trickCommand", new TrickCommand(this)));
         
         // Test
         cmdRegistry.addBasicCommand(new RunCode(this));
@@ -267,7 +270,7 @@ public class MangoBotPlugin extends JDAPlugin {
                 .queue();
 
         try {
-            WebServer.startWebServer((TrickCommand) getCommandRegistry().getCommand("trick"));
+            WebServer.startWebServer(objectMap);
         } catch (Exception e) {
             LogHelper.error("Failed to start WebServer");
             LogHelper.trace(e.getMessage());
