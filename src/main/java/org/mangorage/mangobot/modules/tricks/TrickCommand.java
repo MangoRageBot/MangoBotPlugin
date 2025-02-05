@@ -57,7 +57,7 @@ public class TrickCommand implements IBasicCommand {
     private final TrickScriptable SCRIPT_RUNNER;
 
 
-    private Trick getTrick(String trickId, long guildId) {
+    public Trick getTrick(String trickId, long guildId) {
         return TRICKS.get(new TrickKey(trickId, guildId));
     }
 

@@ -267,7 +267,7 @@ public class MangoBotPlugin extends JDAPlugin {
                 .queue();
 
         try {
-            WebServer.startWebServer();
+            WebServer.startWebServer((TrickCommand) getCommandRegistry().getCommand("trick"));
         } catch (Exception e) {
             LogHelper.error("Failed to start WebServer");
             LogHelper.trace(e.getMessage());

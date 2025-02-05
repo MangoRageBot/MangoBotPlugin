@@ -10,19 +10,33 @@ import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.DefaultServlet;
 
 import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
+import org.mangorage.mangobot.modules.tricks.TrickCommand;
 
 
 public final class WebServer {
-    public static void startWebServer() throws Exception {
+    private static TrickCommand trickCommand;
+
+    public static TrickCommand getTrickCommand() {
+        return trickCommand;
+    }
+
+    public static void startWebServer(TrickCommand trickCommand) throws Exception {
         // Create a Jetty server instance
+        WebServer.trickCommand = trickCommand;
+
         Server server = new Server();
+
 
         // Set up Servlet context
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");
         context.setResourceBase("webpage"); // Serve files from "webpage" directory
         context.addServlet(DefaultServlet.class, "/*"); // Serve all webpage files
+        context.addServlet(new ServletHolder(new MyServlet()), "/info");
+        context.addServlet(new ServletHolder(new TricksServlet()), "/trick");
+
         server.setHandler(context);
 
         // HTTP Configuration
@@ -31,6 +45,8 @@ public final class WebServer {
 
         SecureRequestCustomizer src = new SecureRequestCustomizer();
         src.setSniHostCheck(false); // Disable SNI host check
+        src.setSniRequired(false);
+
         httpConfig.addCustomizer(src);
 
         // SSL Context Factory for HTTPS
@@ -56,11 +72,7 @@ public final class WebServer {
 
         // Start the server
         server.start();
-        System.out.println("Server started with HTTPS on port 8443");
+        System.out.println("Webserver Started");
         server.join();
-    }
-
-    public static void main(String[] args) throws Exception {
-        startWebServer();
     }
 }
