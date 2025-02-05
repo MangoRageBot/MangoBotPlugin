@@ -53,7 +53,8 @@ public final class WebServer {
         sslContextFactory.setCertAlias("mangobot");
         sslContextFactory.setTrustStorePath("keystore.jks");
         sslContextFactory.setTrustStorePassword("mango12");
-
+        sslContextFactory.setNeedClientAuth(true);
+        sslContextFactory.setWantClientAuth(true);
         sslContextFactory.setTrustAll(true);
 
         // HTTP/1.1 Connection Factory
