@@ -1,51 +1,62 @@
 package org.mangorage.mangobot.website;
 
-import org.eclipse.jetty.server.Connector;
+
+
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.servlet.DefaultServlet;
+
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 
 
 public final class WebServer {
     public static void startWebServer() throws Exception {
-        Server server = new Server(30076);
+        // Create a Jetty server instance
+        Server server = new Server();
 
+        // Set up Servlet context
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");
         context.setResourceBase("webpage"); // Serve files from "webpage" directory
         context.addServlet(DefaultServlet.class, "/*"); // Serve all webpage files
         server.setHandler(context);
 
+        // HTTP Configuration
+        HttpConfiguration httpConfig = new HttpConfiguration();
+        httpConfig.setSendServerVersion(false);
 
-        // Configure SSL
+        SecureRequestCustomizer src = new SecureRequestCustomizer();
+        src.setSniHostCheck(false); // Disable SNI host check
+        httpConfig.addCustomizer(src);
+
+        // SSL Context Factory for HTTPS
         SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
         sslContextFactory.setKeyStorePath("keystore.jks"); // Path to your keystore
-        sslContextFactory.setKeyStorePassword("Mango12"); // Keystore password
-        sslContextFactory.setKeyManagerPassword("Mango12"); // Key password
+        sslContextFactory.setKeyStorePassword("mango12"); // Keystore password
+        sslContextFactory.setKeyManagerPassword("mango12"); // Key manager password
 
-        // HTTPS Configuration
-        HttpConfiguration httpsConfig = new HttpConfiguration();
-        httpsConfig.addCustomizer(new SecureRequestCustomizer());
+        // HTTP/1.1 Connection Factory
+        HttpConnectionFactory http1ConnectionFactory = new HttpConnectionFactory(httpConfig);
 
         // HTTPS Connector
-        ServerConnector sslConnector = new ServerConnector(server,
-                new SslConnectionFactory(sslContextFactory, "http/1.1"),
-                new HttpConnectionFactory(httpsConfig));
+        ServerConnector sslConnector = new ServerConnector(
+                server,
+                sslContextFactory,
+                http1ConnectionFactory
+        );
 
+        sslConnector.setPort(30076); // HTTPS port
 
-        sslConnector.setPort(8443); // HTTPS port
+        // Set the connector
+        server.addConnector(sslConnector);
 
-        server.setConnectors(new Connector[]{sslConnector});
-
-
+        // Start the server
         server.start();
-        System.out.println("Server started with port 30076");
+        System.out.println("Server started with HTTPS on port 8443");
         server.join();
     }
 
