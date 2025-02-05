@@ -10,6 +10,7 @@ import org.mangorage.mangobot.modules.tricks.TrickCommand;
 import org.mangorage.mangobot.website.impl.AbstractServlet;
 import org.mangorage.mangobot.website.impl.ObjectMap;
 import org.xmlet.htmlapifaster.EnumRelType;
+import org.xmlet.htmlapifaster.EnumWrapType;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -75,38 +76,40 @@ public class TricksServlet extends AbstractServlet {
 
                     switch (trick.getType()) {
                         case ALIAS -> {
-                            html.h2().text(
-                                    "Alias Target:"
-                            );
-
-                            html.h2().text(
-                                    trick.getAliasTarget()
-                            );
+                            html.h2()
+                                    .text("Alias Target:")
+                                    .__()
+                                    .h2()
+                                    .text(trick.getAliasTarget());
                             break;
                         }
                         case NORMAL -> {
-                            html.h2().text(
+                           html.h2().text(
                                     "Content:"
-                            );
-
-                            html
+                            ).__()
                                     .div()
                                     .textarea()
-                                    .attrCols(50l)
+                                    .attrCols(50L)
                                     .attrRows(20L)
+                                    .attrWrap(EnumWrapType.HARD)
+                                    .attrReadonly(true)
                                     .text(trick.getContent())
-                                    .__();
+                                    .__().__();
 
                             break;
                         }
                         case SCRIPT -> {
                             html.h2().text(
-                                    "Script:"
-                            );
-
-                            html.h2().text(
-                                    trick.getScript()
-                            );
+                                            "Script:"
+                                    ).__()
+                                    .div()
+                                    .textarea()
+                                    .attrCols(50L)
+                                    .attrRows(20L)
+                                    .attrWrap(EnumWrapType.HARD)
+                                    .attrReadonly(true)
+                                    .text(trick.getScript())
+                                    .__().__();
                             break;
                         }
                     }
