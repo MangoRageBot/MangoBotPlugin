@@ -116,15 +116,6 @@ tasks.named('processResources', ProcessResources).configure {
 MangoBotConfig {
     setJarTask(jar)
 
-    if (System.getenv().containsKey("SERVER_TOKEN") && System.getenv().containsKey("SERVER_ID")) {
-        enableRestartServerTask(
-                System.getenv("SERVER_ID") as String,
-                "https://panel.sodiumhosting.com/",
-                System.getenv("SERVER_TOKEN") as String,
-                null
-        )
-    }
-
     addResolver(e -> {
         if (e.versionID2().equals("afec211f05c9dcf0b6ee44276a02f0316ea2458a-SNAPSHOT"))
             return e.complete(

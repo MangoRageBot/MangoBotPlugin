@@ -40,6 +40,7 @@ import org.mangorage.basicutils.LogHelper;
 import org.mangorage.basicutils.config.Config;
 import org.mangorage.basicutils.config.ConfigSetting;
 import org.mangorage.basicutils.config.ISetting;
+import org.mangorage.basicutils.config.Transformers;
 import org.mangorage.jdautils.command.Command;
 import org.mangorage.mangobot.config.GuildConfig;
 import org.mangorage.mangobot.core.BotEventListener;
@@ -136,6 +137,7 @@ public class MangoBotPlugin extends JDAPlugin {
     public static final ISetting<String> BOT_TOKEN = ConfigSetting.create(CONFIG, "BOT_TOKEN", "empty");
     public static final ISetting<String> GITHUB_TOKEN = ConfigSetting.create(CONFIG, "PASTE_TOKEN", "empty");
     public static final ISetting<String> GITHUB_USERNAME = ConfigSetting.create(CONFIG, "GITHUB_USERNAME", "RealMangoRage");
+    public static final ISetting<Boolean> AUTO_UPDATE = ConfigSetting.create(CONFIG, "AUTO_UPDATE", Transformers.BOOLEAN, false);
     public static final ButtonActionRegistry ACTION_REGISTRY = new ButtonActionRegistry();
 
     private final ObjectMap objectMap = new ObjectMap(); // Used for WebServer!
@@ -166,6 +168,7 @@ public class MangoBotPlugin extends JDAPlugin {
         getJDA().addEventListener(new BotEventListener(this));
         objectMap.put("jda", getJDA());
         init();
+        new AutoUpdate(this);
     }
 
     public void startup() {
