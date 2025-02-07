@@ -33,7 +33,7 @@ public final class WebServer {
 
         // HTTPS Connector
         ServerConnector httpsConnector = new ServerConnector(server, sslContextFactory);
-        httpsConnector.setPort(30076);
+        httpsConnector.setPort(443);
         server.addConnector(httpsConnector);
 
         // Start the server
@@ -74,10 +74,6 @@ public final class WebServer {
         sslContextFactory.setKeyStorePath("keystore.jks"); // Path to your keystore
         sslContextFactory.setKeyStorePassword("mango12"); // Keystore password
         sslContextFactory.setKeyManagerPassword("mango12"); // Key manager password
-        sslContextFactory.setCertAlias("mangobot");
-        sslContextFactory.setTrustStorePath("keystore.jks");
-        sslContextFactory.setTrustStorePassword("mango12");
-        sslContextFactory.setTrustAll(true);
 
         // HTTP/1.1 Connection Factory
         HttpConnectionFactory http1ConnectionFactory = new HttpConnectionFactory(httpConfig);
@@ -89,7 +85,7 @@ public final class WebServer {
                 http1ConnectionFactory
         );
 
-        sslConnector.setPort(30076); // HTTPS port
+        sslConnector.setPort(443); // HTTPS port
 
         // Set the connector
         server.addConnector(sslConnector);
