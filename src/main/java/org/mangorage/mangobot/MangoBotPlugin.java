@@ -167,8 +167,9 @@ public class MangoBotPlugin extends JDAPlugin {
 
         getJDA().addEventListener(new BotEventListener(this));
         objectMap.put("jda", getJDA());
-        init();
         new AutoUpdate(this);
+
+        init();
     }
 
     public void startup() {
