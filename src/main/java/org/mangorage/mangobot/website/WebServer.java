@@ -23,6 +23,24 @@ public final class WebServer {
         return new ServletHolder(tClass);
     }
 
+    public static void startBasicWebServer() throws Exception {
+        Server server = new Server();
+
+        // SSL Context Factory
+        SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
+        sslContextFactory.setKeyStorePath("keystore.jks");
+        sslContextFactory.setKeyStorePassword("mango12");
+
+        // HTTPS Connector
+        ServerConnector httpsConnector = new ServerConnector(server, sslContextFactory);
+        httpsConnector.setPort(30076);
+        server.addConnector(httpsConnector);
+
+        // Start the server
+        server.start();
+        server.join();
+    }
+
 
     public static void startWebServer(ObjectMap objectMap) throws Exception {
         Server server = new Server();
