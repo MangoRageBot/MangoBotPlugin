@@ -1,6 +1,5 @@
 package org.mangorage.mangobot;
 
-import com.google.gson.Gson;
 import org.mangorage.basicutils.LogHelper;
 import org.mangorage.mangobotapi.core.plugin.api.JDAPlugin;
 import org.w3c.dom.Document;
