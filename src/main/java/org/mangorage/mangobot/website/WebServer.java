@@ -8,6 +8,8 @@ import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -54,14 +56,13 @@ public final class WebServer {
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");
         context.setResourceBase("webpage"); // Serve files from "webpage" directory
-        context.addServlet(DefaultServlet.class, "/*"); // Serve all webpage files
 
+        context.addServlet(DefaultServlet.class, "/*"); // Serve all webpage files
         context.addServlet(of(InfoServlet.class), "/info");
         context.addServlet(of(TricksServlet.class), "/trick");
         context.addServlet(of(TestServlet.class), "/test");
 
         context.setAttribute("map", objectMap);
-        server.setHandler(context);
 
         // SSL Context Factory for HTTPS
         SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
@@ -81,6 +82,17 @@ public final class WebServer {
 
         // Set the connector
         server.addConnector(sslConnector);
+
+        ResourceHandler resourceHandler = new ResourceHandler();
+        resourceHandler.setResourceBase("webpage");
+        resourceHandler.setDirectoriesListed(true);
+
+
+        HandlerList list = new HandlerList();
+        list.addHandler(resourceHandler);
+        list.addHandler(context);
+
+        server.setHandler(list);
 
         // Start the server
         server.start();
