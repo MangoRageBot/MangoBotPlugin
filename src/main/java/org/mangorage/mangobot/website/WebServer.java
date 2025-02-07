@@ -23,17 +23,22 @@ public final class WebServer {
         return new ServletHolder(tClass);
     }
 
+    public static void main(String[] args) throws Exception {
+        startBasicWebServer();
+    }
+
     public static void startBasicWebServer() throws Exception {
         Server server = new Server();
+        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+        context.setContextPath("/");
+        context.setResourceBase("webpage"); // Serve files from "webpage" directory
+        context.addServlet(DefaultServlet.class, "/*"); // Serve all webpage files
+        server.setHandler(context);
 
-        // SSL Context Factory
-        SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
-        sslContextFactory.setKeyStorePath("keystore.jks");
-        sslContextFactory.setKeyStorePassword("mango12");
 
         // HTTPS Connector
-        ServerConnector httpsConnector = new ServerConnector(server, sslContextFactory);
-        httpsConnector.setPort(443);
+        ServerConnector httpsConnector = new ServerConnector(server);
+        httpsConnector.setPort(30076);
         server.addConnector(httpsConnector);
 
         // Start the server
@@ -44,7 +49,6 @@ public final class WebServer {
 
     public static void startWebServer(ObjectMap objectMap) throws Exception {
         Server server = new Server();
-
 
         // Set up Servlet context
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
@@ -59,30 +63,18 @@ public final class WebServer {
         context.setAttribute("map", objectMap);
         server.setHandler(context);
 
-        // HTTP Configuration
-        HttpConfiguration httpConfig = new HttpConfiguration();
-        httpConfig.setSendServerVersion(false);
-
-        SecureRequestCustomizer src = new SecureRequestCustomizer();
-        src.setSniHostCheck(false); // Disable SNI host check
-        src.setSniRequired(false);
-
-        httpConfig.addCustomizer(src);
-
         // SSL Context Factory for HTTPS
         SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
+        sslContextFactory.setTrustAll(true);
+
         sslContextFactory.setKeyStorePath("keystore.jks"); // Path to your keystore
         sslContextFactory.setKeyStorePassword("mango12"); // Keystore password
         sslContextFactory.setKeyManagerPassword("mango12"); // Key manager password
 
-        // HTTP/1.1 Connection Factory
-        HttpConnectionFactory http1ConnectionFactory = new HttpConnectionFactory(httpConfig);
-
         // HTTPS Connector
         ServerConnector sslConnector = new ServerConnector(
                 server,
-                sslContextFactory,
-                http1ConnectionFactory
+                sslContextFactory
         );
 
         sslConnector.setPort(443); // HTTPS port
