@@ -9,7 +9,9 @@ import org.mangorage.mangobot.modules.tricks.Trick;
 import org.mangorage.mangobot.modules.tricks.TrickCommand;
 import org.mangorage.mangobot.website.impl.AbstractServlet;
 import org.mangorage.mangobot.website.impl.ObjectMap;
+import org.xmlet.htmlapifaster.EnumMethodType;
 import org.xmlet.htmlapifaster.EnumRelType;
+import org.xmlet.htmlapifaster.EnumTypeButtonType;
 import org.xmlet.htmlapifaster.EnumTypeInputType;
 import org.xmlet.htmlapifaster.EnumWrapType;
 
@@ -68,7 +70,7 @@ public class TricksServlet extends AbstractServlet {
                 .__().__().body();
 
         if (guildId == null && trickId == null) {
-            // When the Button Clicked makes the url /trick?guildId=value
+            // When the Button Clicked makes the URL /trick?guildId=value
             var form = html.h2()
                     .text("SELECT GUILD")
                     .__()
@@ -84,37 +86,38 @@ public class TricksServlet extends AbstractServlet {
 
             form.__()
                     .button()
-                    .attrFormtarget("guildId")
+                    .attrType(EnumTypeButtonType.SUBMIT) // Ensure it's a submit button
                     .text("Enter!");
 
         } else if (guildId != null && trickId == null) {
-
-            // When the Button Clicked makes the url /trick?trickId=value
-
-            // CHATGPT: I want it to be /trick?guildId=value&trickId=test
+            // When the Button Clicked makes the URL /trick?guildId=value&trickId=test
             var form = html.h2()
                     .text("SELECT TRICK")
                     .__()
+                    .form()  // Single form starts here
+                    .attrMethod(EnumMethodType.GET)  // Use GET to add parameters to the URL
+                    .attrAction("/trick"); // Ensure submission to /trick
 
-                    .form()
-                    .input()
+            // Preserve guildId as a hidden input
+            form.input()
                     .attrType(EnumTypeInputType.HIDDEN)
                     .attrName("guildId")
-                    .attrValue(guildId)  // Preserves the selected guildId
-                    .__()
-                    .form()
-                    .select()
-                    .attrName("trickId");
+                    .attrValue(guildId)
+                    .__();
+
+            // Create trick selection dropdown
+            var select = form.select().attrName("trickId");
 
             for (Trick trick : command.getTricksForGuild(getLong(guildId))) {
-                form = form.option()
+                select.option()
                         .attrValue(trick.getTrickID())
                         .text(trick.getTrickID()).__();
             }
 
-            form.__()
+            // Close select and add submit button
+            select.__()
                     .button()
-                    .attrFormtarget("trickId")
+                    .attrType(EnumTypeButtonType.SUBMIT) // Ensure it's a submit button
                     .text("Enter!");
 
         } else if (guildId != null && trickId != null) {
