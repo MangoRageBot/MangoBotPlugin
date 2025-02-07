@@ -2,6 +2,7 @@ package org.mangorage.mangobot.website;
 
 
 
+import jakarta.servlet.Servlet;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.SecureRequestCustomizer;
@@ -13,10 +14,15 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.mangorage.mangobot.website.impl.ObjectMap;
 import org.mangorage.mangobot.website.servlet.InfoServlet;
+import org.mangorage.mangobot.website.servlet.TestServlet;
 import org.mangorage.mangobot.website.servlet.TricksServlet;
 
-
 public final class WebServer {
+
+    private static ServletHolder of(Class<? extends Servlet>  tClass) {
+        return new ServletHolder(tClass);
+    }
+
 
     public static void startWebServer(ObjectMap objectMap) throws Exception {
         Server server = new Server();
@@ -28,8 +34,9 @@ public final class WebServer {
         context.setResourceBase("webpage"); // Serve files from "webpage" directory
         context.addServlet(DefaultServlet.class, "/*"); // Serve all webpage files
 
-        context.addServlet(new ServletHolder(InfoServlet.class), "/info");
-        context.addServlet(new ServletHolder(TricksServlet.class), "/trick");
+        context.addServlet(of(InfoServlet.class), "/info");
+        context.addServlet(of(TricksServlet.class), "/trick");
+        context.addServlet(of(TestServlet.class), "/test");
 
         context.setAttribute("map", objectMap);
         server.setHandler(context);

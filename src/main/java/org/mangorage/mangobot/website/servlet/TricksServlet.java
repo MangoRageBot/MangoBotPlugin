@@ -10,6 +10,7 @@ import org.mangorage.mangobot.modules.tricks.TrickCommand;
 import org.mangorage.mangobot.website.impl.AbstractServlet;
 import org.mangorage.mangobot.website.impl.ObjectMap;
 import org.xmlet.htmlapifaster.EnumRelType;
+import org.xmlet.htmlapifaster.EnumTypeInputType;
 import org.xmlet.htmlapifaster.EnumWrapType;
 
 import java.io.IOException;
@@ -32,6 +33,14 @@ public class TricksServlet extends AbstractServlet {
             return guild.getName();
         }
         return "";
+    }
+
+    private static long getLong(String value) {
+        try {
+            return Long.valueOf(value);
+        } catch (Exception ignored) {
+            return -1;
+        }
     }
 
     @Override
@@ -58,7 +67,57 @@ public class TricksServlet extends AbstractServlet {
                 )
                 .__().__().body();
 
-        if (guildId != null && trickId != null) {
+        if (guildId == null && trickId == null) {
+            // When the Button Clicked makes the url /trick?guildId=value
+            var form = html.h2()
+                    .text("SELECT GUILD")
+                    .__()
+                    .form()
+                    .select()
+                    .attrName("guildId");
+
+            for (Long guild : command.getGuilds()) {
+                form = form.option()
+                        .attrValue(guild.toString())
+                        .text(getGuild(jda, guild)).__();
+            }
+
+            form.__()
+                    .button()
+                    .attrFormtarget("guildId")
+                    .text("Enter!");
+
+        } else if (guildId != null && trickId == null) {
+
+            // When the Button Clicked makes the url /trick?trickId=value
+
+            // CHATGPT: I want it to be /trick?guildId=value&trickId=test
+            var form = html.h2()
+                    .text("SELECT TRICK")
+                    .__()
+
+                    .form()
+                    .input()
+                    .attrType(EnumTypeInputType.HIDDEN)
+                    .attrName("guildId")
+                    .attrValue(guildId)  // Preserves the selected guildId
+                    .__()
+                    .form()
+                    .select()
+                    .attrName("trickId");
+
+            for (Trick trick : command.getTricksForGuild(getLong(guildId))) {
+                form = form.option()
+                        .attrValue(trick.getTrickID())
+                        .text(trick.getTrickID()).__();
+            }
+
+            form.__()
+                    .button()
+                    .attrFormtarget("trickId")
+                    .text("Enter!");
+
+        } else if (guildId != null && trickId != null) {
             try {
                 Trick trick = command.getTrick(trickId, Long.parseLong(guildId));
                 if (trick != null) {
@@ -141,10 +200,6 @@ public class TricksServlet extends AbstractServlet {
                     );
                 }
             } catch (Exception ignored) {}
-        } else {
-            html.h1().text(
-                    "URL Format /trick?guildId=1234&trickId=example"
-            );
         }
     }
 

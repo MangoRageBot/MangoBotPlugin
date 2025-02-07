@@ -36,9 +36,12 @@ import org.mangorage.mangobotapi.core.events.SaveEvent;
 import org.mangorage.mangobotapi.core.plugin.api.JDAPlugin;
 import org.mangorage.mangobotapi.core.util.MessageSettings;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -61,7 +64,13 @@ public class TrickCommand implements IBasicCommand {
         return TRICKS.get(new TrickKey(trickId, guildId));
     }
 
-    private List<Trick> getTricksForGuild(long guildId) {
+    public Collection<Long> getGuilds() {
+        Set<Long> set = new HashSet<>();
+        TRICKS.forEach((t, k) -> set.add(t.guildId()));
+        return set;
+    }
+
+    public List<Trick> getTricksForGuild(long guildId) {
         return TRICKS.entrySet()
                 .stream()
                 .filter(e -> e.getKey().guildId() == guildId)
