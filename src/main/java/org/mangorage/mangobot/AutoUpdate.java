@@ -1,5 +1,6 @@
 package org.mangorage.mangobot;
 
+import org.apache.commons.logging.Log;
 import org.mangorage.basicutils.LogHelper;
 import org.mangorage.mangobotapi.core.plugin.api.JDAPlugin;
 import org.w3c.dom.Document;
@@ -61,6 +62,7 @@ public final class AutoUpdate implements Runnable {
             } catch (Exception ignored) {}
         }
 
+        LogHelper.info("Shutting down soon...");
         System.exit(0);
     }
 }
