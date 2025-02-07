@@ -46,7 +46,6 @@ public final class AutoUpdate implements Runnable {
         }
     }
 
-
     @Override
     public void run() {
         while (running) {
