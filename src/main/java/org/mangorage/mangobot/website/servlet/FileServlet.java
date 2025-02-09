@@ -20,6 +20,7 @@ public class FileServlet extends HttpServlet {
         EXTENSIONS.put(".gif", "image/gif");
         EXTENSIONS.put(".pdf", "application/pdf");
         EXTENSIONS.put(".json", "application/json");
+        EXTENSIONS.put(".mp4", "video/mp4");
     }
 
     @Override
