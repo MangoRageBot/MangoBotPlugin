@@ -3,6 +3,7 @@ package org.mangorage.mangobot.website;
 
 
 import jakarta.servlet.DispatcherType;
+import jakarta.servlet.MultipartConfigElement;
 import jakarta.servlet.Servlet;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -20,9 +21,6 @@ import org.mangorage.mangobot.website.servlet.FileServlet;
 import org.mangorage.mangobot.website.servlet.FileUploadServlet;
 import org.mangorage.mangobot.website.servlet.InfoServlet;
 import org.mangorage.mangobot.website.servlet.TricksServlet;
-
-import java.io.File;
-import java.net.URI;
 import java.net.URL;
 import java.util.EnumSet;
 import java.util.function.Consumer;
@@ -82,7 +80,9 @@ public final class WebServer {
         // Add your servlets here as required
         context.addServlet(of(InfoServlet.class), "/info");
         context.addServlet(of(TricksServlet.class), "/trick");
-        context.addServlet(of(FileUploadServlet.class), "/upload");
+        context.addServlet(of(FileUploadServlet.class, h -> {
+            h.getRegistration().setMultipartConfig(new MultipartConfigElement("/tmp/uploads"));
+        }), "/upload");
         context.addServlet(of(FileServlet.class), "/file");
         context.setAttribute("map", objectMap);
         // Add filters if needed
