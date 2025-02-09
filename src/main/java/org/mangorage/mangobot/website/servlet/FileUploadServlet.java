@@ -76,6 +76,8 @@ public class FileUploadServlet extends AbstractServlet {
             UUID ID = UUID.randomUUID();
 
             String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+            String fileExtension = fileName.lastIndexOf(".") == -1 ? "" : fileName.substring(fileName.lastIndexOf("."));
+
             Path uploadPath = Paths.get(UPLOAD_DIR);
 
             if (!Files.exists(uploadPath)) {
@@ -83,10 +85,10 @@ public class FileUploadServlet extends AbstractServlet {
             }
 
             try (InputStream input = filePart.getInputStream()) {
-                Files.copy(input, uploadPath.resolve(ID.toString()), StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(input, uploadPath.resolve(ID + fileExtension), StandardCopyOption.REPLACE_EXISTING);
             }
 
-            httpResp.sendRedirect("/file?id=" + ID);
+            httpResp.sendRedirect("/file?id=" + ID + fileExtension);
         }
     }
 

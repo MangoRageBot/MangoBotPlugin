@@ -5,13 +5,24 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import java.io.*;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Map;
 
 public class FileServlet extends HttpServlet {
     private static final String UPLOAD_DIR = "webpage-root/uploads";  // Your uploads folder path
+    private static final Map<String, String> EXTENSIONS = new HashMap<>();
+
+    static {
+        EXTENSIONS.put(".jpg", "image/jpeg");
+        EXTENSIONS.put(".jpeg", "image/jpeg");
+        EXTENSIONS.put(".png", "image/png");
+        EXTENSIONS.put(".gif", "image/gif");
+        EXTENSIONS.put(".pdf", "application/pdf");
+        EXTENSIONS.put(".json", "application/json");
+    }
+
+
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -36,14 +47,6 @@ public class FileServlet extends HttpServlet {
 
         File file = new File(UPLOAD_DIR, fileName);
 
-        // If the file is an HTML file, return a forbidden response
-        /**
-        if (fileName.endsWith(".html")) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "HTML files cannot be loaded!");
-            return;
-        }
-         **/
-
         // Serve the file content
         if (file.exists() && file.isFile()) {
             String contentType = determineContentType(file);
@@ -58,30 +61,25 @@ public class FileServlet extends HttpServlet {
         }
     }
 
+    public static void main(String[] args) {
+        String fileName = "test.txt";
+        String fileName2 = "test";
+
+        System.out.println(fileName2.lastIndexOf("."));
+    }
+
     private String determineContentType(File file) {
         //String contentType = "application/octet-stream";  // Default content type for unknown files
         String contentType = "text/plain";
 
         String fileName = file.getName().toLowerCase();
-        if (fileName.endsWith(".txt")) {
-            contentType = "text/plain";
-        } else if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
-            contentType = "image/jpeg";
-        } else if (fileName.endsWith(".png")) {
-            contentType = "image/png";
-        } else if (fileName.endsWith(".gif")) {
-            contentType = "image/gif";
-        } else if (fileName.endsWith(".pdf")) {
-            contentType = "application/pdf";
-        } else if (fileName.endsWith(".json")) {
-            contentType = "application/json";
-        } else if (fileName.endsWith(".css")) {
-            contentType = "text/css";
-        } else if (fileName.endsWith(".js")) {
-            contentType = "application/javascript";
+        var index = fileName.lastIndexOf(".");
+
+        if (index == -1) {
+            return contentType;
         }
 
-        return contentType;
+        return EXTENSIONS.getOrDefault(fileName.substring(index), contentType);
     }
 
 }
