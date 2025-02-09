@@ -66,7 +66,7 @@ public final class WebServer {
         SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
         sslContextFactory.setTrustAll(true);
 
-        sslContextFactory.setKeyStorePath("keystore.jks"); // Path to your keystore
+        sslContextFactory.setKeyStorePath("webpage-root/keystore.jks"); // Path to your keystore
         sslContextFactory.setKeyStorePassword("mango12"); // Keystore password
         sslContextFactory.setKeyManagerPassword("mango12"); // Key manager password
 
