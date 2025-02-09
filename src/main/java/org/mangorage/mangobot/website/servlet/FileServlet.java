@@ -22,8 +22,6 @@ public class FileServlet extends HttpServlet {
         EXTENSIONS.put(".json", "application/json");
     }
 
-
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Retrieve the 'id' parameter from the query string
@@ -59,13 +57,6 @@ public class FileServlet extends HttpServlet {
         } else {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "File not found.");
         }
-    }
-
-    public static void main(String[] args) {
-        String fileName = "test.txt";
-        String fileName2 = "test";
-
-        System.out.println(fileName2.lastIndexOf("."));
     }
 
     private String determineContentType(File file) {
