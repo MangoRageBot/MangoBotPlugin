@@ -2,6 +2,7 @@ package org.mangorage.mangobot.website;
 
 
 
+import jakarta.servlet.MultipartConfigElement;
 import jakarta.servlet.Servlet;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
@@ -14,15 +15,26 @@ import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
+import org.mangorage.basicutils.LogHelper;
 import org.mangorage.mangobot.website.impl.ObjectMap;
+import org.mangorage.mangobot.website.servlet.FileDisplayServlet;
+import org.mangorage.mangobot.website.servlet.FileUploadServlet;
 import org.mangorage.mangobot.website.servlet.InfoServlet;
 import org.mangorage.mangobot.website.servlet.TestServlet;
 import org.mangorage.mangobot.website.servlet.TricksServlet;
 
+import java.util.function.Consumer;
+
 public final class WebServer {
 
-    private static ServletHolder of(Class<? extends Servlet>  tClass) {
+    private static ServletHolder of(Class<? extends Servlet> tClass) {
         return new ServletHolder(tClass);
+    }
+
+    private static ServletHolder of(Class<? extends Servlet> tClass, Consumer<ServletHolder> holderConsumer) {
+        var holder = of(tClass);
+        holderConsumer.accept(holder);
+        return holder;
     }
 
     public static void main(String[] args) throws Exception {
@@ -48,6 +60,17 @@ public final class WebServer {
         server.join();
     }
 
+    public static void startWebServerSafely(ObjectMap objectMap) {
+        new Thread(() -> {
+            try {
+                FolderPruner.init();
+                startWebServer(objectMap);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }).start();
+    }
+
 
     public static void startWebServer(ObjectMap objectMap) throws Exception {
         Server server = new Server();
@@ -60,7 +83,10 @@ public final class WebServer {
         context.addServlet(DefaultServlet.class, "/*"); // Serve all webpage files
         context.addServlet(of(InfoServlet.class), "/info");
         context.addServlet(of(TricksServlet.class), "/trick");
-        context.addServlet(of(TestServlet.class), "/test");
+        context.addServlet(of(FileUploadServlet.class, h -> {
+            h.getRegistration().setMultipartConfig(new MultipartConfigElement("/tmp/uploads"));
+        }), "/upload");
+        context.addServlet(of(FileDisplayServlet.class), "/file");
 
         context.setAttribute("map", objectMap);
 
@@ -96,7 +122,7 @@ public final class WebServer {
 
         // Start the server
         server.start();
-        System.out.println("Webserver Started");
+        LogHelper.info("Webserver Started");
         server.join();
     }
 }
