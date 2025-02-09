@@ -1,0 +1,15 @@
+#drop-area {
+    border: 2px dashed #ccc;
+    padding: 20px;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    color: #666;
+    margin-top: 20px;
+    cursor: default;
+}
+#drop-area.highlight {
+    border-color: blue;
+}
+#file-input {
+    display: none;
+}

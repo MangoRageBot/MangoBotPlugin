@@ -37,6 +37,6 @@ public abstract class AbstractServlet implements Servlet {
     }
 
     public String getStyles() {
-        return useDefaultStyles() ? "styles.css" : STR."\{getServletInfo()}.css";
+        return useDefaultStyles() ? "css/styles.css" : STR."css/\{getServletInfo()}.css";
     }
 }

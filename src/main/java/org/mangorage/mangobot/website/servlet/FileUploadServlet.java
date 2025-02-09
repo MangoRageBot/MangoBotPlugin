@@ -13,6 +13,7 @@ import jakarta.servlet.http.Part;
 import org.mangorage.mangobot.website.impl.AbstractServlet;
 import org.xmlet.htmlapifaster.EnumEnctypeType;
 import org.xmlet.htmlapifaster.EnumMethodType;
+import org.xmlet.htmlapifaster.EnumRelType;
 import org.xmlet.htmlapifaster.EnumTypeInputType;
 
 import java.io.IOException;
@@ -34,65 +35,56 @@ public class FileUploadServlet extends AbstractServlet {
 
         // Handle GET request
         if ("GET".equals(httpReq.getMethod())) {
-            // Serve the static HTML form first.
             HtmlFlow
                     .doc(httpResp.getWriter())
                     .html()
-                    .head().title().text("File Upload Page").__().__()
+                    .head()
+                    .title().text("File Upload Page").__()
+                    .link().attrRel(EnumRelType.STYLESHEET).attrHref("/css/dragDropUpload.css").__() // Use external CSS if desired
+                    .__() // Close head
                     .body()
-                    .h1().text("Upload a File").__()
+                    .h1().text("Upload a File").__() // Add page heading
                     .form().attrMethod(EnumMethodType.POST).attrAction("/upload").attrEnctype(EnumEnctypeType.MULTIPART_FORM_DATA)
-                    .input().attrType(EnumTypeInputType.FILE).attrName("file").__()
+                    .div().attrId("drop-area")
+                    .p().text("Drag and drop a file here or click to select").__() // Instructions text
+                    .input().attrType(EnumTypeInputType.FILE).attrId("file-input").attrName("file").__() // Hidden file input
+                    .__() // Close div
                     .br().__()
-                    .input().attrType(EnumTypeInputType.SUBMIT).attrValue("Upload").__()
-                    .__()
-                    .hr().__();
+                    .input().attrType(EnumTypeInputType.SUBMIT).attrValue("Upload").__() // Submit button
+                    .__() // Close form
+                    // .hr().__()   <-- Remove or comment out this line
+                    .script().attrSrc("/js/dragDropUpload.js").__() // Link to JS script
+                    .__(); // Close body and document
 
-            // Now, create an HtmlView for dynamic content.
-            HtmlFlow.view(httpResp.getWriter(), page -> {
-                var body = page.html().body();
-                String uploadedFile = httpReq.getParameter("file");
-                if (uploadedFile != null) {
-                    if (uploadedFile.endsWith(".png") || uploadedFile.endsWith(".jpg") || uploadedFile.endsWith(".jpeg")) {
-                        body.img()
-                                .attrSrc("/" + UPLOAD_DIR + "/" + uploadedFile)
-                                .attrAlt("Uploaded Image")
-                                .attrWidth(300L)
-                                .__();
-                    } else if (uploadedFile.endsWith(".txt") || uploadedFile.endsWith(".log")) {
-                        body.h3().text("File Content:").__();
-                        try {
-                            body.pre().text(readFile(UPLOAD_DIR + "/" + uploadedFile)).__();
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                }
-            });
         }
         // Handle POST request
         else if ("POST".equals(httpReq.getMethod())) {
-            Part filePart = httpReq.getPart("file");
+            // Retrieve the file part
+            Part filePart = httpReq.getPart("file"); // Use the correct name attribute value
+            if (filePart == null || filePart.getSize() == 0) {
+                httpResp.sendError(HttpServletResponse.SC_BAD_REQUEST, "No file was uploaded.");
+                return;
+            }
+
+            // Generate a unique ID for the file
             UUID ID = UUID.randomUUID();
-
             String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-            String fileExtension = fileName.lastIndexOf(".") == -1 ? "" : fileName.substring(fileName.lastIndexOf("."));
+            String fileExtension = fileName.contains(".") ? fileName.substring(fileName.lastIndexOf(".")) : "";
 
+            // Define the upload directory
             Path uploadPath = Paths.get(UPLOAD_DIR);
-
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }
 
+            // Save the file to the upload directory
             try (InputStream input = filePart.getInputStream()) {
                 Files.copy(input, uploadPath.resolve(ID + fileExtension), StandardCopyOption.REPLACE_EXISTING);
             }
 
+            // Redirect to a success page or provide the uploaded file's link
             httpResp.sendRedirect("/file?id=" + ID + fileExtension);
         }
     }
 
-    private String readFile(String filePath) throws IOException {
-        return new String(Files.readAllBytes(Paths.get(filePath)));
-    }
 }
