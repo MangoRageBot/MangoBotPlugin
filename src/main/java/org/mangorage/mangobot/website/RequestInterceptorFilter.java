@@ -22,9 +22,9 @@ public class RequestInterceptorFilter implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         if (request instanceof Request main) {
-            LogHelper.info("Intercepted Request %s -> https://mangobot.mangorage.org%s".formatted(main.getMethod(), main.getOriginalURI()));
+            LogHelper.info("Intercepted Request from %s for %s -> https://mangobot.mangorage.org%s".formatted(request.getRemoteAddr(), main.getMethod(), main.getOriginalURI()));
         } else {
-            LogHelper.info("Unknown Type -> " + request.getClass());
+            LogHelper.info("Unknown Type (Class) From %s -> %s".formatted(request.getRemoteAddr(), request.getClass()));
         }
 
         chain.doFilter(request, response);
