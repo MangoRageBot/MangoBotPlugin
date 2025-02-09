@@ -25,7 +25,7 @@ import java.util.UUID;
 
 @MultipartConfig
 public class FileUploadServlet extends AbstractServlet {
-    private static final String UPLOAD_DIR = "webpage/uploads";
+    private static final String UPLOAD_DIR = "webpage-root/uploads";
 
     @Override
     public void service(ServletRequest req, ServletResponse res) throws ServletException, IOException {
@@ -86,7 +86,7 @@ public class FileUploadServlet extends AbstractServlet {
                 Files.copy(input, uploadPath.resolve(ID.toString()), StandardCopyOption.REPLACE_EXISTING);
             }
 
-            httpResp.sendRedirect("/uploads/" + ID);
+            httpResp.sendRedirect("/file?id=" + ID);
         }
     }
 

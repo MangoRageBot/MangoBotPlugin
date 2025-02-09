@@ -4,9 +4,6 @@ package org.mangorage.mangobot.website;
 
 import jakarta.servlet.MultipartConfigElement;
 import jakarta.servlet.Servlet;
-import org.eclipse.jetty.server.HttpConfiguration;
-import org.eclipse.jetty.server.HttpConnectionFactory;
-import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.HandlerList;
@@ -17,10 +14,9 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.mangorage.basicutils.LogHelper;
 import org.mangorage.mangobot.website.impl.ObjectMap;
-import org.mangorage.mangobot.website.servlet.FileDisplayServlet;
+import org.mangorage.mangobot.website.servlet.FileServlet;
 import org.mangorage.mangobot.website.servlet.FileUploadServlet;
 import org.mangorage.mangobot.website.servlet.InfoServlet;
-import org.mangorage.mangobot.website.servlet.TestServlet;
 import org.mangorage.mangobot.website.servlet.TricksServlet;
 
 import java.util.function.Consumer;
@@ -37,29 +33,6 @@ public final class WebServer {
         return holder;
     }
 
-    public static void main(String[] args) throws Exception {
-        startBasicWebServer();
-    }
-
-    public static void startBasicWebServer() throws Exception {
-        Server server = new Server();
-        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-        context.setContextPath("/");
-        context.setResourceBase("webpage"); // Serve files from "webpage" directory
-        context.addServlet(DefaultServlet.class, "/*"); // Serve all webpage files
-        server.setHandler(context);
-
-
-        // HTTPS Connector
-        ServerConnector httpsConnector = new ServerConnector(server);
-        httpsConnector.setPort(30076);
-        server.addConnector(httpsConnector);
-
-        // Start the server
-        server.start();
-        server.join();
-    }
-
     public static void startWebServerSafely(ObjectMap objectMap) {
         new Thread(() -> {
             try {
@@ -71,14 +44,13 @@ public final class WebServer {
         }).start();
     }
 
-
     public static void startWebServer(ObjectMap objectMap) throws Exception {
         Server server = new Server();
 
         // Set up Servlet context
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");
-        context.setResourceBase("webpage"); // Serve files from "webpage" directory
+        context.setResourceBase("webpage-root/webpage"); // Serve files from "webpage" directory
 
         context.addServlet(DefaultServlet.class, "/*"); // Serve all webpage files
         context.addServlet(of(InfoServlet.class), "/info");
@@ -86,7 +58,7 @@ public final class WebServer {
         context.addServlet(of(FileUploadServlet.class, h -> {
             h.getRegistration().setMultipartConfig(new MultipartConfigElement("/tmp/uploads"));
         }), "/upload");
-        context.addServlet(of(FileDisplayServlet.class), "/file");
+        context.addServlet(of(FileServlet.class), "/file");
 
         context.setAttribute("map", objectMap);
 
@@ -110,7 +82,7 @@ public final class WebServer {
         server.addConnector(sslConnector);
 
         ResourceHandler resourceHandler = new ResourceHandler();
-        resourceHandler.setResourceBase("webpage");
+        resourceHandler.setResourceBase("webpage-root/webpage");
         resourceHandler.setDirectoriesListed(true);
 
 
