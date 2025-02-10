@@ -10,10 +10,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class FolderPruner {
+public final class FolderPruner {
     // Configurable Variables
     private static final String FOLDER_PATH = "webpage-root/uploads"; // Path to your folder
-    private static final long MAX_SIZE_GB = 10; // Maximum size in GB
+    private static final double MAX_SIZE_GB = 0.2; // Maximum size in GB
     private static final long FILE_AGE_LIMIT_HOURS = 12; // Minimum file age to delete in hours
     private static final long PRUNE_INTERVAL_MINUTES = 30; // Prune interval in minutes
 
@@ -32,7 +32,7 @@ public class FolderPruner {
         }
 
         // Get folder size in bytes
-        long maxSizeBytes = MAX_SIZE_GB * 1024 * 1024 * 1024; // Convert GB to bytes
+        long maxSizeBytes = (long) MAX_SIZE_GB * 1024 * 1024 * 1024; // Convert GB to bytes
         long currentSizeBytes = calculateFolderSize(folder);
 
         // If the folder size exceeds the limit, prune the folder
