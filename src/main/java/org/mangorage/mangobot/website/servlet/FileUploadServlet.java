@@ -1,8 +1,8 @@
 package org.mangorage.mangobot.website.servlet;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import htmlflow.HtmlFlow;
-import htmlflow.HtmlPage;
-import htmlflow.HtmlTemplate;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
@@ -11,10 +11,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 import org.mangorage.mangobot.website.impl.AbstractServlet;
+import org.mangorage.mangobot.website.servlet.file.TargetFile;
+import org.mangorage.mangobot.website.servlet.file.UploadConfig;
 import org.xmlet.htmlapifaster.EnumEnctypeType;
 import org.xmlet.htmlapifaster.EnumMethodType;
 import org.xmlet.htmlapifaster.EnumRelType;
 import org.xmlet.htmlapifaster.EnumTypeInputType;
+import org.xmlet.htmlapifaster.S;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,11 +25,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
 import java.util.UUID;
 
 @MultipartConfig
 public class FileUploadServlet extends AbstractServlet {
-    private static final String UPLOAD_DIR = "webpage-root/uploads";
+    private static final String UPLOADS_DATA = "webpage-root/uploads/data";
+    private static final String UPLOADS_CONFIGS = "webpage-root/uploads/cfg/";
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     @Override
     public void service(ServletRequest req, ServletResponse res) throws ServletException, IOException {
@@ -59,31 +65,50 @@ public class FileUploadServlet extends AbstractServlet {
         }
         // Handle POST request
         else if ("POST".equals(httpReq.getMethod())) {
-            // Retrieve the file part
-            Part filePart = httpReq.getPart("file"); // Use the correct name attribute value
-            if (filePart == null || filePart.getSize() == 0) {
-                httpResp.sendError(HttpServletResponse.SC_BAD_REQUEST, "No file was uploaded.");
-                return;
+
+            String UPLOAD_ID = STR."\{UUID.randomUUID()}";
+            HashMap<String, TargetFile> targets = new HashMap<>();
+            Integer index = 0;
+
+            for (Part filePart : httpReq.getParts()) {
+                String fileId = STR."\{UUID.randomUUID()}";
+                String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+                String fileExtension = fileName.contains(".") ? fileName.substring(fileName.lastIndexOf(".")) : "";
+
+                targets.put(
+                        index.toString(),
+                        new TargetFile(
+                                fileName,
+                                fileId,
+                                fileExtension
+                        )
+                );
+
+                index++;
+                // Define the upload directory
+                Path filePath = Paths.get(UPLOADS_DATA);
+                if (!Files.exists(filePath)) {
+                    Files.createDirectories(filePath);
+                }
+
+                // Save the file to the upload directory
+                try (InputStream input = filePart.getInputStream()) {
+                    Files.copy(input, filePath.resolve(fileId), StandardCopyOption.REPLACE_EXISTING);
+                }
+
             }
 
-            // Generate a unique ID for the file
-            UUID ID = UUID.randomUUID();
-            String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-            String fileExtension = fileName.contains(".") ? fileName.substring(fileName.lastIndexOf(".")) : "";
-
-            // Define the upload directory
-            Path uploadPath = Paths.get(UPLOAD_DIR);
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
+            Path uploadCfgPath = Paths.get(UPLOADS_CONFIGS);
+            if (!Files.exists(uploadCfgPath)) {
+                Files.createDirectories(uploadCfgPath);
             }
 
-            // Save the file to the upload directory
-            try (InputStream input = filePart.getInputStream()) {
-                Files.copy(input, uploadPath.resolve(ID + fileExtension), StandardCopyOption.REPLACE_EXISTING);
-            }
+            Files.write(
+                    uploadCfgPath.resolve(UPLOAD_ID),
+                    GSON.toJson(new UploadConfig(targets)).getBytes()
+            );
 
-            // Redirect to a success page or provide the uploaded file's link
-            httpResp.sendRedirect("/file?id=" + ID + fileExtension);
+            httpResp.sendRedirect("/file?id=" + UPLOAD_ID);
         }
     }
 

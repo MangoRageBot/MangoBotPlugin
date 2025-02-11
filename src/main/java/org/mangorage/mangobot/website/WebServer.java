@@ -48,6 +48,10 @@ public final class WebServer {
         }).start();
     }
 
+    public static void main(String[] args) {
+        startWebServerSafely(new ObjectMap());
+    }
+
     public static void startWebServer(ObjectMap objectMap) throws Exception {
 
         Server server = new Server();

@@ -6,9 +6,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public final class FolderPruner {
     // Configurable Variables
@@ -19,9 +16,9 @@ public final class FolderPruner {
 
     public static void init() {
         // Schedule the task to run every PRUNE_INTERVAL_MINUTES
-        LogHelper.info("Starting WebPage Uploads Pruner");
-        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        scheduler.scheduleAtFixedRate(FolderPruner::pruneFolder, 0, PRUNE_INTERVAL_MINUTES, TimeUnit.MINUTES);
+//        LogHelper.info("Starting WebPage Uploads Pruner");
+//        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+//        scheduler.scheduleAtFixedRate(FolderPruner::pruneFolder, 0, PRUNE_INTERVAL_MINUTES, TimeUnit.MINUTES);
     }
 
     private static void pruneFolder() {
