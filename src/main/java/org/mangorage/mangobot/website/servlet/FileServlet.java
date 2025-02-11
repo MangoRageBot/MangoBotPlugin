@@ -82,6 +82,7 @@ public class FileServlet extends HttpServlet {
         String id = request.getParameter("id");
         String target = request.getParameter("target"); // OPTIONAL
         String download = request.getParameter("dl"); // OPTIONAL
+        String delete = request.getParameter("delete"); // OPTIONAL
 
 
         if (id != null && !id.isBlank()) {
@@ -90,6 +91,78 @@ public class FileServlet extends HttpServlet {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid File ID");
                 return;
             }
+
+            boolean isOwner = config.isAccount(request, response);
+            if (!isOwner && delete != null) {
+                HtmlFlow
+                        .doc(response.getWriter())
+                        .html()
+                        .head()
+                        .meta()
+                        .addAttr("http-equiv", "refresh")
+                        .addAttr("content", "5;url=/file?id=%s".formatted(id))
+                        .__().__()
+                        .body()
+                        .h1()
+                        .text("Cant delete, insufficient permission...")
+                        .__()
+                        .h3()
+                        .text("Redirecting you back in 5 seconds...")
+                        .__();
+                return;
+            }
+
+            if (isOwner) {
+                if (delete != null) {
+                    if (target != null) {
+                        var targetFile = config.targets().get(target);
+                        if (targetFile != null) {
+                            config.targets().remove(target);
+                            Path uploadCfgPath = Paths.get(UPLOADS_CONFIGS);
+
+                            if (!Files.exists(uploadCfgPath)) {
+                                Files.createDirectories(uploadCfgPath);
+                            }
+
+                            Files.write(
+                                    uploadCfgPath.resolve(id),
+                                    GSON.toJson(config).getBytes()
+                            );
+                        } else {
+                            HtmlFlow
+                                    .doc(response.getWriter())
+                                    .html()
+                                    .body()
+                                    .h1()
+                                    .text("Invalid Target")
+                                    .__().__();
+                            return;
+                        }
+                    } else {
+                        Path uploadCfgPath = Paths.get(UPLOADS_CONFIGS);
+                        Path dataPath = Paths.get(UPLOADS_DATA);
+                        config.delete(uploadCfgPath, dataPath);
+                    }
+
+                    HtmlFlow
+                            .doc(response.getWriter())
+                            .html()
+                            .head()
+                            .meta()
+                            .addAttr("http-equiv", "refresh")
+                            .addAttr("content", "5;url=/file?id=%s".formatted(id))
+                            .__().__()
+                            .body()
+                            .h1()
+                            .text("Deleted")
+                            .__()
+                            .h3()
+                            .text("Redirecting you back in 5 seconds...")
+                            .__();
+                    return;
+                }
+            }
+
             if (target == null) {
                 var flow = HtmlFlow
                         .doc(response.getWriter())
@@ -106,17 +179,40 @@ public class FileServlet extends HttpServlet {
                         .text("Click to copy to clipboard to share!")
                         .__();
 
-                config.targets().forEach((k, targetFile) -> {
+                if (isOwner) {
                     flow
-                            .h4()
                             .a()
-                            .attrHref("/file?id=%s&target=%s".formatted(id, k))
-                            .text(targetFile.name())
-                            .__()
-                            .a()
-                            .attrHref("/file?id=%s&target=%s&dl=1".formatted(id, k))
-                            .text("Download")
+                            .attrHref("/file?id=%s&delete=1".formatted(id))
+                            .text("Delete")
                             .__();
+                }
+
+                config.targets().forEach((k, targetFile) -> {
+                    if (isOwner) {
+                        flow
+                                .h4()
+                                .a()
+                                .attrHref("/file?id=%s&target=%s".formatted(id, targetFile.index()))
+                                .text(targetFile.name())
+                                .__()
+                                .a()
+                                .attrHref("/file?id=%s&target=%s&dl=1".formatted(id, targetFile.index()))
+                                .text("Download")
+                                .__()
+                                .a()
+                                .attrHref("/file?id=%s&target=%s&delete=1".formatted(id, targetFile.index()))
+                                .text("Delete");
+                    } else {
+                        flow
+                                .h4()
+                                .a()
+                                .attrHref("/file?id=%s&target=%s".formatted(id, targetFile.index()))
+                                .text(targetFile.name())
+                                .__()
+                                .a()
+                                .attrHref("/file?id=%s&target=%s&dl=1".formatted(id, targetFile))
+                                .text("Download");
+                    }
                 });
 
             } else if (download == null) {
@@ -145,9 +241,9 @@ public class FileServlet extends HttpServlet {
     private UploadConfig fetchConfig(String id) {
         Path file = Paths.get(UPLOADS_CONFIGS).resolve(id);
         if (Files.exists(file)) {
-            try {
-                return GSON.fromJson(new FileReader(file.toFile()), UploadConfig.class);
-            } catch (FileNotFoundException ignored) {
+            try (var reader = new FileReader(file.toFile())){
+                return GSON.fromJson(reader, UploadConfig.class);
+            } catch (IOException ignored) {
                 return null;
             }
         }

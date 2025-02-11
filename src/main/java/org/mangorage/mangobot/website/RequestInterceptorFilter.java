@@ -7,11 +7,14 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.server.Request;
 import org.mangorage.basicutils.LogHelper;
 
 
 import java.io.IOException;
+
+import static org.mangorage.mangobot.website.WebUtil.getOrCreateUserToken;
 
 @WebFilter("/*") // Intercept all incoming requests
 public class RequestInterceptorFilter implements Filter {
@@ -30,6 +33,10 @@ public class RequestInterceptorFilter implements Filter {
             LogHelper.info("Unknown Type (Class) From %s -> %s".formatted(ip == null ? http.getRemoteAddr() : ip, request.getClass()));
         } else {
             LogHelper.info("Unknown Type (Class) From %s -> %s".formatted(request.getRemoteAddr(), request.getClass()));
+        }
+
+        if (response instanceof HttpServletResponse resp && request instanceof HttpServletRequest req) {
+            getOrCreateUserToken(req, resp); // Either Get it or create a new one!
         }
 
         chain.doFilter(request, response);

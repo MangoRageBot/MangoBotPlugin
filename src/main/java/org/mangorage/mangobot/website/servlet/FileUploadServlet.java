@@ -10,6 +10,7 @@ import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
+import org.mangorage.mangobot.website.WebUtil;
 import org.mangorage.mangobot.website.impl.AbstractServlet;
 import org.mangorage.mangobot.website.servlet.file.TargetFile;
 import org.mangorage.mangobot.website.servlet.file.UploadConfig;
@@ -66,7 +67,7 @@ public class FileUploadServlet extends AbstractServlet {
         // Handle POST request
         else if ("POST".equals(httpReq.getMethod())) {
 
-            String UPLOAD_ID = STR."\{UUID.randomUUID()}";
+            String uploadId = STR."\{UUID.randomUUID()}";
             HashMap<String, TargetFile> targets = new HashMap<>();
             Integer index = 0;
 
@@ -78,6 +79,7 @@ public class FileUploadServlet extends AbstractServlet {
                 targets.put(
                         index.toString(),
                         new TargetFile(
+                                index.toString(),
                                 fileName,
                                 fileId,
                                 fileExtension
@@ -104,11 +106,11 @@ public class FileUploadServlet extends AbstractServlet {
             }
 
             Files.write(
-                    uploadCfgPath.resolve(UPLOAD_ID),
-                    GSON.toJson(new UploadConfig(targets)).getBytes()
+                    uploadCfgPath.resolve(uploadId),
+                    GSON.toJson(new UploadConfig(uploadId, WebUtil.getOrCreateUserToken(httpReq, httpResp), targets)).getBytes()
             );
 
-            httpResp.sendRedirect("/file?id=" + UPLOAD_ID);
+            httpResp.sendRedirect("/file?id=" + uploadId);
         }
     }
 
