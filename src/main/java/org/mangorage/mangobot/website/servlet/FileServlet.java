@@ -119,6 +119,8 @@ public class FileServlet extends HttpServlet {
                         if (targetFile != null) {
                             config.targets().remove(target);
                             Path uploadCfgPath = Paths.get(UPLOADS_CONFIGS);
+                            Path dataPath = Paths.get(UPLOADS_DATA);
+                            targetFile.delete(dataPath);
 
                             if (!Files.exists(uploadCfgPath)) {
                                 Files.createDirectories(uploadCfgPath);
