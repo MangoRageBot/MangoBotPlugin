@@ -10,6 +10,8 @@ import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
+import org.mangorage.mangobot.website.ResolveString;
+import org.mangorage.mangobot.website.WebServer;
 import org.mangorage.mangobot.website.WebUtil;
 import org.mangorage.mangobot.website.impl.AbstractServlet;
 import org.mangorage.mangobot.website.servlet.file.TargetFile;
@@ -18,8 +20,6 @@ import org.xmlet.htmlapifaster.EnumEnctypeType;
 import org.xmlet.htmlapifaster.EnumMethodType;
 import org.xmlet.htmlapifaster.EnumRelType;
 import org.xmlet.htmlapifaster.EnumTypeInputType;
-import org.xmlet.htmlapifaster.S;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -31,8 +31,9 @@ import java.util.UUID;
 
 @MultipartConfig
 public class FileUploadServlet extends AbstractServlet {
-    private static final String UPLOADS_DATA = "webpage-root/uploads/data";
-    private static final String UPLOADS_CONFIGS = "webpage-root/uploads/cfg/";
+
+    private static final ResolveString UPLOADS_DATA = WebServer.WEBPAGE_ROOT.resolve("uploads").resolve("data");
+    private static final ResolveString UPLOADS_CONFIGS =  WebServer.WEBPAGE_ROOT.resolve("uploads").resolve("cfg");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     @Override
@@ -88,7 +89,7 @@ public class FileUploadServlet extends AbstractServlet {
 
                 index++;
                 // Define the upload directory
-                Path filePath = Paths.get(UPLOADS_DATA);
+                Path filePath = Paths.get(UPLOADS_DATA.value());
                 if (!Files.exists(filePath)) {
                     Files.createDirectories(filePath);
                 }
@@ -100,7 +101,7 @@ public class FileUploadServlet extends AbstractServlet {
 
             }
 
-            Path uploadCfgPath = Paths.get(UPLOADS_CONFIGS);
+            Path uploadCfgPath = Paths.get(UPLOADS_CONFIGS.value());
             if (!Files.exists(uploadCfgPath)) {
                 Files.createDirectories(uploadCfgPath);
             }

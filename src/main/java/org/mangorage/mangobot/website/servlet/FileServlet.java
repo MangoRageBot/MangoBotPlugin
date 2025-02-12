@@ -8,6 +8,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.mangorage.mangobot.website.ResolveString;
+import org.mangorage.mangobot.website.WebServer;
 import org.mangorage.mangobot.website.servlet.file.TargetFile;
 import org.mangorage.mangobot.website.servlet.file.UploadConfig;
 import org.xmlet.htmlapifaster.EnumTypeInputType;
@@ -21,10 +23,9 @@ import java.util.Map;
 
 public class FileServlet extends HttpServlet {
 
-    private static final String UPLOADS_DATA = "webpage-root/uploads/data/";
-    private static final String UPLOADS_CONFIGS = "webpage-root/uploads/cfg/";
+    private static final ResolveString UPLOADS_DATA = WebServer.WEBPAGE_ROOT.resolve("uploads").resolve("data");
+    private static final ResolveString UPLOADS_CONFIGS =  WebServer.WEBPAGE_ROOT.resolve("uploads").resolve("cfg");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-
 
     private static final Map<String, String> EXTENSIONS = new HashMap<>();
 
@@ -118,8 +119,8 @@ public class FileServlet extends HttpServlet {
                         var targetFile = config.targets().get(target);
                         if (targetFile != null) {
                             config.targets().remove(target);
-                            Path uploadCfgPath = Paths.get(UPLOADS_CONFIGS);
-                            Path dataPath = Paths.get(UPLOADS_DATA);
+                            Path uploadCfgPath = Paths.get(UPLOADS_CONFIGS.value());
+                            Path dataPath = Paths.get(UPLOADS_DATA.value());
                             targetFile.delete(dataPath);
 
                             if (!Files.exists(uploadCfgPath)) {
@@ -141,8 +142,8 @@ public class FileServlet extends HttpServlet {
                             return;
                         }
                     } else {
-                        Path uploadCfgPath = Paths.get(UPLOADS_CONFIGS);
-                        Path dataPath = Paths.get(UPLOADS_DATA);
+                        Path uploadCfgPath = Paths.get(UPLOADS_CONFIGS.value());
+                        Path dataPath = Paths.get(UPLOADS_DATA.value());
                         config.delete(uploadCfgPath, dataPath);
                     }
 
@@ -241,7 +242,7 @@ public class FileServlet extends HttpServlet {
     }
 
     private UploadConfig fetchConfig(String id) {
-        Path file = Paths.get(UPLOADS_CONFIGS).resolve(id);
+        Path file = Paths.get(UPLOADS_CONFIGS.value()).resolve(id);
         if (Files.exists(file)) {
             try (var reader = new FileReader(file.toFile())){
                 return GSON.fromJson(reader, UploadConfig.class);
@@ -253,7 +254,7 @@ public class FileServlet extends HttpServlet {
     }
 
     private void handleFileRequest(TargetFile targetFile, boolean download, HttpServletResponse response) throws IOException {
-        File file = new File(UPLOADS_DATA, targetFile.path());
+        File file = new File(UPLOADS_DATA.value(), targetFile.path());
 
         // Serve the file content
         if (file.exists() && file.isFile()) {

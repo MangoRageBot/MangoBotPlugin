@@ -90,7 +90,8 @@ dependencies {
     library('org.eclipse.jetty:jetty-servlet:11.0.16')
     library('org.eclipse.jetty:jetty-util:11.0.16')
     library('com.github.xmlet:htmlflow:4.7')
-    library('com.sparkjava:spark-core:2.9.4')
+    library('org.eclipse.jetty:jetty-security:11.+')
+
 
 }
 

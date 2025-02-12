@@ -5,6 +5,11 @@ package org.mangorage.mangobot.website;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.MultipartConfigElement;
 import jakarta.servlet.Servlet;
+import org.eclipse.jetty.security.ConstraintMapping;
+import org.eclipse.jetty.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.security.HashLoginService;
+import org.eclipse.jetty.security.UserStore;
+import org.eclipse.jetty.security.authentication.BasicAuthenticator;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.HandlerCollection;
@@ -13,6 +18,8 @@ import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.resource.Resource;
+import org.eclipse.jetty.util.security.Constraint;
+import org.eclipse.jetty.util.security.Credential;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.jetbrains.annotations.NotNull;
 import org.mangorage.basicutils.LogHelper;
@@ -20,12 +27,16 @@ import org.mangorage.mangobot.website.impl.ObjectMap;
 import org.mangorage.mangobot.website.servlet.FileServlet;
 import org.mangorage.mangobot.website.servlet.FileUploadServlet;
 import org.mangorage.mangobot.website.servlet.InfoServlet;
+import org.mangorage.mangobot.website.servlet.TestAuthServlet;
 import org.mangorage.mangobot.website.servlet.TricksServlet;
-import java.net.URL;
 import java.util.EnumSet;
 import java.util.function.Consumer;
 
 public final class WebServer {
+    public static final ResolveString WEBPAGE_INTERNAL = new ResolveString("webpage-internal");
+    public static final ResolveString WEBPAGE_ROOT = new ResolveString("webpage-root");
+    public static final ResolveString WEBPAGE_PAGE = WEBPAGE_ROOT.resolve("webpage");
+
 
     private static ServletHolder of(Class<? extends Servlet> tClass) {
         return new ServletHolder(tClass);
@@ -53,32 +64,52 @@ public final class WebServer {
     }
 
     public static void startWebServer(ObjectMap objectMap) throws Exception {
-
         Server server = new Server();
 
-        // Create the ResourceHandler for file serving
-        ResourceHandler fileResourceHandler = new ResourceHandler();
-        fileResourceHandler.setResourceBase("webpage-root/webpage");
+        // Combine the handlers (file, jar resource handlers, and security)
+        HandlerCollection handlers = new HandlerCollection();
+        handlers.addHandler(configureInternalResourceHandler());
+        handlers.addHandler(configureExternalResourceHandler());
+        handlers.addHandler(configureServlets(objectMap));
 
+
+        var securityHandler = configureAuth();
+        securityHandler.setHandler(handlers);
+        server.setHandler(securityHandler);
+
+
+        ServerConnector connector = getServerConnector(server);
+        server.addConnector(connector);
+
+
+        server.start();
+        LogHelper.info("Webserver Started");
+        server.join();
+    }
+
+    private static @NotNull ResourceHandler configureInternalResourceHandler() {
         // Create the ResourceHandler for resources in the JAR
-        // Figure out what path to serve content from
-        ClassLoader cl = WebServer.class.getClassLoader();
-        // We look for a file, as ClassLoader.getResource() is not
-        // designed to look for directories (we resolve the directory later)
-        URL f = cl.getResource("webpage-data/");
-        if (f == null)
-        {
-            throw new RuntimeException("Unable to find resource directory");
-        }
-        var webRootUri = f.toURI();
+        var file = WebServer.class.getClassLoader().getResource(WEBPAGE_INTERNAL.value());
+        if (file == null) throw new RuntimeException("Unable to find resource directory");
 
-        ResourceHandler jarResourceHandler = new ResourceHandler();
-        jarResourceHandler.setBaseResource(Resource.newResource(webRootUri));
+        ResourceHandler resourceHandler = new ResourceHandler();
+        resourceHandler.setBaseResource(Resource.newResource(file));
 
+        return resourceHandler;
+    }
+
+    private static @NotNull ResourceHandler configureExternalResourceHandler() {
+        ResourceHandler resourceHandler = new ResourceHandler();
+        resourceHandler.setResourceBase(WEBPAGE_PAGE.value());
+
+        return resourceHandler;
+    }
+
+    private static @NotNull ServletContextHandler configureServlets(ObjectMap objectMap) {
         // Create the context and servlet handler
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");
-        context.setResourceBase("webpage-root/webpage");
+        context.setResourceBase(WEBPAGE_PAGE.value());
         context.addServlet(DefaultServlet.class, "/*");
 
         // Add your servlets here as required
@@ -88,35 +119,46 @@ public final class WebServer {
             h.getRegistration().setMultipartConfig(new MultipartConfigElement("/tmp/uploads"));
         }), "/upload");
         context.addServlet(of(FileServlet.class), "/file");
+        context.addServlet(of(TestAuthServlet.class), "/testAuth");
         context.setAttribute("map", objectMap);
+
         // Add filters if needed
         context.addFilter(RequestInterceptorFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST));
-
-        // Create the connector
-        ServerConnector connector = getServerConnector(server);
-        server.addConnector(connector);
-
-        // Combine the handlers (file and jar resource handlers)
-        HandlerCollection handlers = new HandlerCollection();
-        handlers.addHandler(jarResourceHandler);
-        handlers.addHandler(fileResourceHandler);
-        handlers.addHandler(context);
-
-        server.setHandler(handlers);
-
-        // Start the server
-        server.start();
-        LogHelper.info("Webserver Started");
-        server.join();
+        return context;
     }
 
+    private static @NotNull ConstraintSecurityHandler configureAuth() {
+        // Security Configuration
+        Constraint constraint = new Constraint();
+        constraint.setName("auth");
+        constraint.setAuthenticate(true);
+        constraint.setRoles(new String[]{"admin", "user"}); // Define allowed roles
 
+        ConstraintMapping cm = new ConstraintMapping();
+        cm.setConstraint(constraint);
+        cm.setPathSpec("/testAuth");
+
+        // Create a login service (in-memory for demo purposes, replace with your own)
+        HashLoginService loginService = new HashLoginService("MyRealm");
+        loginService.setFullValidate(true);
+        UserStore store = new UserStore();
+        store.addUser("admin", Credential.getCredential("admin"), new String[]{"admin"});
+        loginService.setUserStore(store);
+
+        // Create the security handler
+        ConstraintSecurityHandler securityHandler = new ConstraintSecurityHandler();
+        securityHandler.setAuthenticator(new BasicAuthenticator());
+        securityHandler.addConstraintMapping(cm);
+        securityHandler.setLoginService(loginService);
+
+        return securityHandler;
+    }
 
     private static @NotNull ServerConnector getServerConnector(Server server) {
         SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
         sslContextFactory.setTrustAll(true);
 
-        sslContextFactory.setKeyStorePath("webpage-root/keystore.jks"); // Path to your keystore
+        sslContextFactory.setKeyStorePath(WEBPAGE_ROOT.resolveFully("keystore.jks")); // Path to your keystore
         sslContextFactory.setKeyStorePassword("mango12"); // Keystore password
         sslContextFactory.setKeyManagerPassword("mango12"); // Key manager password
 
