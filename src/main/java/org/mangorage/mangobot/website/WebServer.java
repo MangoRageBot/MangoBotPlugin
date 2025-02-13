@@ -4,11 +4,6 @@ package org.mangorage.mangobot.website;
 
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.MultipartConfigElement;
-import jakarta.servlet.Servlet;
-import org.eclipse.jetty.security.ConstraintMapping;
-import org.eclipse.jetty.security.ConstraintSecurityHandler;
-import org.eclipse.jetty.security.HashLoginService;
-import org.eclipse.jetty.security.UserStore;
 import org.eclipse.jetty.security.authentication.BasicAuthenticator;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
@@ -16,10 +11,7 @@ import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.resource.Resource;
-import org.eclipse.jetty.util.security.Constraint;
-import org.eclipse.jetty.util.security.Credential;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.jetbrains.annotations.NotNull;
 import org.mangorage.basicutils.LogHelper;
@@ -29,24 +21,16 @@ import org.mangorage.mangobot.website.servlet.FileUploadServlet;
 import org.mangorage.mangobot.website.servlet.InfoServlet;
 import org.mangorage.mangobot.website.servlet.TestAuthServlet;
 import org.mangorage.mangobot.website.servlet.TricksServlet;
+import org.mangorage.mangobot.website.util.ServletContextHandlerBuilder;
+
 import java.util.EnumSet;
-import java.util.function.Consumer;
+import java.util.Set;
 
 public final class WebServer {
     public static final ResolveString WEBPAGE_INTERNAL = new ResolveString("webpage-internal");
     public static final ResolveString WEBPAGE_ROOT = new ResolveString("webpage-root");
     public static final ResolveString WEBPAGE_PAGE = WEBPAGE_ROOT.resolve("webpage");
 
-
-    private static ServletHolder of(Class<? extends Servlet> tClass) {
-        return new ServletHolder(tClass);
-    }
-
-    private static ServletHolder of(Class<? extends Servlet> tClass, Consumer<ServletHolder> holderConsumer) {
-        var holder = of(tClass);
-        holderConsumer.accept(holder);
-        return holder;
-    }
 
     public static void startWebServerSafely(ObjectMap objectMap) {
         new Thread(() -> {
@@ -66,14 +50,16 @@ public final class WebServer {
     public static void startWebServer(ObjectMap objectMap) throws Exception {
         Server server = new Server();
 
+        var builder = configureBuilders(objectMap);
+        var contextHandler = builder.getServletContextHandler();
+        var securityHandler = builder.getConstraintSecurityHandler();
+
         // Combine the handlers (file, jar resource handlers, and security)
         HandlerCollection handlers = new HandlerCollection();
         handlers.addHandler(configureInternalResourceHandler());
         handlers.addHandler(configureExternalResourceHandler());
-        handlers.addHandler(configureServlets(objectMap));
+        handlers.addHandler(contextHandler);
 
-
-        var securityHandler = configureAuth();
         securityHandler.setHandler(handlers);
         server.setHandler(securityHandler);
 
@@ -105,53 +91,37 @@ public final class WebServer {
         return resourceHandler;
     }
 
-    private static @NotNull ServletContextHandler configureServlets(ObjectMap objectMap) {
-        // Create the context and servlet handler
-        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-        context.setContextPath("/");
-        context.setResourceBase(WEBPAGE_PAGE.value());
-        context.addServlet(DefaultServlet.class, "/*");
 
-        // Add your servlets here as required
-        context.addServlet(of(InfoServlet.class), "/info");
-        context.addServlet(of(TricksServlet.class), "/trick");
-        context.addServlet(of(FileUploadServlet.class, h -> {
-            h.getRegistration().setMultipartConfig(new MultipartConfigElement("/tmp/uploads"));
-        }), "/upload");
-        context.addServlet(of(FileServlet.class), "/file");
-        context.addServlet(of(TestAuthServlet.class), "/testAuth");
-        context.setAttribute("map", objectMap);
+    private static @NotNull ServletContextHandlerBuilder configureBuilders(ObjectMap objectMap) {
+        var builder = ServletContextHandlerBuilder.create(new ServletContextHandler(ServletContextHandler.SESSIONS));
 
-        // Add filters if needed
-        context.addFilter(RequestInterceptorFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST));
-        return context;
-    }
+        builder
+                .setContextPath("/")
+                .setResourceBase(WEBPAGE_PAGE.value())
+                .addServlet(DefaultServlet.class, "/*")
+                .addServlet(InfoServlet.class, "/info")
+                .addServlet(TricksServlet.class, "/trick")
+                .addServlet(FileServlet.class, "/file")
+                .addServlet(TestAuthServlet.class, "/testAuth")
+                .addServlet(FileUploadServlet.class, "/upload", h -> {
+                    h.getRegistration().setMultipartConfig(
+                            new MultipartConfigElement("/tmp/uploads")
+                    );
+                })
+                .setAttribute("map", objectMap)
+                .addFilter(RequestInterceptorFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST))
+                .configureLoginBuilder(security -> {
+                    security
+                            .setFullValidate(true)
+                            .setAuthenticator(new BasicAuthenticator())
+                            .addUser("admin", "admin", Set.of("admin"))
+                            .lock(
+                                Set.of("admin"),
+                                "/testAuth"
+                            );
+                });
 
-    private static @NotNull ConstraintSecurityHandler configureAuth() {
-        // Security Configuration
-        Constraint constraint = new Constraint();
-        constraint.setName("auth");
-        constraint.setAuthenticate(true);
-        constraint.setRoles(new String[]{"admin", "user"}); // Define allowed roles
-
-        ConstraintMapping cm = new ConstraintMapping();
-        cm.setConstraint(constraint);
-        cm.setPathSpec("/testAuth");
-
-        // Create a login service (in-memory for demo purposes, replace with your own)
-        HashLoginService loginService = new HashLoginService("MyRealm");
-        loginService.setFullValidate(true);
-        UserStore store = new UserStore();
-        store.addUser("admin", Credential.getCredential("admin"), new String[]{"admin"});
-        loginService.setUserStore(store);
-
-        // Create the security handler
-        ConstraintSecurityHandler securityHandler = new ConstraintSecurityHandler();
-        securityHandler.setAuthenticator(new BasicAuthenticator());
-        securityHandler.addConstraintMapping(cm);
-        securityHandler.setLoginService(loginService);
-
-        return securityHandler;
+        return builder;
     }
 
     private static @NotNull ServerConnector getServerConnector(Server server) {
