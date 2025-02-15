@@ -1,4 +1,4 @@
-package org.mangorage.mangobot.website;
+package org.mangorage.mangobot.website.filters;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
@@ -14,7 +14,7 @@ import org.mangorage.basicutils.LogHelper;
 
 import java.io.IOException;
 
-import static org.mangorage.mangobot.website.WebUtil.getOrCreateUserToken;
+import static org.mangorage.mangobot.website.util.WebUtil.getOrCreateUserToken;
 
 @WebFilter("/*") // Intercept all incoming requests
 public class RequestInterceptorFilter implements Filter {

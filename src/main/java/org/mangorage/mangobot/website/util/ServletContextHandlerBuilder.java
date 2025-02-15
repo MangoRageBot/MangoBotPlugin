@@ -6,6 +6,7 @@ import jakarta.servlet.Servlet;
 import org.eclipse.jetty.security.ConstraintSecurityHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.mangorage.mangobot.website.impl.StandardHttpServlet;
 
 import java.util.EnumSet;
 import java.util.function.Consumer;
@@ -53,6 +54,14 @@ public final class ServletContextHandlerBuilder {
         consumer.accept(holder);
         handler.addServlet(holder, pathSpec);
         return this;
+    }
+
+    public ServletContextHandlerBuilder addHttpServlet(Class<? extends StandardHttpServlet> servletClass, String pathSpec) {
+        return addServlet(servletClass, pathSpec);
+    }
+
+    public ServletContextHandlerBuilder addHttpServlet(Class<? extends StandardHttpServlet> servletClass, String pathSpec, Consumer<ServletHolder> consumer) {
+        return addServlet(servletClass, pathSpec, consumer);
     }
 
     // OPTIONAL

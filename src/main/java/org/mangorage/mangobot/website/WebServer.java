@@ -15,13 +15,19 @@ import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.jetbrains.annotations.NotNull;
 import org.mangorage.basicutils.LogHelper;
+import org.mangorage.mangobot.website.filters.RequestInterceptorFilter;
 import org.mangorage.mangobot.website.impl.ObjectMap;
+import org.mangorage.mangobot.website.impl.StandardHttpServlet;
+import org.mangorage.mangobot.website.servlet.AccountServlet;
 import org.mangorage.mangobot.website.servlet.FileServlet;
 import org.mangorage.mangobot.website.servlet.FileUploadServlet;
 import org.mangorage.mangobot.website.servlet.InfoServlet;
+import org.mangorage.mangobot.website.servlet.LoginServlet;
 import org.mangorage.mangobot.website.servlet.TestAuthServlet;
 import org.mangorage.mangobot.website.servlet.TricksServlet;
+import org.mangorage.mangobot.website.util.ResolveString;
 import org.mangorage.mangobot.website.util.ServletContextHandlerBuilder;
+import org.mangorage.mangobot.website.util.WebConstants;
 
 import java.util.EnumSet;
 import java.util.Set;
@@ -67,6 +73,8 @@ public final class WebServer {
         ServerConnector connector = getServerConnector(server);
         server.addConnector(connector);
 
+        objectMap.put(WebConstants.LOGIN_SERVICE, securityHandler);
+        objectMap.put("auth", securityHandler.getAuthenticator());
 
         server.start();
         LogHelper.info("Webserver Started");
@@ -99,22 +107,24 @@ public final class WebServer {
                 .setContextPath("/")
                 .setResourceBase(WEBPAGE_PAGE.value())
                 .addServlet(DefaultServlet.class, "/*")
-                .addServlet(InfoServlet.class, "/info")
-                .addServlet(TricksServlet.class, "/trick")
-                .addServlet(FileServlet.class, "/file")
-                .addServlet(TestAuthServlet.class, "/testAuth")
-                .addServlet(FileUploadServlet.class, "/upload", h -> {
+                .addHttpServlet(InfoServlet.class, "/info")
+                .addHttpServlet(TricksServlet.class, "/trick")
+                .addHttpServlet(FileServlet.class, "/file")
+                .addHttpServlet(TestAuthServlet.class, "/testAuth")
+                .addHttpServlet(LoginServlet.class, "/login")
+                .addHttpServlet(AccountServlet.class, "/account")
+                .addHttpServlet(FileUploadServlet.class, "/upload", h -> {
                     h.getRegistration().setMultipartConfig(
                             new MultipartConfigElement("/tmp/uploads")
                     );
                 })
-                .setAttribute("map", objectMap)
+                .setAttribute(WebConstants.WEB_OBJECT_ID, objectMap)
                 .addFilter(RequestInterceptorFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST))
                 .configureLoginBuilder(security -> {
                     security
                             .setFullValidate(true)
                             .setAuthenticator(new BasicAuthenticator())
-                            .addUser("admin", "admin", Set.of("admin"))
+                            .addUser("admin", "pass", Set.of("admin"))
                             .lock(
                                 Set.of("admin"),
                                 "/testAuth"

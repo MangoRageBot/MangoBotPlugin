@@ -1,4 +1,4 @@
-package org.mangorage.mangobot.website;
+package org.mangorage.mangobot.website.util;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;

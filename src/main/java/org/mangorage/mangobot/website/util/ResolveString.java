@@ -1,4 +1,4 @@
-package org.mangorage.mangobot.website;
+package org.mangorage.mangobot.website.util;
 
 public record ResolveString(String value) {
     public ResolveString resolve(String value) {

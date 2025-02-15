@@ -8,7 +8,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.mangorage.mangobot.website.ResolveString;
+import org.mangorage.mangobot.website.impl.StandardHttpServlet;
+import org.mangorage.mangobot.website.util.ResolveString;
 import org.mangorage.mangobot.website.WebServer;
 import org.mangorage.mangobot.website.servlet.file.TargetFile;
 import org.mangorage.mangobot.website.servlet.file.UploadConfig;
@@ -21,7 +22,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
-public class FileServlet extends HttpServlet {
+public class FileServlet extends StandardHttpServlet {
 
     private static final ResolveString UPLOADS_DATA = WebServer.WEBPAGE_ROOT.resolve("uploads").resolve("data");
     private static final ResolveString UPLOADS_CONFIGS =  WebServer.WEBPAGE_ROOT.resolve("uploads").resolve("cfg");

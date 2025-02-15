@@ -2,20 +2,20 @@ package org.mangorage.mangobot.website.servlet;
 
 import htmlflow.HtmlFlow;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
-import jakarta.servlet.http.HttpServlet;
-import org.mangorage.mangobot.website.impl.AbstractServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.mangorage.mangobot.website.impl.StandardHttpServlet;
 import org.xmlet.htmlapifaster.EnumEnctypeType;
 import org.xmlet.htmlapifaster.EnumMethodType;
 import org.xmlet.htmlapifaster.EnumTypeInputType;
 
 import java.io.IOException;
 
-public class TestServlet extends AbstractServlet {
+public class TestServlet extends StandardHttpServlet {
     @Override
-    public void service(ServletRequest req, ServletResponse res) throws ServletException, IOException {
-        HtmlFlow.doc(res.getWriter())
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        HtmlFlow
+                .doc(resp.getWriter())
                 .html()
                 .head().title().text("File Upload Page").__().__()
                 .body()

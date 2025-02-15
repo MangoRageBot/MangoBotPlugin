@@ -1,10 +1,10 @@
 package org.mangorage.mangobot.website.servlet;
 import htmlflow.HtmlFlow;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
 import jakarta.servlet.annotation.WebServlet;
-import org.mangorage.mangobot.website.impl.AbstractServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.mangorage.mangobot.website.impl.StandardHttpServlet;
 import org.mangorage.mangobotapi.core.plugin.PluginContainer;
 import org.mangorage.mangobotapi.core.plugin.PluginManager;
 import org.xmlet.htmlapifaster.EnumRelType;
@@ -12,13 +12,14 @@ import org.xmlet.htmlapifaster.EnumRelType;
 import java.io.IOException;
 
 @WebServlet
-public class InfoServlet extends AbstractServlet {
+public class InfoServlet extends StandardHttpServlet {
+
     @Override
-    public void service(ServletRequest request, ServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         // This is where you handle the request and generate a response
-        response.setContentType("text/html");
+        resp.setContentType("text/html");
         var html = HtmlFlow
-                .doc(response.getWriter())
+                .doc(resp.getWriter())
                 .html()
                 .head()
                 .link()

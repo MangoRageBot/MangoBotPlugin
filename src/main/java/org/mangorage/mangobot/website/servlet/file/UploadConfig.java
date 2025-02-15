@@ -2,7 +2,7 @@ package org.mangorage.mangobot.website.servlet.file;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.mangorage.mangobot.website.WebUtil;
+import org.mangorage.mangobot.website.util.WebUtil;
 
 import java.io.IOException;
 import java.nio.file.Files;

@@ -1,15 +1,16 @@
 package org.mangorage.mangobot.website.servlet;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
-import org.mangorage.mangobot.website.impl.AbstractServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.mangorage.mangobot.website.impl.StandardHttpServlet;
 
 import java.io.IOException;
 
-public class TestAuthServlet extends AbstractServlet {
+public class TestAuthServlet extends StandardHttpServlet {
+
     @Override
-    public void service(ServletRequest req, ServletResponse res) throws ServletException, IOException {
-        res.getWriter().write("Test");
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.getWriter().write("Test");
     }
 }

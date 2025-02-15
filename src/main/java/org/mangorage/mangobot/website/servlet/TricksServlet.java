@@ -4,11 +4,14 @@ import htmlflow.HtmlFlow;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import net.dv8tion.jda.api.JDA;
 import org.mangorage.mangobot.modules.tricks.Trick;
 import org.mangorage.mangobot.modules.tricks.TrickCommand;
-import org.mangorage.mangobot.website.impl.AbstractServlet;
 import org.mangorage.mangobot.website.impl.ObjectMap;
+import org.mangorage.mangobot.website.impl.StandardHttpServlet;
+import org.mangorage.mangobot.website.util.WebConstants;
 import org.xmlet.htmlapifaster.EnumMethodType;
 import org.xmlet.htmlapifaster.EnumRelType;
 import org.xmlet.htmlapifaster.EnumTypeButtonType;
@@ -19,7 +22,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.Date;
 
-public class TricksServlet extends AbstractServlet {
+public class TricksServlet extends StandardHttpServlet {
 
     public static String getUser(JDA jda, long id) {
         var user = jda.getUserById(id);
@@ -45,19 +48,20 @@ public class TricksServlet extends AbstractServlet {
         }
     }
 
+
     @Override
-    public void service(ServletRequest request, ServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         // This is where you handle the request and generate a response
-        var map = (ObjectMap) getServletConfig().getServletContext().getAttribute("map");
+        var map = (ObjectMap) getServletConfig().getServletContext().getAttribute(WebConstants.WEB_OBJECT_ID);
         var command = map.get("trickCommand", TrickCommand.class);
         var jda = map.get("jda", JDA.class);
 
-        response.setContentType("text/html");
-        var guildId = request.getParameter("guildId");
-        var trickId = request.getParameter("trickId");
+        resp.setContentType("text/html");
+        var guildId = req.getParameter("guildId");
+        var trickId = req.getParameter("trickId");
 
         var html = HtmlFlow
-                .doc(response.getWriter())
+                .doc(resp.getWriter())
                 .html()
                 .head()
                 .link()
@@ -146,9 +150,9 @@ public class TricksServlet extends AbstractServlet {
                             break;
                         }
                         case NORMAL -> {
-                           html.h2().text(
-                                    "Content:"
-                            ).__()
+                            html.h2().text(
+                                            "Content:"
+                                    ).__()
                                     .div()
                                     .textarea()
                                     .attrCols(50L)
@@ -196,6 +200,15 @@ public class TricksServlet extends AbstractServlet {
                     html.h4().text(
                             STR."Times Used: \{trick.getTimesUsed()}"
                     );
+
+                    html.h4().text(
+                            STR."Locked: \{trick.isLocked()}"
+                    );
+
+                    html.h4().text(
+                            STR."Embeds Supressed: \{trick.isSuppressed()}"
+                    );
+
 
                 } else {
                     html.h1().text(
