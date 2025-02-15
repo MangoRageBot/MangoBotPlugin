@@ -24,6 +24,11 @@ public final class ServletContextHandlerBuilder {
         this.handler = handler;
     }
 
+    public ServletContextHandlerBuilder dynamic(Consumer<ServletContextHandler> consumer) {
+        consumer.accept(handler);
+        return this;
+    }
+
     public ServletContextHandlerBuilder setContextPath(String contextPath) {
         handler.setContextPath(contextPath);
         return this;

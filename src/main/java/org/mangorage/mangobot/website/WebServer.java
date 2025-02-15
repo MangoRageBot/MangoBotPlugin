@@ -16,6 +16,7 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.jetbrains.annotations.NotNull;
 import org.mangorage.basicutils.LogHelper;
 import org.mangorage.mangobot.website.filters.RequestInterceptorFilter;
+import org.mangorage.mangobot.website.handlers.DefaultErrorHandler;
 import org.mangorage.mangobot.website.impl.ObjectMap;
 import org.mangorage.mangobot.website.impl.StandardHttpServlet;
 import org.mangorage.mangobot.website.servlet.AccountServlet;
@@ -106,6 +107,9 @@ public final class WebServer {
         builder
                 .setContextPath("/")
                 .setResourceBase(WEBPAGE_PAGE.value())
+                .dynamic(h -> {
+                    h.setErrorHandler(new DefaultErrorHandler());
+                })
                 .addServlet(DefaultServlet.class, "/*")
                 .addHttpServlet(InfoServlet.class, "/info")
                 .addHttpServlet(TricksServlet.class, "/trick")

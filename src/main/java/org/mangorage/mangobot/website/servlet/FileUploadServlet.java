@@ -42,7 +42,7 @@ public class FileUploadServlet extends StandardHttpServlet {
                 .html()
                 .head()
                 .title().text("File Upload Page").__()
-                .link().attrRel(EnumRelType.STYLESHEET).attrHref("/css/dragDropUpload.css").__() // Use external CSS if desired
+                .link().attrRel(EnumRelType.STYLESHEET).attrHref(getStyles()).__() // Use external CSS if desired
                 .__() // Close head
                 .body()
                 .h1().text("Upload a File").__() // Add page heading
@@ -107,4 +107,8 @@ public class FileUploadServlet extends StandardHttpServlet {
         resp.sendRedirect("/file?id=" + uploadId);
     }
 
+    @Override
+    public boolean useDefaultStyles() {
+        return false;
+    }
 }

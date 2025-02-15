@@ -37,6 +37,10 @@ public abstract class StandardHttpServlet extends HttpServlet {
         return useDefaultStyles() ? "css/styles.css" : STR."css/\{getServletInfo()}.css";
     }
 
+    @Override
+    public String getServletInfo() {
+        return getClass().getSimpleName();
+    }
 
     // ALL AVAILABLE METHODS....
 
