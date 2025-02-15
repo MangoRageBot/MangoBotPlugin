@@ -52,7 +52,7 @@ public class FileUploadServlet extends StandardHttpServlet {
                 .input().attrType(EnumTypeInputType.FILE).attrId("file-input").attrName("file").__() // Hidden file input
                 .__() // Close div
                 .br().__()
-                .input().attrType(EnumTypeInputType.SUBMIT).attrValue("Upload").__() // Submit button
+                .input().attrType(EnumTypeInputType.SUBMIT).attrId("upload").attrValue("Upload").__() // Submit button
                 .__() // Close form
                 // .hr().__()   <-- Remove or comment out this line
                 .script().attrSrc("/js/dragDropUpload.js").__() // Link to JS script
