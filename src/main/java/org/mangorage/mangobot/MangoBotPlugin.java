@@ -150,11 +150,8 @@ public class MangoBotPlugin extends JDAPlugin {
                         .enableCache(cacheFlags)
                         .setActivity(
                                 Activity.of(
-                                        Activity.ActivityType.CUSTOM_STATUS,
-                                        """
-                                                    MangoBot is on version %s
-                                                """.formatted(VersionCommand.getVersion()),
-                                        "https://www.discord.minecraftforge.net/"
+                                        Activity.ActivityType.WATCHING,
+                                        "https://mangobot.mangorage.org/"
                                 )
                         )
                         .setStatus(OnlineStatus.ONLINE)
