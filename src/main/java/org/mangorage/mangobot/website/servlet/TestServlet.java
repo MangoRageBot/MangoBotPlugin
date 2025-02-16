@@ -28,4 +28,9 @@ public class TestServlet extends StandardHttpServlet {
                 .__()
                 .__();
     }
+
+    @Override
+    public boolean hasEmbed() {
+        return true;
+    }
 }

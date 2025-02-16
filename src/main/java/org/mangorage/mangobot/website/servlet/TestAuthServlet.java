@@ -13,4 +13,9 @@ public class TestAuthServlet extends StandardHttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.getWriter().write("Test");
     }
+
+    @Override
+    public boolean hasEmbed() {
+        return true;
+    }
 }

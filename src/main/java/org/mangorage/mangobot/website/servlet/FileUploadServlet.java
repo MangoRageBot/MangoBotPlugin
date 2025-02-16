@@ -108,6 +108,11 @@ public class FileUploadServlet extends StandardHttpServlet {
     }
 
     @Override
+    public boolean hasEmbed() {
+        return true;
+    }
+
+    @Override
     public boolean useDefaultStyles() {
         return false;
     }

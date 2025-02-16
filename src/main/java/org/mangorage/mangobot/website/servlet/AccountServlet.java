@@ -32,4 +32,9 @@ public class AccountServlet extends StandardHttpServlet {
             resp.getWriter().write("No Account Signed In");
         }
     }
+
+    @Override
+    public boolean hasEmbed() {
+        return true;
+    }
 }

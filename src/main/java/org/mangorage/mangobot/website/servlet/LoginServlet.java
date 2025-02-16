@@ -52,4 +52,9 @@ public class LoginServlet extends StandardHttpServlet {
         resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         resp.getWriter().println("HTTP 401 - Unauthorized");
     }
+
+    @Override
+    public boolean hasEmbed() {
+        return true;
+    }
 }
