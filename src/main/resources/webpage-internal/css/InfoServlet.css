@@ -1,7 +1,7 @@
 /* General body styling */
 body {
     font-family: 'Helvetica Neue', Arial, sans-serif;
-    background-color: #f4f7fc;
+    background-color: black;
     margin: 0;
     padding: 0;
     display: flex;
@@ -13,7 +13,7 @@ body {
 
 /* Main container for the page */
 .container {
-    background-color: #ffffff;
+    background-color: gray;
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     padding: 30px;
@@ -24,7 +24,7 @@ body {
 /* Page Title */
 .page-title {
     text-align: center;
-    color: #2c3e50;
+    color: white;
     font-size: 32px;
     margin-bottom: 30px;
     font-weight: 600;
