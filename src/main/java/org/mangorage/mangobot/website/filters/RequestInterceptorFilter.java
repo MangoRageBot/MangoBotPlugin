@@ -1,4 +1,5 @@
 package org.mangorage.mangobot.website.filters;
+import htmlflow.HtmlFlow;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
@@ -10,8 +11,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.server.Request;
 import org.mangorage.basicutils.LogHelper;
+import org.xmlet.htmlapifaster.EnumHttpEquivType;
 
 
+import javax.swing.text.html.HTML;
 import java.io.IOException;
 
 import static org.mangorage.mangobot.website.util.WebUtil.getOrCreateUserToken;
@@ -39,15 +42,15 @@ public class RequestInterceptorFilter implements Filter {
         if (response instanceof HttpServletResponse resp && request instanceof HttpServletRequest req) {
             getOrCreateUserToken(req, resp); // Either Get it or create a new one!
 
-            response.getWriter().write(
-                    """
-                            <meta property="og:title" content="MangoBot" />
-                            <meta property="og:description" content="The Offical MangoBot Discord Bot." />
-                            <meta property="og:image" content="https://mangobot.mangorage.org/file?id=568d44d8-b6bc-4394-a860-915fac5c085d&target=0" />
-                            <meta property="og:url" content="https://mangobot.mangorage.org/file?id=568d44d8-b6bc-4394-a860-915fac5c085d&target=0" />
-                            <meta property="og:type" content="website" />
-                    """
-            );
+            HtmlFlow
+                    .doc(resp.getWriter())
+                    .html()
+                    .head()
+                    .meta().attrName("og:title").attrContent("MangoBot").__()
+                    .meta().attrName("og:description").attrContent("The Official MangoBot Discord Bot.").__()
+                    .meta().attrName("og:image").attrContent("https://mangobot.mangorage.org/pink-sheep.png").__()
+                    .meta().attrName("og:url").attrContent("https://mangobot.mangorage.org/file?id=568d44d8-b6bc-4394-a860-915fac5c085d&target=0").__()
+                    .meta().attrName("og:type").attrContent("website").__();
         }
 
         chain.doFilter(request, response);
