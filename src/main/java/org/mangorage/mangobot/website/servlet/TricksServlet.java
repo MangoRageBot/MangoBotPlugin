@@ -2,8 +2,6 @@ package org.mangorage.mangobot.website.servlet;
 
 import htmlflow.HtmlFlow;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import net.dv8tion.jda.api.JDA;
@@ -26,18 +24,12 @@ public class TricksServlet extends StandardHttpServlet {
 
     public static String getUser(JDA jda, long id) {
         var user = jda.getUserById(id);
-        if (user != null) {
-            return user.getName();
-        }
-        return "";
+        return user != null ? user.getName() : "";
     }
 
     public static String getGuild(JDA jda, long id) {
         var guild = jda.getGuildById(id);
-        if (guild != null) {
-            return guild.getName();
-        }
-        return "";
+        return guild != null ? guild.getName() : "";
     }
 
     private static long getLong(String value) {
@@ -48,10 +40,9 @@ public class TricksServlet extends StandardHttpServlet {
         }
     }
 
-
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // This is where you handle the request and generate a response
+        // Retrieve shared objects from the servlet context
         var map = (ObjectMap) getServletConfig().getServletContext().getAttribute(WebConstants.WEB_OBJECT_ID);
         var command = map.get("trickCommand", TrickCommand.class);
         var jda = map.get("jda", JDA.class);
@@ -60,163 +51,97 @@ public class TricksServlet extends StandardHttpServlet {
         var guildId = req.getParameter("guildId");
         var trickId = req.getParameter("trickId");
 
+        // Build HTML document with semantic structure and CSS classes for improved styling
         var html = HtmlFlow
                 .doc(resp.getWriter())
                 .html()
                 .head()
-                .link()
-                .attrRel(
-                        EnumRelType.STYLESHEET
-                )
-                .attrHref(
-                        getStyles()
-                )
-                .__().__().body();
+                .meta().attrCharset("UTF-8").__()
+                .title().text("Mangobot Tricks").__()
+                .link().attrRel(EnumRelType.STYLESHEET).attrHref(getStyles()).__()
+                .__() // end head
+                .body().attrClass("page-body")
+                .div().attrClass("container");
 
         if (guildId == null && trickId == null) {
-            // When the Button Clicked makes the URL /trick?guildId=value
-            var form = html.h2()
-                    .text("SELECT GUILD")
-                    .__()
-                    .form()
-                    .select()
-                    .attrName("guildId");
-
+            // Guild selection page
+            var a =html.h2().attrClass("title").text("Select Guild").__()
+                    .form().attrMethod(EnumMethodType.GET).attrAction("/trick").attrClass("form-group")
+                    .label().attrFor("guildId").text("Choose a Guild:").__()
+                    .select().attrName("guildId").attrId("guildId").attrClass("select-input");
             for (Long guild : command.getGuilds()) {
-                form = form.option()
-                        .attrValue(guild.toString())
-                        .text(getGuild(jda, guild)).__();
+                a.option().attrValue(guild.toString()).text(getGuild(jda, guild)).__();
             }
-
-            form.__()
-                    .button()
-                    .attrType(EnumTypeButtonType.SUBMIT) // Ensure it's a submit button
-                    .text("Enter!");
-
+            a.__() // close select
+                    .button().attrType(EnumTypeButtonType.SUBMIT).attrClass("btn btn-primary").text("Enter!").__()
+                    .__(); // close form
         } else if (guildId != null && trickId == null) {
-            // When the Button Clicked makes the URL /trick?guildId=value&trickId=test
-            var form = html.h2()
-                    .text("SELECT TRICK")
-                    .__()
-                    .form()  // Single form starts here
-                    .attrMethod(EnumMethodType.GET)  // Use GET to add parameters to the URL
-                    .attrAction("/trick"); // Ensure submission to /trick
-
-            // Preserve guildId as a hidden input
-            form.input()
-                    .attrType(EnumTypeInputType.HIDDEN)
-                    .attrName("guildId")
-                    .attrValue(guildId)
-                    .__();
-
-            // Create trick selection dropdown
-            var select = form.select().attrName("trickId");
-
+            // Trick selection page
+            var a = html.h2().attrClass("title").text("Select Trick").__()
+                    .form().attrMethod(EnumMethodType.GET).attrAction("/trick").attrClass("form-group")
+                    .input().attrType(EnumTypeInputType.HIDDEN).attrName("guildId").attrValue(guildId).__()
+                    .label().attrFor("trickId").text("Choose a Trick:").__()
+                    .select().attrName("trickId").attrId("trickId").attrClass("select-input");
             for (Trick trick : command.getTricksForGuild(getLong(guildId))) {
-                select.option()
-                        .attrValue(trick.getTrickID())
-                        .text(trick.getTrickID()).__();
+                a.option().attrValue(trick.getTrickID()).text(trick.getTrickID()).__();
             }
-
-            // Close select and add submit button
-            select.__()
-                    .button()
-                    .attrType(EnumTypeButtonType.SUBMIT) // Ensure it's a submit button
-                    .text("Enter!");
-
+            a.__() // close select
+                    .button().attrType(EnumTypeButtonType.SUBMIT).attrClass("btn btn-primary").text("Enter!").__()
+                    .__(); // close form
         } else if (guildId != null && trickId != null) {
+            // Trick details page
             try {
                 Trick trick = command.getTrick(trickId, Long.parseLong(guildId));
                 if (trick != null) {
-                    html.h2().text(
-                            STR."Id: \{trick.getTrickID()}"
-                    );
-
-                    html.h2().text(
-                            STR."Type: \{trick.getType()}"
-                    );
-
-                    html.h2().text(
-                            STR."GuildId: \{trick.getGuildID()} \{getGuild(jda, trick.getGuildID())}"
-                    );
+                    html.h2().attrClass("trick-title").text("Trick Details").__();
+                    html.div().attrClass("trick-info")
+                            .p().attrClass("trick-id").text("ID: " + trick.getTrickID()).__()
+                            .p().attrClass("trick-type").text("Type: " + trick.getType()).__()
+                            .p().attrClass("trick-guild").text("Guild: " + trick.getGuildID() + " " + getGuild(jda, trick.getGuildID())).__()
+                            .__(); // end trick-info
 
                     switch (trick.getType()) {
                         case ALIAS -> {
-                            html.h2()
-                                    .text("Alias Target:")
-                                    .__()
-                                    .h2()
-                                    .text(trick.getAliasTarget());
-                            break;
+                            html.h3().attrClass("section-title").text("Alias Target").__();
+                            html.div().attrClass("trick-alias").text(trick.getAliasTarget()).__();
                         }
                         case NORMAL -> {
-                            html.h2().text(
-                                            "Content:"
-                                    ).__()
-                                    .div()
-                                    .textarea()
-                                    .attrCols(50L)
-                                    .attrRows(20L)
-                                    .attrWrap(EnumWrapType.HARD)
-                                    .attrReadonly(true)
-                                    .text(trick.getContent())
-                                    .__().__();
-
-                            break;
+                            html.h3().attrClass("section-title").text("Content").__();
+                            html.div().attrClass("trick-content")
+                                    .textarea().attrCols(50L).attrRows(20L).attrWrap(EnumWrapType.HARD)
+                                    .attrReadonly(true).text(trick.getContent()).__()
+                                    .__();
                         }
                         case SCRIPT -> {
-                            html.h2().text(
-                                            "Script:"
-                                    ).__()
-                                    .div()
-                                    .textarea()
-                                    .attrCols(50L)
-                                    .attrRows(20L)
-                                    .attrWrap(EnumWrapType.HARD)
-                                    .attrReadonly(true)
-                                    .text(trick.getScript())
-                                    .__().__();
-                            break;
+                            html.h3().attrClass("section-title").text("Script").__();
+                            html.div().attrClass("trick-script")
+                                    .textarea().attrCols(50L).attrRows(20L).attrWrap(EnumWrapType.HARD)
+                                    .attrReadonly(true).text(trick.getScript()).__()
+                                    .__();
                         }
                     }
 
-
-                    html.h4().text(
-                            STR."Trick Owner: \{trick.getOwnerID()} \{getUser(jda, trick.getOwnerID())}"
-                    );
-
-                    html.h4().text(
-                            STR."Last User to edit: \{trick.getLastUserEdited()} \{getUser(jda, trick.getLastUserEdited())}"
-                    );
-
-                    html.h4().text(
-                            STR."Trick Creation Date: \{Date.from(Instant.ofEpochMilli(trick.getCreated()))}"
-                    );
-
-                    html.h4().text(
-                            STR."Trick Last Edited: \{Date.from(Instant.ofEpochMilli(trick.getLastEdited()))}"
-                    );
-
-                    html.h4().text(
-                            STR."Times Used: \{trick.getTimesUsed()}"
-                    );
-
-                    html.h4().text(
-                            STR."Locked: \{trick.isLocked()}"
-                    );
-
-                    html.h4().text(
-                            STR."Embeds Supressed: \{trick.isSuppressed()}"
-                    );
-
-
+                    html.div().attrClass("trick-meta")
+                            .p().attrClass("meta-item").text("Trick Owner: " + trick.getOwnerID() + " " + getUser(jda, trick.getOwnerID())).__()
+                            .p().attrClass("meta-item").text("Last Edited By: " + trick.getLastUserEdited() + " " + getUser(jda, trick.getLastUserEdited())).__()
+                            .p().attrClass("meta-item").text("Created: " + Date.from(Instant.ofEpochMilli(trick.getCreated()))).__()
+                            .p().attrClass("meta-item").text("Last Edited: " + Date.from(Instant.ofEpochMilli(trick.getLastEdited()))).__()
+                            .p().attrClass("meta-item").text("Times Used: " + trick.getTimesUsed()).__()
+                            .p().attrClass("meta-item").text("Locked: " + trick.isLocked()).__()
+                            .p().attrClass("meta-item").text("Embeds Suppressed: " + trick.isSuppressed()).__()
+                            .__(); // end trick-meta
                 } else {
-                    html.h1().text(
-                            "Invalid Trick %s Supplied for Guild %s".formatted(trickId, guildId)
-                    );
+                    html.h1().attrClass("error").text("Invalid Trick " + trickId + " supplied for Guild " + guildId).__();
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+                html.h1().attrClass("error").text("An error occurred while processing your request.").__();
+            }
         }
+
+        // Close container, body, and html tags
+        html.__() // close container
+                .__() // close body
+                .__(); // close html
     }
 
     @Override
