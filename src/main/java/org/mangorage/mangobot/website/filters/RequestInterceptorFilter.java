@@ -38,7 +38,16 @@ public class RequestInterceptorFilter implements Filter {
 
         if (response instanceof HttpServletResponse resp && request instanceof HttpServletRequest req) {
             getOrCreateUserToken(req, resp); // Either Get it or create a new one!
-            resp.setHeader("Content-Security-Policy", "img-src 'self' https://mangobot.mangorage.org/file?id=8e79263e-1579-4e88-8233-62ee91c52156&target=0; frame-src 'self' https://mangobot.mangorage.org/file?id=8e79263e-1579-4e88-8233-62ee91c52156&target=0;");
+
+            response.getWriter().write(
+                    """
+                            <meta property="og:title" content="MangoBot" />
+                            <meta property="og:description" content="The Offical MangoBot Discord Bot." />
+                            <meta property="og:image" content="https://mangobot.mangorage.org/file?id=568d44d8-b6bc-4394-a860-915fac5c085d&target=0" />
+                            <meta property="og:url" content="https://mangobot.mangorage.org/file?id=568d44d8-b6bc-4394-a860-915fac5c085d&target=0" />
+                            <meta property="og:type" content="website" />
+                    """
+            );
         }
 
         chain.doFilter(request, response);
