@@ -48,8 +48,8 @@ public class RequestInterceptorFilter implements Filter {
                     .head()
                     .meta().attrName("og:title").attrContent("MangoBot").__()
                     .meta().attrName("og:description").attrContent("The Official MangoBot Discord Bot.").__()
-                    .meta().attrName("og:image").attrContent("https://mangobot.mangorage.org/pink-sheep.png").__()
-                    .meta().attrName("og:url").attrContent("https://mangobot.mangorage.org/file?id=568d44d8-b6bc-4394-a860-915fac5c085d&target=0").__()
+                    .meta().attrName("og:image").attrContent("https://mangobot.mangorage.org/pink-sheep.png").attrHttpEquiv(EnumHttpEquivType.CONTENT_TYPE).__()
+                    .meta().attrName("og:url").attrContent("https://mangobot.mangorage.org/file?id=568d44d8-b6bc-4394-a860-915fac5c085d&target=0").attrHttpEquiv(EnumHttpEquivType.CONTENT_TYPE).__()
                     .meta().attrName("og:type").attrContent("website").__();
         }
 
