@@ -25,6 +25,7 @@ public class RequestInterceptorFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+
         if (request instanceof Request main) {
             var ip = main.getHeader("X-Forwarded-For");
             LogHelper.info("Intercepted Request from %s for %s -> https://mangobot.mangorage.org%s".formatted(ip == null ? request.getRemoteAddr() : ip, main.getMethod(), main.getOriginalURI()));
@@ -37,6 +38,7 @@ public class RequestInterceptorFilter implements Filter {
 
         if (response instanceof HttpServletResponse resp && request instanceof HttpServletRequest req) {
             getOrCreateUserToken(req, resp); // Either Get it or create a new one!
+            resp.setHeader("Content-Security-Policy", "img-src 'self' https://mangobot.mangorage.org/file?id=8e79263e-1579-4e88-8233-62ee91c52156&target=0; frame-src 'self' https://mangobot.mangorage.org/file?id=8e79263e-1579-4e88-8233-62ee91c52156&target=0;");
         }
 
         chain.doFilter(request, response);
