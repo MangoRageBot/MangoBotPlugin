@@ -12,6 +12,7 @@ import org.mangorage.mangobot.website.util.ResolveString;
 import org.mangorage.mangobot.website.WebServer;
 import org.mangorage.mangobot.website.servlet.file.TargetFile;
 import org.mangorage.mangobot.website.servlet.file.UploadConfig;
+import org.xmlet.htmlapifaster.EnumHttpEquivType;
 import org.xmlet.htmlapifaster.EnumRelType;
 import org.xmlet.htmlapifaster.EnumTypeInputType;
 
@@ -79,6 +80,20 @@ public class FileServlet extends StandardHttpServlet {
         String target = request.getParameter("target"); // optional
         String download = request.getParameter("dl");     // optional
         String delete = request.getParameter("delete");     // optional
+        String header = request.getParameter("h");
+
+        if (header != null) {
+            HtmlFlow
+                    .doc(response.getWriter())
+                    .html()
+                    .head()
+                    .meta().attrName("og:title").attrContent("MangoBot").__()
+                    .meta().attrName("og:description").attrContent("The Official MangoBot Discord Bot.").__()
+                    .meta().attrName("og:image").attrContent("https://mangobot.mangorage.org/file?id=%s&target=%s".formatted(id, target)).attrHttpEquiv(EnumHttpEquivType.CONTENT_TYPE).__()
+                    .meta().attrName("og:url").attrContent("https://mangobot.mangorage.org/file?id=%s&target=%s".formatted(id, target)).attrHttpEquiv(EnumHttpEquivType.CONTENT_TYPE).__()
+                    .meta().attrName("og:type").attrContent("website").__();
+            return;
+        }
 
         if (id == null || id.isBlank()) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "File ID is required.");
