@@ -77,8 +77,6 @@ import org.mangorage.mangobot.modules.music.commands.PlayingCommand;
 import org.mangorage.mangobot.modules.music.commands.QueueCommand;
 import org.mangorage.mangobot.modules.music.commands.StopCommand;
 import org.mangorage.mangobot.modules.music.commands.VolumeCommand;
-import org.mangorage.mangobot.website.WebServer;
-import org.mangorage.mangobot.website.impl.ObjectMap;
 import org.mangorage.mangobotapi.core.events.DiscordEvent;
 import org.mangorage.mangobotapi.core.events.LoadEvent;
 import org.mangorage.mangobotapi.core.events.SaveEvent;
@@ -98,7 +96,7 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
 @Plugin(id = MangoBotPlugin.ID)
-public class MangoBotPlugin extends JDAPlugin {
+public final class MangoBotPlugin extends JDAPlugin {
     public static final String ID = "mangobot";
     private static final EnumSet<GatewayIntent> intents = EnumSet.of(
             // Enables MessageReceivedEvent for guild (also known as servers)
@@ -140,8 +138,6 @@ public class MangoBotPlugin extends JDAPlugin {
     public static final ISetting<Boolean> AUTO_UPDATE = ConfigSetting.create(CONFIG, "AUTO_UPDATE", Transformers.BOOLEAN, false);
     public static final ButtonActionRegistry ACTION_REGISTRY = new ButtonActionRegistry();
 
-    private final ObjectMap objectMap = new ObjectMap(); // Used for WebServer!
-
     public MangoBotPlugin() {
         super(
                 MangoBotPlugin.ID,
@@ -163,7 +159,7 @@ public class MangoBotPlugin extends JDAPlugin {
         );
 
         getJDA().addEventListener(new BotEventListener(this));
-        objectMap.put("jda", getJDA());
+
         new AutoUpdate(this);
 
         init();
@@ -229,7 +225,7 @@ public class MangoBotPlugin extends JDAPlugin {
 
 
         // Tricks
-        cmdRegistry.addBasicCommand(objectMap.putAndReturn("trickCommand", new TrickCommand(this)));
+        cmdRegistry.addBasicCommand(new TrickCommand(this));
         
         // Test
         cmdRegistry.addBasicCommand(new RunCode(this));
@@ -271,8 +267,6 @@ public class MangoBotPlugin extends JDAPlugin {
                 .queue();
 
         try {
-            //WebServer.startBasicWebServer();
-            WebServer.startWebServerSafely(objectMap);
         } catch (Exception e) {
             LogHelper.error("Failed to start WebServer");
             LogHelper.trace(e.getMessage());
