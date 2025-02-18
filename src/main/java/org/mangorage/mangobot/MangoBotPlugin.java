@@ -140,7 +140,6 @@ public final class MangoBotPlugin extends JDAPlugin {
 
     public MangoBotPlugin() {
         super(
-                MangoBotPlugin.ID,
                 JDABuilder.createDefault(BOT_TOKEN.get())
                         .setEnabledIntents(intents)
                         .enableCache(cacheFlags)

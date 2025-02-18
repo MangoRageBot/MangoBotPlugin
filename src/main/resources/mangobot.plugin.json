@@ -1,7 +1,8 @@
 {
   "id": "mangobot",
-  "version": "${mangobot_version}",
   "name": "MangoBot",
+  "type": "JDA",
+  "version": "${mangobot_version}",
   "dependencies": [
     {
       "id": "mangobotcore",
