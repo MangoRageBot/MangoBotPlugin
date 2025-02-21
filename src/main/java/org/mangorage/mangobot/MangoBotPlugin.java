@@ -215,7 +215,6 @@ public final class MangoBotPlugin extends JDAPlugin {
         cmdRegistry.addBasicCommand(new StopCommand());
         cmdRegistry.addBasicCommand(new VolumeCommand());
 
-
         // Tricks
         cmdRegistry.addBasicCommand(new TrickCommand(this));
         
