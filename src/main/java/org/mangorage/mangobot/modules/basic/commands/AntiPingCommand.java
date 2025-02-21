@@ -11,7 +11,7 @@ import org.mangorage.mangobotapi.core.data.IEmptyFileNameResolver;
 import org.mangorage.mangobotapi.core.events.DiscordEvent;
 import org.mangorage.mangobotapi.core.events.LoadEvent;
 import org.mangorage.mangobotapi.core.events.SaveEvent;
-import org.mangorage.mangobotapi.core.plugin.api.JDAPlugin;
+import org.mangorage.mangobotapi.core.plugin.extra.JDAPlugin;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

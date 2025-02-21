@@ -32,7 +32,7 @@ import org.mangorage.mangobot.loader.CoreMain;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandPrefix;
 import org.mangorage.mangobotapi.core.events.BasicCommandEvent;
-import org.mangorage.mangobotapi.core.plugin.api.JDAPlugin;
+import org.mangorage.mangobotapi.core.plugin.extra.JDAPlugin;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;

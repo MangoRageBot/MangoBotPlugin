@@ -42,7 +42,6 @@ import org.mangorage.basicutils.config.ConfigSetting;
 import org.mangorage.basicutils.config.ISetting;
 import org.mangorage.basicutils.config.Transformers;
 import org.mangorage.jdautils.command.Command;
-import org.mangorage.mangobot.config.GuildConfig;
 import org.mangorage.mangobot.core.BotEventListener;
 import org.mangorage.mangobot.core.BotPermissions;
 import org.mangorage.mangobot.core.Listeners;
@@ -66,11 +65,7 @@ import org.mangorage.mangobot.modules.developer.RestartCommand;
 import org.mangorage.mangobot.modules.developer.RunCode;
 import org.mangorage.mangobot.modules.developer.SpeakCommand;
 import org.mangorage.mangobot.modules.developer.TerminateCommand;
-import org.mangorage.mangobot.modules.github.GHIssueStatus;
-import org.mangorage.mangobot.modules.github.GHPRStatus;
-import org.mangorage.mangobot.modules.github.IssueScanCommand;
-import org.mangorage.mangobot.modules.github.PRScanCommand;
-import org.mangorage.mangobot.modules.github.PasteRequestModule;
+
 import org.mangorage.mangobot.modules.music.commands.PauseCommand;
 import org.mangorage.mangobot.modules.music.commands.PlayCommand;
 import org.mangorage.mangobot.modules.music.commands.PlayingCommand;
@@ -83,8 +78,8 @@ import org.mangorage.mangobotapi.core.events.SaveEvent;
 import org.mangorage.mangobotapi.core.events.ShutdownEvent;
 import org.mangorage.mangobotapi.core.events.StartupEvent;
 import org.mangorage.mangobotapi.core.modules.action.ButtonActionRegistry;
-import org.mangorage.mangobotapi.core.plugin.api.JDAPlugin;
-import org.mangorage.mangobotapi.core.plugin.api.PluginMessageEvent;
+import org.mangorage.mangobotapi.core.plugin.PluginMessageEvent;
+import org.mangorage.mangobotapi.core.plugin.extra.JDAPlugin;
 import org.mangorage.mangobotapi.core.plugin.impl.Plugin;
 
 import net.dv8tion.jda.api.JDABuilder;
@@ -160,8 +155,6 @@ public final class MangoBotPlugin extends JDAPlugin {
         getJDA().addEventListener(new BotEventListener(this));
 
         new AutoUpdate(this);
-
-        init();
     }
 
     public void startup() {
@@ -230,16 +223,7 @@ public final class MangoBotPlugin extends JDAPlugin {
         cmdRegistry.addBasicCommand(new RunCode(this));
         cmdRegistry.addBasicCommand(new GetEmbedsCommand());
 
-
-        cmdRegistry.addBasicCommand(new PRScanCommand(this));
-        cmdRegistry.addBasicCommand(new IssueScanCommand(this));
-
-        GuildConfig.loadServerConfigs();
         permRegistry.save();
-        PasteRequestModule.register(getPluginBus());
-        new GHPRStatus(this);
-        new GHIssueStatus(this);
-        
 
         getPluginBus().addListener(10, PluginMessageEvent.class, pm -> {
             if (pm.getMethod().equals("getDate")) {

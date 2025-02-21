@@ -13,7 +13,6 @@ import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.utils.MarkdownSanitizer;
-import org.eclipse.egit.github.core.Gist;
 import org.jetbrains.annotations.NotNull;
 import org.mangorage.basicutils.LogHelper;
 import org.mangorage.basicutils.TaskScheduler;
@@ -23,7 +22,6 @@ import org.mangorage.jdautils.command.Command;
 import org.mangorage.jdautils.command.CommandOption;
 import org.mangorage.mangobot.MangoBotPlugin;
 import org.mangorage.mangobot.modules.actions.TrashButtonAction;
-import org.mangorage.mangobot.modules.github.GistHandler;
 import org.mangorage.mangobotapi.core.commands.Arguments;
 import org.mangorage.mangobotapi.core.commands.CommandAlias;
 import org.mangorage.mangobotapi.core.commands.CommandResult;
@@ -33,7 +31,7 @@ import org.mangorage.mangobotapi.core.events.BasicCommandEvent;
 import org.mangorage.mangobotapi.core.events.DiscordEvent;
 import org.mangorage.mangobotapi.core.events.LoadEvent;
 import org.mangorage.mangobotapi.core.events.SaveEvent;
-import org.mangorage.mangobotapi.core.plugin.api.JDAPlugin;
+import org.mangorage.mangobotapi.core.plugin.extra.JDAPlugin;
 import org.mangorage.mangobotapi.core.util.MessageSettings;
 import java.util.Arrays;
 import java.util.Collection;
@@ -421,6 +419,7 @@ public class TrickCommand implements IBasicCommand {
                     isSuppressed -> %s
                     Times Used -> %s
                   
+                    Extra Info: https://mangobot.mangorage.org/trick?guildId=%s&trickId=%s
                     """
                     .formatted(
                             trick.getTrickID(),
@@ -433,27 +432,10 @@ public class TrickCommand implements IBasicCommand {
                             trick.getLastEdited() / 1000, // Discord expects it to be in Epoch Seconds, not ms
                             trick.isLocked(),
                             trick.isSuppressed(),
-                            trick.getTimesUsed()
+                            trick.getTimesUsed(),
+                            trick.getGuildID(),
+                            trick.getTrickID()
                     );
-
-
-            if (trick.getType() == TrickType.NORMAL) {
-                if (trick.getContent().length() < 2000)
-                    details = details + "Content: \n" + trick.getContent();
-                else {
-                    Gist gist = GistHandler.createGist(trick.getContent(), trick.getTrickID() + ".txt");
-                    details = details + "[[Content](%s)]".formatted(gist.getHtmlUrl());
-                }
-            } else if (trick.getType() == TrickType.ALIAS) {
-                details = details + "Alias -> " + trick.getAliasTarget();
-            } else if (trick.getType() == TrickType.SCRIPT) {
-                if (trick.getScript().length() < 2000)
-                    details = details + "Script: \n" + trick.getScript();
-                else {
-                    Gist gist = GistHandler.createGist(trick.getScript(), trick.getTrickID() + ".txt");
-                    details = details + "[[Script](%s)]".formatted(gist.getHtmlUrl());
-                }
-            }
 
             dMessage.apply(message.reply(details))
                     .setSuppressedNotifications(true)

@@ -35,7 +35,7 @@ import org.luaj.vm2.lib.jse.JseBaseLib;
 import org.luaj.vm2.lib.jse.JseMathLib;
 import org.mangorage.mangobot.modules.tricks.lua.LuaJDA;
 import org.mangorage.mangobot.modules.tricks.lua.objects.LuaStringArray;
-import org.mangorage.mangobotapi.core.plugin.api.JDAPlugin;
+import org.mangorage.mangobotapi.core.plugin.extra.JDAPlugin;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;

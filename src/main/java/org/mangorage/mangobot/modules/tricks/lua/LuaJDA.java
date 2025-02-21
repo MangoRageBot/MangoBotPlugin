@@ -8,7 +8,7 @@ import org.mangorage.mangobot.modules.tricks.lua.builders.LuaEmbedBuilder;
 import org.mangorage.mangobot.modules.tricks.lua.builders.LuaMessageResponseBuilder;
 import org.mangorage.mangobot.modules.tricks.lua.helpers.LuaInfoHelper;
 import org.mangorage.mangobot.modules.tricks.lua.helpers.LuaObjectHelper;
-import org.mangorage.mangobotapi.core.plugin.api.JDAPlugin;
+import org.mangorage.mangobotapi.core.plugin.extra.JDAPlugin;
 
 
 public final class LuaJDA {

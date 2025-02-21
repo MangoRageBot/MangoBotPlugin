@@ -1,8 +1,7 @@
 package org.mangorage.mangobot;
 
-import org.apache.commons.logging.Log;
 import org.mangorage.basicutils.LogHelper;
-import org.mangorage.mangobotapi.core.plugin.api.JDAPlugin;
+import org.mangorage.mangobotapi.core.plugin.extra.JDAPlugin;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 

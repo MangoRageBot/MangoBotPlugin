@@ -23,7 +23,7 @@
 package org.mangorage.mangobot.modules.developer;
 
 import org.mangorage.mangobot.modules.basic.commands.ReplyCommand;
-import org.mangorage.mangobotapi.core.plugin.api.JDAPlugin;
+import org.mangorage.mangobotapi.core.plugin.extra.JDAPlugin;
 
 public class SpeakCommand extends ReplyCommand {
 

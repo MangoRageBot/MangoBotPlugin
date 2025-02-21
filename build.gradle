@@ -77,13 +77,11 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
 
     installer('org.mangorage:installer:3.0.27')
-    bot('org.mangorage:mangobot:11.0.16')
+    bot('org.mangorage:mangobot:11.0.18')
 
     compileOnly('org.mangorage:MangoBotGradle:4.0.5')
 
     library('org.luaj:luaj-jse:3.0.1')
-    library('org.eclipse.mylyn.github:org.eclipse.egit.github.core:2.1.5')
-    library('org.kohsuke:github-api:1.321')
     library('dev.arbjerg:lavaplayer:2.2.2')
     library('dev.lavalink.youtube:common:1.11.3')
 }
@@ -111,18 +109,6 @@ tasks.named('processResources', ProcessResources).configure {
 
 MangoBotConfig {
     setJarTask(jar)
-
-    addResolver(e -> {
-        if (e.versionID2().equals("afec211f05c9dcf0b6ee44276a02f0316ea2458a-SNAPSHOT"))
-            return e.complete(
-                    e.groupID(),
-                    e.nameID(),
-                    e.versionID(),
-                    e.nameID2(),
-                    "afec211f05c9dcf0b6ee44276a02f0316ea2458a-20240330.121616-1"
-            )
-        return e.pass()
-    })
 }
 
 publishing {
@@ -130,12 +116,12 @@ publishing {
         artifact jar
 
         pom {
-            name = 'MangoBot Core Plugin'
-            description = 'The Core Plugin for MangoBot'
-            url = 'https://github.com/MangoRageBot/MangoBot'
+            name = 'MangoBotPlugin'
+            description = 'The Main Plugin For MangoBot'
+            url = 'https://github.com/MangoRageBot/MangoBotPlugin'
             issueManagement {
                 system = 'github'
-                url = 'https://github.com/MangoRageBot/MangoBot/issues'
+                url = 'https://github.com/MangoRageBot/MangoBotPlugin/issues'
             }
             developers {
                 developer {
