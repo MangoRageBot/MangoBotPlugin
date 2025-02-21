@@ -43,7 +43,6 @@ import org.mangorage.jdautils.WatcherManager;
 import org.mangorage.mangobotapi.core.events.DiscordEvent;
 import org.mangorage.mangobotapi.core.events.discord.DMessageReceivedEvent;
 import org.mangorage.mangobotapi.core.plugin.extra.JDAPlugin;
-import org.mangorage.mangobotapi.core.plugin.extra.JDAPlugin;
 
 import java.util.concurrent.TimeUnit;
 
