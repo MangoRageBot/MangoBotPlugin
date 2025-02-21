@@ -128,8 +128,6 @@ public final class MangoBotPlugin extends JDAPlugin {
 
     // Where we create Settings for said Config
     public static final ISetting<String> BOT_TOKEN = ConfigSetting.create(CONFIG, "BOT_TOKEN", "empty");
-    public static final ISetting<String> GITHUB_TOKEN = ConfigSetting.create(CONFIG, "PASTE_TOKEN", "empty");
-    public static final ISetting<String> GITHUB_USERNAME = ConfigSetting.create(CONFIG, "GITHUB_USERNAME", "RealMangoRage");
     public static final ISetting<Boolean> AUTO_UPDATE = ConfigSetting.create(CONFIG, "AUTO_UPDATE", Transformers.BOOLEAN, false);
     public static final ButtonActionRegistry ACTION_REGISTRY = new ButtonActionRegistry();
 
