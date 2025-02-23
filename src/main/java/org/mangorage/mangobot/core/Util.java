@@ -78,7 +78,7 @@ public class Util {
         if (rawMessage.length() > 1 && rawMessage.startsWith(cmdPrefix)) {
             if (event.getAuthor().isBot()) return new MessageType(false, false);
             String[] command_pre = rawMessage.split(" ");
-            String command = command_pre[0].replaceFirst(cmdPrefix, "");
+            String command = command_pre[0].substring(cmdPrefix.length());
             Arguments arguments = Arguments.of(Arguments.of(command_pre).getFrom(1).split(" "));
 
             var commandEvent = new BasicCommandEvent(event.getMessage(), command, arguments);
