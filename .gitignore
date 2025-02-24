@@ -138,3 +138,4 @@ secrets.properties
 /mappings/
 /src/main/resources/installerdata/deps.txt
 /webpage/
+/src/main/resources/installer-data/dependencies.json
