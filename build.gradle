@@ -2,7 +2,6 @@ import org.mangorage.mangobotgradle.util.GitVersion
 
 buildscript {
     repositories {
-        mavenLocal()
         mavenCentral()
         maven {
             url = uri("https://plugins.gradle.org/m2/")
@@ -17,7 +16,7 @@ buildscript {
 
     dependencies {
         classpath 'gradle.plugin.com.github.johnrengelman:shadow:7.1.2'
-        classpath 'org.mangorage:MangoBotGradle:5.0.4'
+        classpath 'org.mangorage:MangoBotGradle:5.0.6'
     }
 }
 
@@ -108,6 +107,15 @@ publishing {
                 developer {
                     id = 'mangorage'
                     name = 'MangoRage'
+                }
+            }
+            withXml {
+                def dependencies = asNode().appendNode('dependencies')
+                configurations.library.getDependencies().each {
+                    def dependency = dependencies.appendNode('dependency')
+                    dependency.appendNode('groupId', it.group)
+                    dependency.appendNode('artifactId', it.name)
+                    dependency.appendNode('version', it.version)
                 }
             }
         }
