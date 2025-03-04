@@ -505,20 +505,23 @@ public class TrickCommand implements IBasicCommand {
             tricks = tricks.stream().filter((trick) ->
                     trick.getTrickID().contains(finalTrickID)
                             || trick.getTrickID().matches(finalTrickID)).collect(Collectors.toList());
-
             MessageChannelUnion channel = message.getChannel();
             if (!tricks.isEmpty()) {
-
                 PagedList<String> trickList = createTricks(guildID, tricks);
-
                 channel.sendMessage("""
-                        Finding matching tricks... 
-                        """).queue((m -> {
+                    Finding matching tricks... 
+                    """).queue((m -> {
                             PAGES.put(m.getId(), trickList);
                             TaskScheduler.getExecutor().schedule(new RunnableTask<>(m, (d) -> removeTricksList(d.get())), 10, TimeUnit.MINUTES);
                             updateTrickListMessage(trickList, m, true);
                         })
                 );
+
+
+            } else {
+                channel.sendMessage("""
+                            No matching tricks found
+                            """).queue();
             }
             return CommandResult.PASS;
         }
@@ -593,7 +596,7 @@ public class TrickCommand implements IBasicCommand {
 
     @Override
     public List<String> commandAliases() {
-        return CommandAlias.create(this, "tricks", "tr");
+        return CommandAlias.create(this, "tricks", "tr", "trick");
     }
 
     @Override
@@ -690,7 +693,7 @@ public class TrickCommand implements IBasicCommand {
     private PagedList<String> createTricks(long guildID, List<Trick> tricks) {
         PagedList<String> trickList = new PagedList<>();
 
-        Object[] LIST = tricks.toArray();
+        Object[] LIST = tricks.stream().map(Trick::getTrickID).toArray();
         trickList.rebuild(Arrays.copyOf(LIST, LIST.length, String[].class), tricks.size());
 
         return trickList;
