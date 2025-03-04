@@ -9,6 +9,7 @@ public enum TrickCMDType {
     LIST("-l", "-list"),
     TRANSFER("-t", "-transfer"),
     LOCK("-lock"),
+    FIND("-f", "-find"),
     NONE();
 
     private String[] strings;

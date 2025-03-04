@@ -42,6 +42,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class TrickCommand implements IBasicCommand {
     private static final boolean ALLOW_SCRIPT_TRICKS = true;
@@ -497,6 +498,29 @@ public class TrickCommand implements IBasicCommand {
             }
         } else if (type == TrickCMDType.TRANSFER) {
             // TODO: Add transfer ability...
+        } else if (type == TrickCMDType.FIND) {
+            var tricks = getTricksForGuild(guildID);
+            if (trickID == null) trickID = ".*"; // Match any on error
+            String finalTrickID = trickID;
+            tricks = tricks.stream().filter((trick) ->
+                    trick.getTrickID().contains(finalTrickID)
+                            || trick.getTrickID().matches(finalTrickID)).collect(Collectors.toList());
+
+            MessageChannelUnion channel = message.getChannel();
+            if (!tricks.isEmpty()) {
+
+                PagedList<String> trickList = createTricks(guildID, tricks);
+
+                channel.sendMessage("""
+                        Finding matching tricks... 
+                        """).queue((m -> {
+                            PAGES.put(m.getId(), trickList);
+                            TaskScheduler.getExecutor().schedule(new RunnableTask<>(m, (d) -> removeTricksList(d.get())), 10, TimeUnit.MINUTES);
+                            updateTrickListMessage(trickList, m, true);
+                        })
+                );
+            }
+            return CommandResult.PASS;
         }
 
         /*
@@ -504,6 +528,7 @@ public class TrickCommand implements IBasicCommand {
         !trick -r trickID
         !trick -i trickID
         !trick -l <10>
+        !trick -f <trickname or regex>
 
         !trick -e trickID -suppress -content Hello There!
         !trick -e trickID -script msg.reply(''Hello!');
@@ -602,6 +627,10 @@ public class TrickCommand implements IBasicCommand {
                 
                 ## How to show a list of tricks:
                 `!tricks -l 10`
+                
+                ## How to find tricks:
+                `!tricks -f installerlogs`
+                `!tricks -f create.*`
                 """;
     }
 
@@ -656,6 +685,15 @@ public class TrickCommand implements IBasicCommand {
         tricks.rebuild(Arrays.copyOf(LIST, LIST.length, String[].class), entries);
 
         return tricks;
+    }
+
+    private PagedList<String> createTricks(long guildID, List<Trick> tricks) {
+        PagedList<String> trickList = new PagedList<>();
+
+        Object[] LIST = tricks.toArray();
+        trickList.rebuild(Arrays.copyOf(LIST, LIST.length, String[].class), tricks.size());
+
+        return trickList;
     }
 
     public void onButton(DiscordEvent<ButtonInteractionEvent> event) {
