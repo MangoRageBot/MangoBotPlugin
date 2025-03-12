@@ -1,0 +1,166 @@
+package org.mangorage.mangobot.modules.logs;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import net.dv8tion.jda.api.entities.Message;
+
+public class StackTraceReader implements LogAnalyserModule {
+
+	// 正则表达式用于匹配Java异常堆栈跟踪
+	private static final Pattern STACK_TRACE_PATTERN = Pattern.compile("(?m)(^\\S.*(?:\\r?\\n[ \\t]+at\\s+.*)+)");
+	// 正则表达式用于匹配包含org.spongepowered.asm.mixin的异常并提取JSON文件名（不包括refmap）
+	private static final Pattern JSON_FILE_PATTERN = Pattern.compile("(\\S+\\.json)(?=[: ])");
+	// 正则表达式用于匹配{}内的内容
+	private static final Pattern BRACE_CONTENT_PATTERN = Pattern.compile("\\{([^}]+)\\}");
+
+	public static String nl = System.lineSeparator();
+
+	@Override
+	public void analyse(String log, Message message) {
+		StringBuilder build = new StringBuilder();
+
+		List<String> sm_config = new ArrayList<>();
+		List<String> jars = new ArrayList<>();
+		List<String> braceContents = new ArrayList<>();
+
+		for (String trace : getTraces(log)) {
+			List<String> jsonFiles = findJsonFilesInMixinExceptions(trace);
+
+			if (!jsonFiles.isEmpty()) {
+				for (String jsonFile : jsonFiles) {
+					if (!sm_config.contains(jsonFile) && !jsonFile.endsWith(".refmap.json")) {
+						sm_config.add(jsonFile);
+						build.append("**Potentially Problematic SpongeMixin Config:** " + jsonFile).append(nl);
+					}
+				}
+			} else {
+				String[] arr = trace.split(nl);
+				for (String untrimmed : arr) {
+					String line = untrimmed.trim();
+
+					// 解析JAR文件名
+					extractJarNames(line, jars);
+
+					// 解析{}内的内容
+					Matcher braceMatcher = BRACE_CONTENT_PATTERN.matcher(line);
+					while (braceMatcher.find()) {
+						String content = braceMatcher.group(1).trim();
+						if (!braceContents.contains(content)) {
+							braceContents.add(content);
+						}
+					}
+				}
+			}
+		}
+
+		List<String> jar_names = new ArrayList<String>();
+		if (!jars.isEmpty()) {
+			build.append("**Found potentially problematic JAR files:**").append(nl);
+			for (String jar : jars) {
+				String jar_name = jar.split(".jar")[0]+".jar";
+				if (!jar_names.contains(jar_name)) {
+					build.append(jar_name).append(nl);
+					jar_names.add(jar_name);
+				}
+			}
+		}
+
+		if (!build.toString().isEmpty()) {
+			System.out.println(build.toString());
+			message.reply(build.toString()).setSuppressEmbeds(true).mentionRepliedUser(true).queue();
+			;
+		}
+		// System.out.println("Found contents in {}:"); TODO
+		// for (String content : braceContents) {
+		// System.out.println(content);
+		// }
+	}
+
+	private void extractJarNames(String line, List<String> jars) {
+		int startIdx = line.indexOf('[');
+		int endIdx = line.indexOf(']');
+
+		while (startIdx != -1 && endIdx != -1 && startIdx < endIdx) {
+			String candidate = line.substring(startIdx + 1, endIdx);
+			// Check if the candidate string ends with ".jar" or contains ".jar%23"
+			if (candidate.contains(".jar%23") && !isJarDenied(candidate)) {
+				if (!jars.contains(candidate)) {
+					jars.add(candidate);
+				}
+			}
+			// Look for the next '[' and ']'
+			startIdx = line.indexOf('[', endIdx);
+			endIdx = line.indexOf(']', endIdx + 1);
+		}
+	}
+
+	public static List<String> getTraces(String log) {
+		List<String> stackTraces = new ArrayList<>();
+		Matcher matcher = STACK_TRACE_PATTERN.matcher(log);
+		while (matcher.find()) {
+			stackTraces.add(matcher.group());
+		}
+		return stackTraces;
+	}
+
+	public List<String> findJsonFilesInMixinExceptions(String logContent) {
+		List<String> jsonFiles = new ArrayList<>();
+
+		String[] lines = logContent.split("\r?\n");
+		for (String line : lines) {
+			if (line.contains("org.spongepowered.asm.mixin")) {
+				Matcher matcher = JSON_FILE_PATTERN.matcher(line.trim());
+				while (matcher.find()) {
+					// Group 1 captures the mixin JSON file name
+					if (matcher.group(1) != null) {
+						jsonFiles.add(matcher.group(1));
+					}
+				}
+			}
+		}
+
+		return jsonFiles;
+	}
+
+	private boolean isJarDenied(String jarName) {
+		if (jarName.startsWith("fml")) {
+			return true;
+		}
+		if (jarName.startsWith("forge-")) {
+			return true;
+		}
+		if (jarName.startsWith("mixin")) {
+			return true;
+		}
+
+		if (jarName.startsWith("gson-")) {
+			return true;
+		}
+		if (jarName.startsWith("eventbus")) {
+			return true;
+		}
+		if (jarName.startsWith("featurecreep")) {
+			return true;
+		}
+		if (jarName.startsWith("server-")) {
+			return true;
+		}
+		if (jarName.startsWith("modlauncher")) {
+			return true;
+		}
+		if (jarName.startsWith("javafmllanguage")) {
+			return true;
+		}
+		if (jarName.startsWith("client-")) {
+			return true;
+		}
+		if (jarName.startsWith("lwjgl-")) {
+			return true;
+		}
+
+		return false;
+	}
+}
