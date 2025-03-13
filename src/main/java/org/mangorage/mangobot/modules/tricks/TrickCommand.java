@@ -74,6 +74,7 @@ public class TrickCommand implements IBasicCommand {
                 .stream()
                 .filter(e -> e.getKey().guildId() == guildId)
                 .map(Map.Entry::getValue)
+                .sorted()
                 .toList();
     }
 
