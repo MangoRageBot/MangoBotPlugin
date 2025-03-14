@@ -1,0 +1,289 @@
+package org.mangorage.mangobot.modules.logs;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import net.dv8tion.jda.api.entities.Message;
+
+public class StackTraceReader implements LogAnalyserModule {
+
+	// 正则表达式用于匹配Java异常堆栈跟踪
+	private static final Pattern STACK_TRACE_PATTERN = Pattern.compile("(?m)(^\\S.*(?:\\r?\\n[ \\t]+at\\s+.*)+)");
+	// 正则表达式用于匹配包含org.spongepowered.asm.mixin的异常并提取JSON文件名（不包括refmap）
+	private static final Pattern JSON_FILE_PATTERN = Pattern.compile("(\\S+\\.json)(?=[: ])");
+	// 正则表达式用于匹配{}内的内容
+	private static final Pattern BRACE_CONTENT_PATTERN = Pattern.compile("\\{([^}]+)\\}");
+
+	public static String nl = System.lineSeparator();
+
+	@Override
+	public void analyse(String log, Message message) {
+		StringBuilder build = new StringBuilder();
+
+		List<String> sm_config = new ArrayList<>();
+		Map<String,Boolean> jars = new LinkedHashMap<>();//FATAL
+		List<String> braceContents = new LinkedList<>();
+
+		for (String trace : getFatalTraces(log).reversed()) {//Las ultimas son las más importante
+			String[] arr = trace.split(nl);
+			for (String untrimmed : arr) {
+			String line = untrimmed.trim();
+
+			extractJarNames(line, jars,true);
+
+			Matcher braceMatcher = BRACE_CONTENT_PATTERN.matcher(line);
+			while (braceMatcher.find()) {
+				String content = braceMatcher.group(1).trim();
+				if (!braceContents.contains(content)) {
+					braceContents.add(content);
+				}
+			}
+		}
+		}
+		
+		for (String trace : getTraces(log).reversed()) {//Las ultimas son las más importante
+			List<String> jsonFiles = findJsonFilesInMixinExceptions(trace);
+
+			if (!jsonFiles.isEmpty()) {
+				for (String jsonFile : jsonFiles) {
+					if (!sm_config.contains(jsonFile) && !jsonFile.endsWith(".refmap.json")) {
+						sm_config.add(jsonFile);
+						build.append("**Potentially Problematic SpongeMixin Config:** " + jsonFile).append(nl);
+					}
+				}
+			} else {
+				String[] arr = trace.split(nl);
+				for (String untrimmed : arr) {
+					String line = untrimmed.trim();
+
+					extractJarNames(line, jars,false);
+
+					Matcher braceMatcher = BRACE_CONTENT_PATTERN.matcher(line);
+					while (braceMatcher.find()) {
+						String content = braceMatcher.group(1).trim();
+						if (!braceContents.contains(content)) {
+							braceContents.add(content);
+						}
+					}
+				}
+			}
+		}
+
+		List<String> jar_names = new ArrayList<String>();
+		if (!jars.isEmpty()) {
+			build.append("**Found potentially problematic JAR files (Top are most likely):**").append(nl);
+			for (Map.Entry<String, Boolean> jar : jars.entrySet()) {
+				String jar_name = jar.getKey().split(".jar")[0]+".jar";
+				if (!jar_names.contains(jar_name)) {
+					if(jar.getValue()) {build.append("**Possibly Fatal:** ");}
+					build.append(jar_name).append(nl);	
+					jar_names.add(jar_name);
+				}
+			}
+		}
+		 List<String> injected_configs = new LinkedList<String>();
+		 for (String content : braceContents.reversed()) {
+			 for(String ind:removeDuplicates(content.split(","))) {
+				String cleansed = ind.replace("pl:runtimedistcleaner:A", "")
+				.replace("re:classloading","")
+				.replace("pl:mixin:APP:","")
+				.replace("re:computing_frames", "")
+				.replace("pl:accesstransformer:B", "")
+				.replace("pl:mixin:A", "")
+				.replace("xf:fml", "")
+				.replace("featurecreep", "")
+				.replace("re:mixin", "");
+				if(!injected_configs.contains(cleansed)&&!cleansed.isEmpty()) {
+					injected_configs.add(cleansed);	
+				}
+			 }
+				System.out.println(injected_configs.size());
+		 }
+
+
+		 if(!injected_configs.isEmpty()) {
+			 build.append("**Found contents in {} (Top is most important, only top 8 shown):**").append(nl);
+			 int siz = 0;
+			 for(String conf:injected_configs) {
+				 if(siz<=8) {	 
+				 build.append(conf.split(".json")[0].replace(".mixin", "").replace("mixin.", "")).append(nl);
+				 siz++;
+				 }
+			 }
+		 }
+		 
+	
+		 
+			if (!build.toString().isEmpty()) {
+				message.reply(build.toString()).setSuppressEmbeds(true).mentionRepliedUser(true).queue();
+				;
+			}
+		 
+	}
+
+	
+    public static String[] removeDuplicates(String[] inputArray) {
+        // 使用LinkedHashSet来保持插入顺序的同时去除重复项
+        Set<String> set = new HashSet<>(Arrays.asList(inputArray));
+        
+        // 将去重后的set转回数组
+        String[] resultArray = set.toArray(new String[0]);
+        
+        return resultArray;
+    }
+	
+	
+	private List<String> getFatalTraces(String log) {
+		// TODO Auto-generated method stub
+		List<String> ret = new ArrayList<String>();
+		String[] lines = log.split(nl);
+		int len = lines.length;
+		for(int i=0;i<len;i++) {
+			String line=lines[i];
+			if (line.contains("/FATAL]")) {
+				if(i+2>len) {}else {
+					StringBuilder trace = new StringBuilder();
+					trace.append(lines[i+1]);
+					addFatalTraces(trace,lines,i+2);
+					ret.add(trace.toString());
+				}
+			}
+		}
+		return ret;
+	}
+
+	private void addFatalTraces(StringBuilder trace, String[] lines, int index) {
+		// TODO Auto-generated method stub
+		int len = lines.length;
+		for(int i=index;i<len;i++) {
+			String line=lines[i];
+			if(line.trim().startsWith("at ")) {
+				trace.append(line);
+			}else {
+				return;
+			}
+			
+		}
+		
+	}
+
+	private void extractJarNames(String line, Map<String,Boolean> jars, boolean fatal) {
+		int startIdx = line.indexOf('[');
+		int endIdx = line.indexOf(']');
+
+		while (startIdx != -1 && endIdx != -1 && startIdx < endIdx) {
+			String candidate = line.substring(startIdx + 1, endIdx);
+			// Check if the candidate string ends with ".jar" or contains ".jar%23"
+			if (candidate.contains(".jar") && !isJarDenied(candidate)) {
+				if (!jars.containsKey(candidate)) {
+					jars.put(candidate,fatal);
+				}
+			}
+			// Look for the next '[' and ']'
+			startIdx = line.indexOf('[', endIdx);
+			endIdx = line.indexOf(']', endIdx + 1);
+		}
+	}
+
+	public static List<String> getTraces(String log) {
+		List<String> stackTraces = new ArrayList<>();
+		Matcher matcher = STACK_TRACE_PATTERN.matcher(log);
+		while (matcher.find()) {
+			stackTraces.add(matcher.group());
+		}
+		return stackTraces;
+	}
+
+	public List<String> findJsonFilesInMixinExceptions(String logContent) {
+		List<String> jsonFiles = new ArrayList<>();
+
+		String[] lines = logContent.split("\r?\n");
+		for (String line : lines) {
+			if (line.contains("org.spongepowered.asm.mixin")) {
+				Matcher matcher = JSON_FILE_PATTERN.matcher(line.trim());
+				while (matcher.find()) {
+					// Group 1 captures the mixin JSON file name
+					if (matcher.group(1) != null) {
+						jsonFiles.add(matcher.group(1));
+					}
+				}
+			}
+		}
+
+		return jsonFiles;
+	}
+
+	private boolean isJarDenied(String jarName) {
+		if (jarName.startsWith("fml")) {
+			return true;
+		}
+		if (jarName.startsWith("forge-")) {
+			return true;
+		}
+		if(jarName.contains("fmlcore")) {
+			return true;
+		}
+		if (jarName.startsWith("mixin")) {
+			return true;
+		}
+
+		if (jarName.startsWith("gson-")) {
+			return true;
+		}
+		if (jarName.startsWith("eventbus")) {
+			return true;
+		}
+		if (jarName.startsWith("featurecreep-")) {
+			return true;
+		}
+		if (jarName.startsWith("server-")) {
+			return true;
+		}
+		if (jarName.startsWith("modlauncher")) {
+			return true;
+		}
+		if (jarName.startsWith("javafmllanguage")) {
+			return true;
+		}
+		if (jarName.startsWith("client-")) {
+			return true;
+		}
+		if (jarName.startsWith("lwjgl-")) {
+			return true;
+		}
+		if (jarName.startsWith("netty-")) {
+			return true;
+		}
+		if(jarName.startsWith("bootstraplauncher")) {
+			return true;
+		}
+		if(jarName.startsWith("securejarhandler")) {
+			return true;
+		}
+		if(jarName.startsWith("core-")) {
+			return true;
+		}
+		if(jarName.startsWith("loader-")) {
+			return true;
+		}
+		if(jarName.startsWith("language-")) {
+			return true;
+		}
+		if(jarName.startsWith("minecraft-") && jarName.contains("server")) {
+			return true;
+		}
+		if(jarName.startsWith("minecraft-") && jarName.contains("client")) {
+			return true;
+		}
+		System.out.println(jarName);
+		return false;
+	}
+}
