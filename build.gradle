@@ -61,6 +61,8 @@ dependencies {
     installer('org.mangorage:installer:4.0.3')
     bot('org.mangorage:mangobot:11.0.23')
 
+    plugin('org.mangorage:mangobotgithub:+')
+
     library('org.luaj:luaj-jse:3.0.1')
     library('dev.arbjerg:lavaplayer:2.2.2')
     library('dev.lavalink.youtube:common:1.11.3')
@@ -126,7 +128,7 @@ publishing {
             url = "https://maven.minecraftforge.net/"
 
             credentials {
-                username = System.getenv("MAVEN_USERNAME")
+                username = System.getenv("MAVEN_USER")
                 password = System.getenv("MAVEN_PASSWORD")
             }
         }

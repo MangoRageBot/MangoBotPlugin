@@ -11,16 +11,17 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.BiConsumer;
 import java.util.function.BiPredicate;
-import java.util.function.Predicate;
 
 import org.mangorage.mangobot.core.Util;
 
 import net.dv8tion.jda.api.entities.Message;
+import org.mangorage.mangobot.modules.logs.modules.BrokenDrivers;
+import org.mangorage.mangobot.modules.logs.modules.EarlyWindow;
+import org.mangorage.mangobot.modules.logs.modules.Java22;
+import org.mangorage.mangobot.modules.logs.modules.MissingDeps;
 
-public class LogAnalyser {
-
+public final class LogAnalyser {
 	public static LogAnalyser of(LogAnalyserModule... modules) {
 		return new LogAnalyser(List.of(modules));
 	}
