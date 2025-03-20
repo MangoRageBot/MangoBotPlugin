@@ -15,7 +15,7 @@ public final class UUIDChecker implements LogAnalyserModule {
         if (matcher.find()) {
             return matcher.group(1);
         } else {
-            return "UUID not found";
+            return null;
         }
     }
 
@@ -24,10 +24,13 @@ public final class UUIDChecker implements LogAnalyserModule {
         var lines = str.split("\n");
         for (String line : lines) {
             if (line.contains("--username") && line.contains("--uuid")) {
-                message.reply(
-                        "[Found Profile](https://namemc.com/search/%s)".formatted(extractUUID(line))
-                ).setSuppressEmbeds(true).mentionRepliedUser(true).queue();
-                break;
+                var id = extractUUID(line);
+                if (id != null) {
+                    message.reply(
+                            "[Found Profile](https://namemc.com/search/%s)".formatted(id)
+                    ).setSuppressEmbeds(true).mentionRepliedUser(true).queue();
+                    break;
+                }
             }
         }
     }
