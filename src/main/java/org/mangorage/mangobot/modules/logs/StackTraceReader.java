@@ -152,6 +152,20 @@ public class StackTraceReader implements LogAnalyserModule {
 			;
 		}
 
+		
+		
+		
+		sm_config.clear();
+		jars.clear();
+		modids.clear();
+		packs.clear();
+		braceContents.clear();
+		fatal_missing_classes.clear();
+		bad_jar.clear();
+		bad_modid.clear();
+		bad_package.clear();
+		build = new StringBuilder();
+	
 	}
 
 	public void processTrace(String trace, boolean fatal, int lvl) {
