@@ -69,8 +69,7 @@ public interface LogAnalyserModule {
 							"Caused by: java.lang.IllegalArgumentException: Missing scheme",
 							"org.jboss.modules"
 					)
-			),
-		new StackTraceReader()
+			)
 	);
 
 	void analyse(String str, Message message);
