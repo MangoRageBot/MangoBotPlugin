@@ -1,12 +1,11 @@
 package org.mangorage.mangobot.modules.logs.modules;
 
 import net.dv8tion.jda.api.entities.Message;
-import org.mangorage.mangobot.modules.logs.LogAnalyserModule;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public final class UUIDChecker implements LogAnalyserModule {
+public final class UUIDChecker {
     private static final Pattern pattern = Pattern.compile("--uuid,\\s*([a-fA-F0-9-]+)");
 
     public static String extractUUID(String input) {
@@ -19,7 +18,6 @@ public final class UUIDChecker implements LogAnalyserModule {
         }
     }
 
-    @Override
     public void analyse(String str, Message message) {
         var lines = str.split("\n");
         for (String line : lines) {

@@ -4,46 +4,37 @@
  * */
 package org.mangorage.mangobot.modules.logs.modules;
 
-import net.dv8tion.jda.api.entities.Message;
 import org.mangorage.mangobot.modules.logs.LogAnalyserModule;
 
 public class BrokenDrivers implements LogAnalyserModule {
 
-	public void analyse(String str, Message message) {
+	private static String nl = System.getProperty("line.separator");
 
+
+	public void analyse(String str, StringBuilder message) {
 		if (str.contains("EXCEPTION_ACCESS_VIOLATION") && str.contains("atio6axx.dll")) {
-			message.reply(
-					"Updating your drivers might help. Please bear in mind that checking for updates the usual ways won't find any updates when drivers are in a broken state, so it's important you follow the linked guide. Important: If you have Nvidia graphics, also make sure you've set anything Minecraft-related (such as Java and launchers) to prioritise high performance graphics in both the Windows settings and Nvidia control panel. Read this guide to fix them: https://forums.minecraftforge.net/topic/125488-rules-and-frequently-asked-questions-faq/#:~:text=How%20do%20I%20update%20my%20drivers%3F")
-					.setSuppressEmbeds(true).mentionRepliedUser(true).queue();
-		} else if (str.contains("EXCEPTION_ACCESS_VIOLATION") && str.contains("nouveau")) { // FUCKK I forgot the name
-																							// of the full file that
-																							// sometimes causes crashes,
-																							// was it like nouveau.so ?
-			message.reply(
-					"Some older versions sometimes have a few issues with some Nouveau Graphics on early loading screen")
-					.setSuppressEmbeds(true).mentionRepliedUser(true).queue();
+			message.append("\n").append(
+					"Updating your drivers might help. Please bear in mind that checking for updates the usual ways won't find any updates when drivers are in a broken state, so it's important you follow the linked guide. Important: If you have Nvidia graphics, also make sure you've set anything Minecraft-related (such as Java and launchers) to prioritise high performance graphics in both the Windows settings and Nvidia control panel. Read this guide to fix them: https://forums.minecraftforge.net/topic/125488-rules-and-frequently-asked-questions-faq/#:~:text=How%20do%20I%20update%20my%20drivers%3F"
+			);
+		} else if (str.contains("EXCEPTION_ACCESS_VIOLATION") && str.contains("nouveau")) {
+			message.append("\n").append(
+					"Some older versions sometimes have a few issues with some Nouveau Graphics on early loading screen"
+			);
 		} else {
 			String last = null;
-
-			String nl = System.getProperty("line.separator");
 
 			for (String line : str.split(nl)) {
 				last = line;
 			}
 
 			if (last != null) {
-
-				if (last.contains("Backend library: LWJGL") || last.contains("Trying GL version")
-						|| last.contains("you probably have a driver issue")) {
-					message.reply(
-							"You have an issue with your Graphics Drivers. If you have an AMD/ATI GPU or APU update your AMD graphics drivers. If you have an NVIDIA graphics card make sure to mark the game and all instances of javaw.exe to use the dedicated graphics card. Read this guide: https://forums.minecraftforge.net/topic/125488-rules-and-frequently-asked-questions-faq/#:~:text=How%20do%20I%20update%20my%20drivers%3F")
-							.setSuppressEmbeds(true).mentionRepliedUser(true).queue();
+				if (last.contains("Backend library: LWJGL") || last.contains("Trying GL version") || last.contains("you probably have a driver issue")) {
+					message.append("\n").append(
+							"You have an issue with your Graphics Drivers. If you have an AMD/ATI GPU or APU update your AMD graphics drivers. If you have an NVIDIA graphics card make sure to mark the game and all instances of javaw.exe to use the dedicated graphics card. Read this guide: https://forums.minecraftforge.net/topic/125488-rules-and-frequently-asked-questions-faq/#:~:text=How%20do%20I%20update%20my%20drivers%3F"
+					);
 				}
-
 			}
-
 		}
-
 	}
 
 }

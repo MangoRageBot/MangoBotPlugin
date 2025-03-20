@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 import net.dv8tion.jda.api.entities.Message;
 import org.mangorage.mangobot.modules.logs.LogAnalyserModule;
 
-public class StackTraceReader implements LogAnalyserModule {
+public class StackTraceReader {
 
 	// 正则表达式用于匹配Java异常堆栈跟踪
 	private static final Pattern STACK_TRACE_PATTERN = Pattern.compile("(?m)(^\\S.*(?:\\r?\\n[ \\t]+at\\s+.*)+)");
@@ -38,9 +38,6 @@ public class StackTraceReader implements LogAnalyserModule {
 	List<String> fatal_missing_classes = new ArrayList<String>();
 
 
-
-
-
 	//These only contain the content but not lvl
 	List<String> bad_jar = new ArrayList<String>();
 	List<String> bad_modid = new ArrayList<String>();
@@ -48,11 +45,8 @@ public class StackTraceReader implements LogAnalyserModule {
 	StringBuilder build = new StringBuilder();
 
 
-	@Override
+
 	public void analyse(String log, Message message) {
-
-
-
 		int lvl = 0;
 		for (String trace : getFatalTraces(log).reversed()) {// Las ultimas son las más importante
 			lvl++;

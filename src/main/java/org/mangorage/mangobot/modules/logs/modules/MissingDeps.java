@@ -4,23 +4,21 @@
  * */
 package org.mangorage.mangobot.modules.logs.modules;
 
-import net.dv8tion.jda.api.entities.Message;
 import org.mangorage.mangobot.modules.logs.LogAnalyserModule;
 
 public class MissingDeps  implements LogAnalyserModule {
 
-	public void analyse(String str, Message message) {
+	public void analyse(String str, StringBuilder message) {
 		if (str.contains("Missing or unsupported mandatory dependencies:")) {
-			String nl = System.getProperty("line.separator");
-			
-			String out = "Missing or unsupported mandatory dependencies:" + nl;
 
-			for(String line: str.split(nl)) {
+			String out = STR."Missing or unsupported mandatory dependencies:\{LogAnalyserModule.LS}";
+
+			for(String line: str.split(LogAnalyserModule.LS)) {
 					if (line.contains("Mod ID") && line.contains("Requested by") && line.contains("Expected range")) {
-						out = out + line + nl;
+						out = out + line + LogAnalyserModule.LS;
 					}
 			}
-			message.reply(out).setSuppressEmbeds(true).mentionRepliedUser(true).queue();
+			message.append("\n").append(out);
 		}
 	}
 }
