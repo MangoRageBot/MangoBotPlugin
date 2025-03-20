@@ -1,4 +1,4 @@
-package org.mangorage.mangobot.modules.logs;
+package org.mangorage.mangobot.modules.logs.modules;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.dv8tion.jda.api.entities.Message;
+import org.mangorage.mangobot.modules.logs.LogAnalyserModule;
 
 public class StackTraceReader implements LogAnalyserModule {
 
@@ -24,9 +25,9 @@ public class StackTraceReader implements LogAnalyserModule {
 
 	public static String nl = System.lineSeparator();
 
-	
-	
-	
+
+
+
 	List<String> sm_config = new ArrayList<>();
 	Map<String, Boolean> jars = new LinkedHashMap<>();// FATAL
 	Map<String, Boolean> modids = new LinkedHashMap<>();// FATAL
@@ -35,18 +36,18 @@ public class StackTraceReader implements LogAnalyserModule {
 	List<String> braceContents = new LinkedList<>();
 
 	List<String> fatal_missing_classes = new ArrayList<String>();
-	
-	
-	
-	
-	
+
+
+
+
+
 	//These only contain the content but not lvl
 	List<String> bad_jar = new ArrayList<String>();
 	List<String> bad_modid = new ArrayList<String>();
 	List<String> bad_package = new ArrayList<String>();
 	StringBuilder build = new StringBuilder();
 
-	
+
 	@Override
 	public void analyse(String log, Message message) {
 

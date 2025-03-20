@@ -1,11 +1,12 @@
 package org.mangorage.mangobot.modules.logs;
 
 import net.dv8tion.jda.api.entities.Message;
-import org.apache.commons.logging.Log;
 import org.mangorage.mangobot.modules.logs.modules.BrokenDrivers;
 import org.mangorage.mangobot.modules.logs.modules.EarlyWindow;
 import org.mangorage.mangobot.modules.logs.modules.Java22;
 import org.mangorage.mangobot.modules.logs.modules.MissingDeps;
+import org.mangorage.mangobot.modules.logs.modules.RenewableLogAnalyser;
+import org.mangorage.mangobot.modules.logs.modules.StackTraceReader;
 import org.mangorage.mangobot.modules.logs.modules.UUIDChecker;
 
 import java.util.List;
@@ -17,6 +18,7 @@ public interface LogAnalyserModule {
 			new Java22(),
 			new MissingDeps(),
 			new UUIDChecker(),
+			new RenewableLogAnalyser(StackTraceReader::new),
 			LogAnalyser.createModule(
 					(s, m) -> {
 						m.reply("This is a common issue on Modrinth Theseus. Modrinth's launcher has been known to be problematic in some cases with Forge. If you need to download a Modrinth format modpack you can use Prism Launcher, GDLauncher, ATLauncher, or others which are far more reliable.").setSuppressEmbeds(true).mentionRepliedUser(true).queue();
@@ -69,8 +71,7 @@ public interface LogAnalyserModule {
 							"Caused by: java.lang.IllegalArgumentException: Missing scheme",
 							"org.jboss.modules"
 					)
-			),
-		new StackTraceReader()
+			)
 	);
 
 	void analyse(String str, Message message);
