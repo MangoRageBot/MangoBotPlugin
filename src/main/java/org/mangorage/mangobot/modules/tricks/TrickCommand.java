@@ -2,6 +2,7 @@ package org.mangorage.mangobot.modules.tricks;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageType;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -549,6 +550,12 @@ public class TrickCommand implements IBasicCommand {
     private void useTrick(Trick trick, Message message, MessageChannel channel, long guildID, Arguments args) {
         MessageSettings dMessage = plugin.getMessageSettings();
         var type = trick.getType();
+        var replyTarget = message.getMessageReference() == null ? null : message.getMessageReference().getMessage();
+        boolean shouldPing = false;
+        if (replyTarget != null && replyTarget.getMember() != null) {
+            shouldPing = replyTarget.getMember().getRoles()
+                    .stream().noneMatch((role) -> role.isHoisted() ^ role.getName().equals("Patreons"));
+        }
         if (type == TrickType.NORMAL) {
             dMessage.withButton(
                     dMessage.apply(channel.sendMessage(trick.getContent()))
@@ -561,7 +568,7 @@ public class TrickCommand implements IBasicCommand {
                                 return true;
                             })
                             .toList()
-            ).queue();
+            ).setMessageReference(replyTarget).mentionRepliedUser(shouldPing).queue();
             trick.use();
             save(trick);
         } else if (type == TrickType.ALIAS) {
