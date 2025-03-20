@@ -48,7 +48,7 @@ public class StackTraceReader implements LogAnalyserModule {
 	StringBuilder build = new StringBuilder();
 
 
-	@Override
+		@Override
 	public void analyse(String log, Message message) {
 
 
@@ -67,7 +67,7 @@ public class StackTraceReader implements LogAnalyserModule {
 		List<String> jar_names = new ArrayList<String>();
 		if (!jars.isEmpty()) {
 			build.append(
-					"**Found potentially problematic JAR files (Prioritise FATAL then Higher lvl then lower ln):**")
+					"**Found potentially problematic JAR files (Prioritise FATAL then Lower lvl):**")
 					.append(nl);
 			for (Map.Entry<String, Boolean> jar : jars.entrySet()) {
 				String[] lvl_info_arr = jar.getKey().split(Pattern.quote(" **lvl ** "));
@@ -92,7 +92,7 @@ public class StackTraceReader implements LogAnalyserModule {
 		
 		if (!modids.isEmpty()) {
 			build.append(
-					"**Found potentially problematic modids (Prioritise FATAL then Higher lvl then lower ln):**")
+					"**Found potentially problematic modids (Prioritise FATAL then Lower lvl):**")
 					.append(nl);
 			for (Map.Entry<String, Boolean> modid : modids.entrySet()) {
 					if (modid.getValue()) {
@@ -104,7 +104,7 @@ public class StackTraceReader implements LogAnalyserModule {
 		
 		if (!packs.isEmpty()) {
 			build.append(
-					"**Found potentially problematic packages (Prioritise FATAL then Higher lvl then lower ln):**")
+					"**Found potentially problematic packages (Prioritise FATAL then Lower lvl):**")
 					.append(nl);
 			for (Map.Entry<String, Boolean> pack : packs.entrySet()) {
 					if (pack.getValue()) {
@@ -153,6 +153,20 @@ public class StackTraceReader implements LogAnalyserModule {
 			;
 		}
 
+		
+		
+		
+		sm_config.clear();
+		jars.clear();
+		modids.clear();
+		packs.clear();
+		braceContents.clear();
+		fatal_missing_classes.clear();
+		bad_jar.clear();
+		bad_modid.clear();
+		bad_package.clear();
+		build = new StringBuilder();
+	
 	}
 
 	public void processTrace(String trace, boolean fatal, int lvl) {
@@ -186,7 +200,7 @@ public class StackTraceReader implements LogAnalyserModule {
 					if (!bad_modid.contains(modid) && !line.split("/")[0].startsWith("java.")&&!isModIDDenylisted(modid)&&line.startsWith("at")) {
 						bad_modid.add(modid);
 						modids.put(
-								modid + " **lvl ** " + String.valueOf(lvl) + "** ln** " + String.valueOf(line_num),
+								modid + " **lvl ** " + String.valueOf(lvl) + "." + String.valueOf(line_num),
 								fatal);
 
 					}
@@ -199,7 +213,7 @@ public class StackTraceReader implements LogAnalyserModule {
 					}
 					String pack = line.substring(3, line_len);
 					if(!bad_package.contains(pack) && !packIsDenyListed(pack)) {
-					packs.put(pack + " **lvl ** " + Integer.toString(lvl) + "** ln** " + Integer.toString(line_num),
+					packs.put(pack + " **lvl ** " + Integer.toString(lvl) + "." + Integer.toString(line_num),
 							fatal);
 					bad_package.add(pack);
 					}
@@ -363,7 +377,7 @@ public class StackTraceReader implements LogAnalyserModule {
 			if (candidate.contains(".jar") && !isJarDenied(candidate)) {
 				if (!bad_jar.contains(candidate)) {
 					bad_jar.add(candidate);
-					jars.put(candidate + " **lvl ** " + Integer.toString(lvl) + "** ln** " + Integer.toString(line_num),
+					jars.put(candidate + " **lvl ** " + Integer.toString(lvl) + "**.**" + Integer.toString(line_num),
 							fatal);
 				}
 			}
@@ -372,7 +386,6 @@ public class StackTraceReader implements LogAnalyserModule {
 			endIdx = line.indexOf(']', endIdx + 1);
 		}
 	}
-
 	public static List<String> getTraces(String log) {
 		List<String> stackTraces = new ArrayList<>();
 		Matcher matcher = STACK_TRACE_PATTERN.matcher(log);
