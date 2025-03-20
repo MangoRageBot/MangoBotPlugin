@@ -30,12 +30,16 @@ version = GitVersion.getGitVersion().getVersionAsString()
 
 println("Version: " + version)
 
-tasks.withType(JavaCompile) {
-    options.compilerArgs += "--enable-preview"
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(24)
+    }
 }
 
-tasks.withType(JavaExec) {
-    jvmArgs += "--enable-preview"
+tasks.withType(JavaExec).configureEach {
+    javaLauncher.set(javaToolchains.launcherFor {
+        languageVersion.set(JavaLanguageVersion.of(24))
+    })
 }
 
 repositories {
