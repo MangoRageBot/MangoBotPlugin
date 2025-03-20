@@ -18,7 +18,6 @@ public interface LogAnalyserModule {
 			new Java22(),
 			new MissingDeps(),
 			new UUIDChecker(),
-			new RenewableLogAnalyser(StackTraceReader::new),
 			LogAnalyser.createModule(
 					(s, m) -> {
 						m.reply("This is a common issue on Modrinth Theseus. Modrinth's launcher has been known to be problematic in some cases with Forge. If you need to download a Modrinth format modpack you can use Prism Launcher, GDLauncher, ATLauncher, or others which are far more reliable.").setSuppressEmbeds(true).mentionRepliedUser(true).queue();
