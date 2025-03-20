@@ -16,10 +16,6 @@ import java.util.function.BiPredicate;
 import org.mangorage.mangobot.core.Util;
 
 import net.dv8tion.jda.api.entities.Message;
-import org.mangorage.mangobot.modules.logs.modules.BrokenDrivers;
-import org.mangorage.mangobot.modules.logs.modules.EarlyWindow;
-import org.mangorage.mangobot.modules.logs.modules.Java22;
-import org.mangorage.mangobot.modules.logs.modules.MissingDeps;
 
 public final class LogAnalyser {
 	public static LogAnalyser of(LogAnalyserModule... modules) {
@@ -34,7 +30,7 @@ public final class LogAnalyser {
 		return new LogAnalyserModule() {
 			private final List<String> stringsList = strings;
 			@Override
-			public void analyse(String str, Message message) {
+			public void analyse(String str, StringBuilder message) {
 				boolean foundAll = true;
 				for (String string : stringsList) {
 					if (!comparePredicate.test(str, string)) {
@@ -73,14 +69,14 @@ public final class LogAnalyser {
 			"pastebin.com/", "mclo.gs/"
 	};
 
-	public void scanMessage(Message message) {
+	public void scanMessage(Message message, StringBuilder stringBuilder) {
 		String content = message.getContentStripped();
 		for (String uri : getLogURLs(content)) {
 			InputStream log = Util.getFileInputStream(uri);
 			if (log != null) {
 				try {
 					String str = Util.getStringFromInputStream(log);
-					readLog(message, str);
+					readLog(stringBuilder, str);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -123,7 +119,7 @@ public final class LogAnalyser {
 		return list;
 	}
 
-	public void readLog(Message message, String log) {
+	public void readLog(StringBuilder message, String log) {
 		for(LogAnalyserModule mod : mods) {
 			mod.analyse(log, message);
 		}
