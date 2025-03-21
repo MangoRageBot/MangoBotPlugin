@@ -11,10 +11,9 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.dv8tion.jda.api.entities.Message;
 import org.mangorage.mangobot.modules.logs.LogAnalyserModule;
 
-public class StackTraceReader {
+public class StackTraceReader implements LogAnalyserModule{
 
 	// 正则表达式用于匹配Java异常堆栈跟踪
 	private static final Pattern STACK_TRACE_PATTERN = Pattern.compile("(?m)(^\\S.*(?:\\r?\\n[ \\t]+at\\s+.*)+)");
@@ -42,20 +41,44 @@ public class StackTraceReader {
 	List<String> bad_jar = new ArrayList<String>();
 	List<String> bad_modid = new ArrayList<String>();
 	List<String> bad_package = new ArrayList<String>();
-	StringBuilder build = new StringBuilder();
 
 
+	public String[] package_denylist = {
+			"java.",
+			"net.minecraft",
+			"net.minecraftforge",
+			"org.spongepowered",
+			"it.unimi",
+			"com.mojang.",
+			"cpw.",
+			"featurecreep.",
+			"jdk.",
+			"sun.",
+			"com.sun.",
+			"org.lwjgl.",
+			"org.apache.",
+			"io.netty",
+			"org.prismlauncher",
+			"io.github.zekerzhayard",
+			"org.multimc",
+			"org.polymc",
+			"org.tlauncher",
+			
+	};
+	
+	
+	
 
-	public void analyse(String log, Message message) {
+	public void analyse(String log, StringBuilder build) {
 		int lvl = 0;
 		for (String trace : getFatalTraces(log).reversed()) {// Las ultimas son las más importante
 			lvl++;
-			this.processTrace(trace, true, lvl);
+			this.processTrace(build,trace, true, lvl);
 		}
 
 		for (String trace : getTraces(log).reversed()) {// Las ultimas son las más importante
 			lvl++;
-			this.processTrace(trace, false, lvl);
+			this.processTrace(build,trace, false, lvl);
 		}
 
 		List<String> jar_names = new ArrayList<String>();
@@ -142,14 +165,9 @@ public class StackTraceReader {
 			}
 		}
 
-		if (!build.toString().isEmpty()) {
-			message.reply(build.toString()).setSuppressEmbeds(true).mentionRepliedUser(true).queue();
-			;
-		}
-
 	}
 
-	public void processTrace(String trace, boolean fatal, int lvl) {
+	public void processTrace(StringBuilder build, String trace, boolean fatal, int lvl) {
 
 		List<String> jsonFiles = findJsonFilesInMixinExceptions(trace);
 
@@ -271,28 +289,8 @@ public class StackTraceReader {
 
 	private boolean packIsDenyListed(String pack) {
 		// TODO Auto-generated method stub
-		String[] prefixes = {
-				"java.",
-				"net.minecraft.",
-				"net.minecraftforge.",
-				"com.mojang.",
-				"cpw.",
-				"featurecreep.",
-				"jdk.",
-				"sun.",
-				"com.sun.",
-				"org.lwjgl.",
-				"org.apache.",
-				"io.netty",
-				"org.prismlauncher",
-				"io.github.zekerzhayard",
-				"org.multimc",
-				"org.polymc",
-				"org.tlauncher",
-				
-		};
-		
-		for(String prefix:prefixes) {
+
+		for(String prefix:package_denylist) {
 			if(pack.startsWith(prefix)) {
 				return true;
 			}

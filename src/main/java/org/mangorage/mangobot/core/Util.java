@@ -23,17 +23,6 @@
 package org.mangorage.mangobot.core;
 
 
-import net.dv8tion.jda.api.entities.ISnowflake;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.utils.TimeUtil;
-import org.mangorage.basicutils.LogHelper;
-import org.mangorage.mangobot.loader.CoreMain;
-import org.mangorage.mangobotapi.core.commands.Arguments;
-import org.mangorage.mangobotapi.core.commands.CommandPrefix;
-import org.mangorage.mangobotapi.core.events.BasicCommandEvent;
-import org.mangorage.mangobotapi.core.plugin.extra.JDAPlugin;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -49,6 +38,21 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.temporal.TemporalAccessor;
+import java.util.List;
+
+import org.mangorage.basicutils.LogHelper;
+import org.mangorage.mangobot.loader.CoreMain;
+import org.mangorage.mangobot.modules.logs.LogAnalyser;
+import org.mangorage.mangobot.modules.logs.LogAnalyserModule;
+import org.mangorage.mangobotapi.core.commands.Arguments;
+import org.mangorage.mangobotapi.core.commands.CommandPrefix;
+import org.mangorage.mangobotapi.core.events.BasicCommandEvent;
+import org.mangorage.mangobotapi.core.plugin.extra.JDAPlugin;
+
+import net.dv8tion.jda.api.entities.ISnowflake;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.utils.TimeUtil;
 
 public class Util {
 
@@ -69,7 +73,6 @@ public class Util {
 
         Message message = event.getMessage();
         String rawMessage = message.getContentRaw();
-
 
         boolean silent = rawMessage.startsWith("s");
         if (silent)
