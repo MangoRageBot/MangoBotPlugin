@@ -5,17 +5,10 @@
 
 package org.mangorage.mangobot.modules.logs;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiPredicate;
-
-import org.mangorage.mangobot.core.Util;
-
-import net.dv8tion.jda.api.entities.Message;
 
 public final class LogAnalyser {
 	public static LogAnalyser of(LogAnalyserModule... modules) {
@@ -59,67 +52,8 @@ public final class LogAnalyser {
 		this.mods.addAll(List.of(modules));
 	}
 
-
-	// Be sure to include slashes, Paste.ee and other sites without separate or
-	// only raw URLs will not work, ones with fancy raw URLs like OpenSUSE paste
-	// will also not be included at this time.
-	public String[] supported_paste_sites = new String[] {
-			"paste.mikumikudance.jp/",
-			"paste.centos.org/",
-			"pastebin.com/", "mclo.gs/"
-	};
-
-	public void scanMessage(Message message, StringBuilder stringBuilder) {
-		String content = message.getContentStripped();
-		for (String uri : getLogURLs(content)) {
-			InputStream log = Util.getFileInputStream(uri);
-			if (log != null) {
-				try {
-					String str = Util.getStringFromInputStream(log);
-					readLog(stringBuilder, str);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-
-		}			
-	}
-
-	public ArrayList<String> getLogURLs(String message) {
-		ArrayList<String> list = new ArrayList<>();
-		for (String word : message.split(" ")) {
-
-			for (String paste : supported_paste_sites) {
-				if (word.contains(paste)) {
-
-					if (paste.equals("mclo.gs/")) {
-						String[] url_arr = word.split("/");
-						String slug = url_arr[url_arr.length - 1];
-						list.add("https://api.mclo.gs/1/raw/" + slug);
-					} else if (paste.equals("pastebin.com/")) {
-						String[] url_arr = word.split("/");
-						String slug = url_arr[url_arr.length - 1];
-						list.add("https://pastebin.com/raw/" + slug);
-					} else { // Add more else ifs for other sites
-						if (word.contains("/view/raw/")) {
-							list.add(word);
-						} else if (word.contains("/view/")) {
-							list.add(word.replace("/view/", "/view/raw/"));
-						}
-
-					}
-
-				}
-
-			}
-
-		}
-
-		return list;
-	}
-
 	public void readLog(StringBuilder message, String log) {
+		log = log.replace("\\r?\\n", "\\n");
 		for(LogAnalyserModule mod : mods) {
 			mod.analyse(log, message);
 		}

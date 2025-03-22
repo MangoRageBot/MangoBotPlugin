@@ -10,7 +10,7 @@ import java.util.List;
 public interface LogAnalyserModule {
 
 	static String[] split(String str) {
-		return str.replace("\r\n", "\n").replace("\r", "\n").split("\n");
+		return str.split("\n");
 	}
 
 	LogAnalyser MAIN = LogAnalyser.of(
