@@ -53,7 +53,7 @@ public final class LogAnalyser {
 	}
 
 	public void readLog(StringBuilder message, String log) {
-		log = log.replace("\\r?\\n", "\\n");
+		log = log.replaceAll("\\r?\\n", "\\n");
 		for(LogAnalyserModule mod : mods) {
 			mod.analyse(log, message);
 		}
