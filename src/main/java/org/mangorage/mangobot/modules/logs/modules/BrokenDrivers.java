@@ -8,9 +8,6 @@ import org.mangorage.mangobot.modules.logs.LogAnalyserModule;
 
 public class BrokenDrivers implements LogAnalyserModule {
 
-	private static String nl = System.getProperty("line.separator");
-
-
 	public void analyse(String str, StringBuilder message) {
 		if (str.contains("EXCEPTION_ACCESS_VIOLATION") && str.contains("atio6axx.dll")) {
 			message.append("\n").append(
@@ -23,7 +20,7 @@ public class BrokenDrivers implements LogAnalyserModule {
 		} else {
 			String last = null;
 
-			for (String line : str.split(nl)) {
+			for (String line : str.split(LogAnalyserModule.LS)) {
 				last = line;
 			}
 

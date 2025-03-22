@@ -4,7 +4,6 @@
  * */
 package org.mangorage.mangobot.modules.logs.modules;
 
-import net.dv8tion.jda.api.entities.Message;
 import org.mangorage.mangobot.modules.logs.LogAnalyserModule;
 
 public class Java22  implements LogAnalyserModule {

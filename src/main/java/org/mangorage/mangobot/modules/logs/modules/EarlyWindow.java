@@ -10,9 +10,7 @@ import org.mangorage.mangobot.modules.logs.LogAnalyserModule;
 public class EarlyWindow  implements LogAnalyserModule {
 
 	public void analyse(String str, StringBuilder message) {
-		String nl = System.getProperty("line.separator");
-
-		var lines = str.split(nl);
+		var lines = str.split(LogAnalyserModule.LS);
 		if (lines.length > 0) {
 			String last = lines[lines.length - 1];
 			if (last.contains("Loading ImmediateWindowProvider fmlearlywindow")) {
