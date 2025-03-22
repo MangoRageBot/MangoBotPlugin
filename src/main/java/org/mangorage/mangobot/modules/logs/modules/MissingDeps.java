@@ -11,9 +11,9 @@ public class MissingDeps  implements LogAnalyserModule {
 	public void analyse(String str, StringBuilder message) {
 		if (str.contains("Missing or unsupported mandatory dependencies:")) {
 
-			StringBuilder out = new StringBuilder("Missing or unsupported mandatory dependencies: %s".formatted(LogAnalyserModule.LS));
+			StringBuilder out = new StringBuilder("Missing or unsupported mandatory dependencies: \n");
 
-			for(String line: str.split(LogAnalyserModule.LS)) {
+			for(String line: LogAnalyserModule.split(str)) {
 					if (line.contains("Mod ID") && line.contains("Requested by") && line.contains("Expected range")) {
 						out.append(line).append("\n");
 					}

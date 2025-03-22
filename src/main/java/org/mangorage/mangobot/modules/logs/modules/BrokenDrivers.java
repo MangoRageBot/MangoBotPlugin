@@ -20,7 +20,7 @@ public class BrokenDrivers implements LogAnalyserModule {
 		} else {
 			String last = null;
 
-			for (String line : str.split(LogAnalyserModule.LS)) {
+			for (String line : LogAnalyserModule.split(str)) {
 				last = line;
 			}
 

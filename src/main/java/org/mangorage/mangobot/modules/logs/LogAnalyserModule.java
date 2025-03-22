@@ -8,7 +8,10 @@ import org.mangorage.mangobot.modules.logs.modules.MissingDeps;
 import java.util.List;
 
 public interface LogAnalyserModule {
-	String LS = System.lineSeparator();
+
+	static String[] split(String str) {
+		return str.lines().toArray(String[]::new);
+	}
 
 	LogAnalyser MAIN = LogAnalyser.of(
 			new BrokenDrivers(),
