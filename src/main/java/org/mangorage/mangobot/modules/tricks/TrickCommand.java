@@ -550,9 +550,10 @@ public class TrickCommand implements IBasicCommand {
     private void useTrick(Trick trick, Message message, MessageChannel channel, long guildID, Arguments args) {
         MessageSettings dMessage = plugin.getMessageSettings();
         var type = trick.getType();
-        var replyTarget = message.getMessageReference() == null ? null : message.getMessageReference().getMessage();
+        var replyTarget = message == null ? null : (message.getMessageReference() == null ? null : message.getMessageReference().getMessage());
         boolean shouldPing = false;
         if (replyTarget != null && replyTarget.getMember() != null) {
+            // No ping if hoisted UNLESS not staff.
             shouldPing = replyTarget.getMember().getRoles()
                     .stream().noneMatch((role) -> role.isHoisted() ^ role.getName().equals("Patreons"));
         }
