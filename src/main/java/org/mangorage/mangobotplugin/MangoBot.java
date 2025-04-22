@@ -29,7 +29,6 @@ public final class MangoBot implements Plugin {
 
     public static final ButtonActionRegistry ACTION_REGISTRY = new ButtonActionRegistry();
 
-
     // Where we create our "config"
     public final static Config CONFIG = new Config(Path.of("plugins/%s/.env".formatted(MangoBot.ID)));
 

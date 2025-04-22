@@ -1,5 +1,5 @@
 {
-  "id": "mangobotplugin",
+  "id": "mangobot",
   "name": "MangoBotPlugin",
   "type": "JDA",
   "version": "${mangobot_version}",
