@@ -20,6 +20,12 @@ import org.mangorage.mangobotplugin.BotEventListener;
 import org.mangorage.mangobotplugin.actions.TrashButtonAction;
 import org.mangorage.mangobotplugin.commands.PingCommand;
 import org.mangorage.mangobotplugin.commands.PingsCommand;
+import org.mangorage.mangobotplugin.commands.music.commands.PauseCommand;
+import org.mangorage.mangobotplugin.commands.music.commands.PlayCommand;
+import org.mangorage.mangobotplugin.commands.music.commands.PlayingCommand;
+import org.mangorage.mangobotplugin.commands.music.commands.QueueCommand;
+import org.mangorage.mangobotplugin.commands.music.commands.StopCommand;
+import org.mangorage.mangobotplugin.commands.music.commands.VolumeCommand;
 import org.mangorage.mangobotplugin.commands.trick.TrickCommand;
 
 import java.nio.file.Path;
@@ -77,6 +83,13 @@ public final class MangoBot implements Plugin {
         commandManager.register(new PingCommand());
         commandManager.register(new TrickCommand(this));
         commandManager.register(new PingsCommand());
+
+        commandManager.register(new PauseCommand());
+        commandManager.register(new PlayCommand());
+        commandManager.register(new PlayingCommand());
+        commandManager.register(new QueueCommand());
+        commandManager.register(new StopCommand());
+        commandManager.register(new VolumeCommand());
     }
 
     @Override

@@ -72,9 +72,12 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
 
     installer('org.mangorage:installer:4.0.3')
-    bot('org.mangorage:mangobot:12.0.19')
+    bot('org.mangorage:mangobot:12.0.20')
 
     library('org.luaj:luaj-jse:3.0.1')
+
+    library('dev.arbjerg:lavaplayer:2.2.3')
+    library('dev.lavalink.youtube:common:1.12.0')
 }
 
 configurations.all {
