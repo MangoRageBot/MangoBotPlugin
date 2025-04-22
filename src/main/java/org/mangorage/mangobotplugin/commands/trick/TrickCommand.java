@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.utils.MarkdownSanitizer;
+import org.jetbrains.annotations.Nullable;
 import org.mangorage.commonutils.data.DataHandler;
 import org.mangorage.commonutils.jda.MessageSettings;
 import org.mangorage.commonutils.jda.slash.command.Command;
@@ -544,12 +545,13 @@ public class TrickCommand implements ICommand {
         return CommandResult.PASS;
     }
 
-    private void useTrick(Trick trick, Message message, MessageChannel channel, long guildID, Arguments args) {
+    private void useTrick(Trick trick, @Nullable Message message, MessageChannel channel, long guildID, Arguments args) {
         MessageSettings dMessage = plugin.getMessageSettings();
         var type = trick.getType();
-        var replyTarget = message.getMessageReference() == null ? null : message.getMessageReference().getMessage();
+        var replyTarget = message == null ? null : (message.getMessageReference() == null ? null : message.getMessageReference().getMessage());
         boolean shouldPing = false;
         if (replyTarget != null && replyTarget.getMember() != null) {
+            // No ping if hoisted UNLESS not staff.
             shouldPing = replyTarget.getMember().getRoles()
                     .stream().noneMatch((role) -> role.isHoisted() ^ role.getName().equals("Patreons"));
         }
