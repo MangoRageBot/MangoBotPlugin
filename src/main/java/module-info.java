@@ -7,4 +7,5 @@ module org.mangorage.mangobotplugin {
     requires net.minecraftforge.eventbus;
 
     exports org.mangorage.mangobotplugin.entrypoint;
+    exports org.mangorage.mangobotplugin.commands.trick;
 }
