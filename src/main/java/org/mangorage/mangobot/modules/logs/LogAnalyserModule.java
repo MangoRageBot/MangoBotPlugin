@@ -1,11 +1,13 @@
 package org.mangorage.mangobot.modules.logs;
 
+import java.util.List;
+
 import org.mangorage.mangobot.modules.logs.modules.BrokenDrivers;
 import org.mangorage.mangobot.modules.logs.modules.EarlyWindow;
 import org.mangorage.mangobot.modules.logs.modules.Java22;
+import org.mangorage.mangobot.modules.logs.modules.LastStack;
 import org.mangorage.mangobot.modules.logs.modules.MissingDeps;
-
-import java.util.List;
+import org.mangorage.mangobot.modules.logs.modules.RenewableLogAnalyser;
 
 public interface LogAnalyserModule {
 
@@ -18,6 +20,7 @@ public interface LogAnalyserModule {
 			new EarlyWindow(),
 			new Java22(),
 			new MissingDeps(),
+			new RenewableLogAnalyser(LastStack::new),
 			LogAnalyser.createModule(
 					(s, m) -> {
 						m.append("\n").append("This is a common issue on Modrinth Theseus. Modrinth's launcher has been known to be problematic in some cases with Forge. If you need to download a Modrinth format modpack you can use Prism Launcher, GDLauncher, ATLauncher, or others which are far more reliable.");
