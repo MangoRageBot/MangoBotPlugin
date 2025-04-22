@@ -2,6 +2,7 @@ package org.mangorage.mangobotplugin.commands.trick;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -98,7 +99,7 @@ public class TrickCommand implements ICommand {
                                 var gid = g.getIdLong();
                                 var trick = getTrick(valueOption.getAsString(), gid);
                                 if (trick != null) {
-                                    useTrick(trick, null, e.getChannel(), gid, Arguments.of());
+                                    useTrick(trick, e.getUser(), null, e.getChannel(), gid, Arguments.of());
                                     e.reply("Executed Trick!").setEphemeral(true).queue();
                                     return;
                                 }
@@ -190,12 +191,15 @@ public class TrickCommand implements ICommand {
         var guild = DEvent.getGuild();
         var user = DEvent.getUser();
         if (guild == null) {
-            DEvent.deferReply(true).setContent("""
+            DEvent.deferReply(true).setContent(
+                    """
                     Cannot Add Trick. Only works in guilds.
-                    """).queue();
+                    """
+            ).queue();
         } else {
             var modalID = DEvent.getModalId();
-            if (modalID.equals("trickcreation")) {
+            if (modalID.startsWith("trickcreation")) {
+                var isSilent = modalID.startsWith("trickcreation1");
                 var trickID = DEvent.getInteraction().getValue("trickid");
                 var content = DEvent.getInteraction().getValue("content");
                 if (trickID != null && content != null) {
@@ -207,6 +211,7 @@ public class TrickCommand implements ICommand {
                         newTrick.setOwnerID(user.getIdLong());
                         newTrick.setType(TrickType.NORMAL);
                         newTrick.setContent(content.getAsString());
+                        newTrick.setSuppress(isSilent);
                         save(newTrick);
                         TRICKS.put(new TrickKey(trickID.getAsString(), guild.getIdLong()), newTrick);
                         DEvent.reply("Created new trick '%s'!".formatted(trickID.getAsString())).queue();
@@ -450,7 +455,7 @@ public class TrickCommand implements ICommand {
             }
 
             var trick = getTrick(trickID, guildID);
-            useTrick(trick, message, message.getChannel(), guildID, args);
+            useTrick(trick, message.getAuthor(), message, message.getChannel(), guildID, args);
         } else if (type == TrickCMDType.LIST) {
             int length;
 
@@ -545,7 +550,7 @@ public class TrickCommand implements ICommand {
         return CommandResult.PASS;
     }
 
-    private void useTrick(Trick trick, @Nullable Message message, MessageChannel channel, long guildID, Arguments args) {
+    private void useTrick(Trick trick, User requester, @Nullable Message message, MessageChannel channel, long guildID, Arguments args) {
         MessageSettings dMessage = plugin.getMessageSettings();
         var type = trick.getType();
         var replyTarget = message == null ? null : (message.getMessageReference() == null ? null : message.getMessageReference().getMessage());
@@ -558,7 +563,7 @@ public class TrickCommand implements ICommand {
         if (type == TrickType.NORMAL) {
             dMessage.withButton(
                     dMessage.apply(channel.sendMessage(trick.getContent()))
-                            .setSuppressEmbeds(trick.isSuppressed()), MangoBot.ACTION_REGISTRY.get(TrashButtonAction.class).createForUser(message.getAuthor())
+                            .setSuppressEmbeds(trick.isSuppressed()), MangoBot.ACTION_REGISTRY.get(TrashButtonAction.class).createForUser(requester)
             ).setAllowedMentions(
                     Arrays.stream(Message.MentionType.values())
                             .filter(t -> {
@@ -574,7 +579,7 @@ public class TrickCommand implements ICommand {
             if (exists(trick.getAliasTarget(), guildID)) {
                 var alias = getTrick(trick.getAliasTarget(), guildID);
                 trick.use();
-                useTrick(alias, message, channel, guildID, args);
+                useTrick(alias, requester, message, channel, guildID, args);
             }
             // Cannot use Scripts with slash commands
         } else if (type == TrickType.SCRIPT && message != null) {

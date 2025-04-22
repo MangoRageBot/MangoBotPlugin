@@ -31,7 +31,6 @@ public final class BotEventListener {
         WatcherManager.onCommandAutoCompleteEvent(event);
     }
 
-
     @SubscribeEvent
     public void onModalInteract(ModalInteractionEvent event) {
         DiscordModalInteractionEvent.BUS.post(new DiscordModalInteractionEvent(event));
