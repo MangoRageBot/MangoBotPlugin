@@ -9,6 +9,11 @@ import java.util.List;
 
 public class PingCommand implements ICommand {
     @Override
+    public String id() {
+        return "ping";
+    }
+
+    @Override
     public List<String> commands() {
         return List.of("ping");
     }

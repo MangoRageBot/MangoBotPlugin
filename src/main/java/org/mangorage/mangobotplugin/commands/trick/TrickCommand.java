@@ -594,6 +594,11 @@ public class TrickCommand implements ICommand {
     }
 
     @Override
+    public String id() {
+        return "trick";
+    }
+
+    @Override
     public List<String> commands() {
         return List.of("trick");
     }
