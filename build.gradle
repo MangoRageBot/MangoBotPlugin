@@ -20,6 +20,10 @@ buildscript {
     }
 }
 
+plugins {
+    id 'org.gradlex.extra-java-module-info' version '1.12'
+}
+
 apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'java'
 apply plugin: 'MangoBotGradle'
@@ -29,6 +33,10 @@ group = 'org.mangorage'
 version = GitVersion.getGitVersion().getVersionAsString()
 
 println("Version: " + version)
+
+extraJavaModuleInfo {
+    setDeriveAutomaticModuleNamesFromFileNames(true)
+}
 
 java {
     toolchain {
@@ -44,6 +52,7 @@ tasks.withType(JavaExec).configureEach {
 
 repositories {
     mavenCentral()
+    mavenLocal()
     maven {
         url = 'https://maven.minecraftforge.net/'
     }
@@ -63,11 +72,9 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
 
     installer('org.mangorage:installer:4.0.3')
-    bot('org.mangorage:mangobot:11.0.75')
+    bot('org.mangorage:mangobot:12.0.0')
 
     library('org.luaj:luaj-jse:3.0.1')
-    library('dev.arbjerg:lavaplayer:2.2.2')
-    library('dev.lavalink.youtube:common:1.11.3')
 }
 
 configurations.all {
