@@ -1,6 +1,7 @@
 package org.mangorage.mangobotplugin;
 
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -24,6 +25,12 @@ public final class BotEventListener {
     public void onInteraction(SlashCommandInteractionEvent event) {
         WatcherManager.onCommandEvent(event);
     }
+
+    @SubscribeEvent
+    public void onSlashAuto(CommandAutoCompleteInteractionEvent event) {
+        WatcherManager.onCommandAutoCompleteEvent(event);
+    }
+
 
     @SubscribeEvent
     public void onModalInteract(ModalInteractionEvent event) {
