@@ -19,6 +19,7 @@ import org.mangorage.mangobotcore.plugin.api.Plugin;
 import org.mangorage.mangobotplugin.BotEventListener;
 import org.mangorage.mangobotplugin.actions.TrashButtonAction;
 import org.mangorage.mangobotplugin.commands.PingCommand;
+import org.mangorage.mangobotplugin.commands.PingsCommand;
 import org.mangorage.mangobotplugin.commands.trick.TrickCommand;
 
 import java.nio.file.Path;
@@ -75,6 +76,7 @@ public final class MangoBot implements Plugin {
 
         commandManager.register(new PingCommand());
         commandManager.register(new TrickCommand(this));
+        commandManager.register(new PingsCommand());
     }
 
     @Override
