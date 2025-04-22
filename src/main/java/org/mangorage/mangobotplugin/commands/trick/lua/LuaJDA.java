@@ -2,7 +2,7 @@ package org.mangorage.mangobotplugin.commands.trick.lua;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import org.mangorage.mangobotplugin.MangoBot;
+import org.mangorage.mangobotplugin.entrypoint.MangoBot;
 import org.mangorage.mangobotplugin.commands.trick.Trick;
 import org.mangorage.mangobotplugin.commands.trick.TrickCommand;
 import org.mangorage.mangobotplugin.commands.trick.lua.builders.LuaEmbedBuilder;

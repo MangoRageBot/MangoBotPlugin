@@ -6,5 +6,5 @@ module org.mangorage.mangobotplugin {
 
     requires net.minecraftforge.eventbus;
 
-    opens org.mangorage.mangobotplugin to org.mangorage.mangobotcore;
+    exports org.mangorage.mangobotplugin.entrypoint;
 }

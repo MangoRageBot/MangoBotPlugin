@@ -24,7 +24,7 @@ import org.mangorage.mangobotcore.jda.command.api.ICommand;
 import org.mangorage.mangobotcore.jda.event.CommandEvent;
 import org.mangorage.mangobotcore.jda.event.DiscordButtonInteractEvent;
 import org.mangorage.mangobotcore.jda.event.DiscordModalInteractionEvent;
-import org.mangorage.mangobotplugin.MangoBot;
+import org.mangorage.mangobotplugin.entrypoint.MangoBot;
 import org.mangorage.mangobotplugin.actions.TrashButtonAction;
 
 import java.util.Arrays;

@@ -1,4 +1,4 @@
-package org.mangorage.mangobotplugin;
+package org.mangorage.mangobotplugin.entrypoint;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -16,6 +16,7 @@ import org.mangorage.commonutils.jda.MessageSettings;
 import org.mangorage.mangobotcore.jda.command.api.CommandManager;
 import org.mangorage.mangobotcore.plugin.api.MangoBotPlugin;
 import org.mangorage.mangobotcore.plugin.api.Plugin;
+import org.mangorage.mangobotplugin.BotEventListener;
 import org.mangorage.mangobotplugin.actions.TrashButtonAction;
 import org.mangorage.mangobotplugin.commands.PingCommand;
 import org.mangorage.mangobotplugin.commands.trick.TrickCommand;

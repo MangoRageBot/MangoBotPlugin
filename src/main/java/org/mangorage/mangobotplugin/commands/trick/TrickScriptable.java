@@ -33,7 +33,7 @@ import org.luaj.vm2.lib.PackageLib;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.luaj.vm2.lib.jse.JseBaseLib;
 import org.luaj.vm2.lib.jse.JseMathLib;
-import org.mangorage.mangobotplugin.MangoBot;
+import org.mangorage.mangobotplugin.entrypoint.MangoBot;
 import org.mangorage.mangobotplugin.commands.trick.lua.LuaJDA;
 import org.mangorage.mangobotplugin.commands.trick.lua.objects.LuaStringArray;
 
