@@ -72,7 +72,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
 
     installer('org.mangorage:installer:4.0.3')
-    bot('org.mangorage:mangobot:12.0.9')
+    bot('org.mangorage:mangobot:12.0.10')
 
     library('org.luaj:luaj-jse:3.0.1')
 }
