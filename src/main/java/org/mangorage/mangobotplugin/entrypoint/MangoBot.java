@@ -20,6 +20,7 @@ import org.mangorage.mangobotplugin.BotEventListener;
 import org.mangorage.mangobotplugin.actions.TrashButtonAction;
 import org.mangorage.mangobotplugin.commands.PingCommand;
 import org.mangorage.mangobotplugin.commands.PingsCommand;
+import org.mangorage.mangobotplugin.commands.internal.EmojiCommand;
 import org.mangorage.mangobotplugin.commands.music.commands.PauseCommand;
 import org.mangorage.mangobotplugin.commands.music.commands.PlayCommand;
 import org.mangorage.mangobotplugin.commands.music.commands.PlayingCommand;
@@ -79,6 +80,8 @@ public final class MangoBot implements Plugin {
 
     public MangoBot() {
         ACTION_REGISTRY.register(new TrashButtonAction());
+
+        commandManager.register(new EmojiCommand());
 
         commandManager.register(new PingCommand());
         commandManager.register(new TrickCommand(this));
