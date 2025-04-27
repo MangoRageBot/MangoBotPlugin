@@ -118,6 +118,8 @@ public final class MangoBot implements Plugin {
                 .build();
 
         getJDA().addEventListener(new BotEventListener(this));
+
+        System.out.println("Launched");
     }
 
     public JDA getJDA() {

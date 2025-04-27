@@ -1,5 +1,6 @@
 package org.mangorage.mangobotplugin.commands.trick;
 
+import com.google.gson.GsonBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
