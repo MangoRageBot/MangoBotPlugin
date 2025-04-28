@@ -13,6 +13,7 @@ import org.mangorage.commonutils.config.ConfigSetting;
 import org.mangorage.commonutils.config.ISetting;
 import org.mangorage.commonutils.jda.ButtonActionRegistry;
 import org.mangorage.commonutils.jda.MessageSettings;
+import org.mangorage.commonutils.jda.slash.command.Command;
 import org.mangorage.mangobotcore.jda.command.api.CommandManager;
 import org.mangorage.mangobotcore.plugin.api.MangoBotPlugin;
 import org.mangorage.mangobotcore.plugin.api.Plugin;
@@ -118,6 +119,11 @@ public final class MangoBot implements Plugin {
                 .build();
 
         getJDA().addEventListener(new BotEventListener(this));
+
+        jda.updateCommands()
+                .addCommands(
+                        Command.globalCommands
+                ).queue();
 
         System.out.println("Launched");
     }
