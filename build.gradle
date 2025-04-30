@@ -3,6 +3,7 @@ import org.mangorage.mangobotgradle.util.GitVersion
 buildscript {
     repositories {
         mavenCentral()
+        mavenLocal()
         maven {
             url = uri("https://plugins.gradle.org/m2/")
         }
@@ -16,7 +17,7 @@ buildscript {
 
     dependencies {
         classpath 'gradle.plugin.com.github.johnrengelman:shadow:7.1.2'
-        classpath 'org.mangorage:MangoBotGradle:5.0.6'
+        classpath 'org.mangorage:MangoBotGradle:6.0.2'
     }
 }
 
@@ -36,18 +37,6 @@ println("Version: " + version)
 
 extraJavaModuleInfo {
     setDeriveAutomaticModuleNamesFromFileNames(true)
-}
-
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(24)
-    }
-}
-
-tasks.withType(JavaExec).configureEach {
-    javaLauncher.set(javaToolchains.launcherFor {
-        languageVersion.set(JavaLanguageVersion.of(24))
-    })
 }
 
 repositories {
@@ -71,19 +60,12 @@ dependencies {
     testImplementation platform('org.junit:junit-bom:5.9.1')
     testImplementation 'org.junit.jupiter:junit-jupiter'
 
-    installer('org.mangorage:installer:4.0.3')
-    bot('org.mangorage:mangobot:12.0.28')
+    installer('org.mangorage:installer:4.0.13')
+    bot('org.mangorage:mangobot:12.0.29')
 
     library('org.luaj:luaj-jse:3.0.1')
-
     library('dev.arbjerg:lavaplayer:2.2.3')
     library('dev.lavalink.youtube:common:1.12.0')
-}
-
-configurations.all {
-    resolutionStrategy {
-        force 'com.google.code.gson:gson:2.11.+'
-    }
 }
 
 test {
