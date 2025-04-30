@@ -17,7 +17,7 @@ buildscript {
 
     dependencies {
         classpath 'gradle.plugin.com.github.johnrengelman:shadow:7.1.2'
-        classpath 'org.mangorage:MangoBotGradle:6.0.2'
+        classpath 'org.mangorage:MangoBotGradle:6.0.6'
     }
 }
 
@@ -61,7 +61,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
 
     installer('org.mangorage:installer:4.0.13')
-    bot('org.mangorage:mangobot:12.0.29')
+    bot('org.mangorage:mangobot:12.0.36')
 
     library('org.luaj:luaj-jse:3.0.1')
     library('dev.arbjerg:lavaplayer:2.2.3')
