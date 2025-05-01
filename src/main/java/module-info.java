@@ -16,6 +16,8 @@ module org.mangorage.mangobotplugin {
     exports org.mangorage.mangobotplugin.entrypoint;
     exports org.mangorage.mangobotplugin.commands.trick;
 
+    exports org.mangorage.mangobotplugin to net.dv8tion.jda;
+
     opens org.mangorage.mangobotplugin.commands.trick to com.google.gson;
     opens org.mangorage.mangobotplugin.commands.trick.lua to com.google.gson;
 
