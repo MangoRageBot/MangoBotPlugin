@@ -3,7 +3,6 @@ module org.mangorage.mangobotplugin {
 
     requires net.dv8tion.jda;
     requires com.google.gson;
-    requires static luaj.jse;
     requires jdk.unsupported;
 
     requires net.minecraftforge.eventbus;
