@@ -14,6 +14,7 @@ import org.mangorage.commonutils.config.ISetting;
 import org.mangorage.commonutils.jda.ButtonActionRegistry;
 import org.mangorage.commonutils.jda.MessageSettings;
 import org.mangorage.commonutils.jda.slash.command.Command;
+import org.mangorage.entrypoint.MangoBotCore;
 import org.mangorage.mangobotcore.jda.command.api.CommandManager;
 import org.mangorage.mangobotcore.plugin.api.MangoBotPlugin;
 import org.mangorage.mangobotcore.plugin.api.Plugin;
