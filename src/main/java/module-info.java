@@ -18,4 +18,7 @@ module org.mangorage.mangobotplugin {
 
     opens org.mangorage.mangobotplugin.commands.trick to com.google.gson;
     opens org.mangorage.mangobotplugin.commands.trick.lua to com.google.gson;
+
+    provides org.mangorage.mangobotcore.plugin.api.Plugin with org.mangorage.mangobotplugin.entrypoint.MangoBot;
+    uses org.mangorage.mangobotcore.plugin.api.Plugin;
 }
