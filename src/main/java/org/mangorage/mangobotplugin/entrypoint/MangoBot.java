@@ -125,7 +125,7 @@ public final class MangoBot implements Plugin {
                 .addCommands(
                         Command.globalCommands
                 ).queue();
-
+        
         System.out.println("Launched");
     }
 

@@ -11,6 +11,7 @@ module org.mangorage.mangobotplugin {
     requires static lavaplayer;
     requires static common;
     requires java.desktop;
+    requires luaj.jme;
 
 
     exports org.mangorage.mangobotplugin.entrypoint;

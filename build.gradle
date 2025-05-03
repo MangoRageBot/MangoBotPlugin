@@ -67,6 +67,9 @@ dependencies {
 
 //    library('org.classdump.luna:luna-all-shaded:0.4.1')
 
+
+    library('org.luaj:luaj-jme:3.0.1')
+
     library('dev.arbjerg:lavaplayer:2.2.3')
     library('dev.lavalink.youtube:common:1.12.0')
 }
