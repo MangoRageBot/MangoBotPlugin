@@ -30,8 +30,8 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.utils.MarkdownUtil;
 import org.jetbrains.annotations.NotNull;
-import org.mangorage.commonutils.log.LogHelper;
 import org.mangorage.commonutils.misc.Arguments;
 import org.mangorage.mangobotcore.jda.command.api.CommandResult;
 import org.mangorage.mangobotcore.jda.command.api.ICommand;
@@ -40,7 +40,7 @@ import org.mangorage.mangobotplugin.commands.music.MusicUtil;
 
 import java.util.List;
 
-public class PlayCommand implements ICommand {
+public final class PlayCommand implements ICommand {
     @Override
     public String id() {
         return "play";
@@ -59,11 +59,8 @@ public class PlayCommand implements ICommand {
     @NotNull
     @Override
     public CommandResult execute(Message message, Arguments arg) {
-        String[] args = arg.getArgs();
-
         if (!message.isFromGuild()) return CommandResult.GUILD_ONLY;
 
-        String URL = args[0];
         MessageChannelUnion channel = message.getChannel();
         Guild guild = message.getGuild();
         Member member = message.getMember();
@@ -75,58 +72,25 @@ public class PlayCommand implements ICommand {
         if (voiceState == null) return CommandResult.FAIL;
         MusicPlayer player = MusicPlayer.getInstance(guild.getId());
 
-        if (voiceState.inAudioChannel()) {
-            if (!URL.isEmpty()) {
-                if (!player.isPlaying()) {
-                    try {
-                        player.load(String.join(" ", args), e -> {
-                            switch (e.getReason()) {
-                                case SUCCESS -> {
-                                    MusicUtil.connectToAudioChannel(voiceState.getChannel().asVoiceChannel());
-                                    player.add(e.getTrack());
-                                    player.play();
-                                    MessageEmbed embed = new EmbedBuilder()
-                                            .setTitle(e.getTrack().getInfo().title, e.getTrack().getInfo().uri)
-                                            .build();
-                                    channel.sendMessage("Playing: ").addEmbeds(embed).queue();
-                                }
-                                case FAILED -> {
-                                    channel.sendMessage("Failed").queue();
-                                }
-                                case NO_MATCHES -> {
-                                    channel.sendMessage("No matches was found!").queue();
-                                }
-                            }
-                        });
-                    } catch (Exception e) {
-                        LogHelper.error(e.getMessage());
-                        e.getStackTrace();
-                    }
-                } else
-                    channel.sendMessage("Already playing!").queue();
-            } else {
-                if (player.isPlaying()) {
-                    player.resume();
-                    AudioTrack track = player.getPlaying();
-                    MessageEmbed embed = new EmbedBuilder()
-                            .setTitle(track.getInfo().title, track.getInfo().uri)
-                            .build();
-                    channel.sendMessage("Resumed playing: ").addEmbeds(embed).queue();
-                } else {
-                    if (!player.isQueueEmpty()) {
-                        MusicUtil.connectToAudioChannel(voiceState.getChannel().asVoiceChannel());
-                        player.play();
-                        AudioTrack track = player.getPlaying();
-                        MessageEmbed embed = new EmbedBuilder()
-                                .setTitle(track.getInfo().title, track.getInfo().uri)
-                                .build();
-                        channel.sendMessage("Started playing: ").addEmbeds(embed).queue();
-                    } else
-                        channel.sendMessage("Nothing is currently playing.").queue();
-                }
-            }
-        } else
-            channel.sendMessage("Must be in a voice channel!").queue();
+
+        if (!voiceState.inAudioChannel()) {
+            message.reply("Must be in a Voice Channel!").queue();
+            return CommandResult.PASS;
+        }
+
+        if (player.isPlaying() && !player.isPaused()) return CommandResult.PASS;
+
+        MusicUtil.connectToAudioChannel(voiceState.getChannel().asVoiceChannel());
+
+        player.resume();
+
+        AudioTrack track = player.getPlaying();
+        channel.sendMessage(
+                """
+                Playing:
+                %s/%s
+                %s
+                """.formatted(MusicUtil.formatDuration(track.getPosition()), MusicUtil.formatDuration(track.getDuration()),  MarkdownUtil.maskedLink(track.getInfo().title, track.getInfo().uri))).queue();
 
         return CommandResult.PASS;
     }

@@ -28,15 +28,17 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.utils.MarkdownUtil;
 import org.jetbrains.annotations.NotNull;
 import org.mangorage.commonutils.misc.Arguments;
 import org.mangorage.mangobotcore.jda.command.api.CommandResult;
 import org.mangorage.mangobotcore.jda.command.api.ICommand;
 import org.mangorage.mangobotplugin.commands.music.MusicPlayer;
+import org.mangorage.mangobotplugin.commands.music.MusicUtil;
 
 import java.util.List;
 
-public class PlayingCommand implements ICommand {
+public final class PlayingCommand implements ICommand {
     @Override
     public String id() {
         return "playing";
@@ -49,7 +51,7 @@ public class PlayingCommand implements ICommand {
 
     @Override
     public String usage() {
-        return "Playing Usage: N/A";
+        return "Playing Usage: !playing";
     }
 
     @NotNull
@@ -61,11 +63,13 @@ public class PlayingCommand implements ICommand {
         if (MusicPlayer.getInstance(guild.getId()).isPlaying()) {
             AudioTrack track = MusicPlayer.getInstance(guild.getId()).getPlaying();
 
+            channel.sendMessage(
+                    """
+                    Playing:
+                    %s/%s
+                    %s
+                    """.formatted(MusicUtil.formatDuration(track.getPosition()), MusicUtil.formatDuration(track.getDuration()),  MarkdownUtil.maskedLink(track.getInfo().title, track.getInfo().uri))).queue();
 
-            MessageEmbed embed = new EmbedBuilder()
-                    .setTitle(track.getInfo().title, track.getInfo().uri)
-                    .build();
-            channel.sendMessageFormat("Playing (%s / %s): ", track.getPosition(), track.getDuration()).addEmbeds(embed).queue();
         }
 
         return CommandResult.PASS;

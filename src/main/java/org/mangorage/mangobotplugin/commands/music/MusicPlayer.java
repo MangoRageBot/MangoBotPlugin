@@ -40,6 +40,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.List;
 import java.util.function.Consumer;
 
 public final class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
@@ -56,7 +57,7 @@ public final class MusicPlayer extends AudioEventAdapter implements AudioSendHan
 
     private final DefaultAudioPlayerManager manager;
     private final DefaultAudioPlayer audioPlayer;
-    private final Deque<AudioTrack> TRACKS_QUEUE = new ArrayDeque<>();
+    private final Deque<AudioTrack> tracks = new ArrayDeque<>();
     private final String guildID;
     private AudioStatus status = AudioStatus.STOPPED;
     private AudioFrame lastFrame;
@@ -86,8 +87,12 @@ public final class MusicPlayer extends AudioEventAdapter implements AudioSendHan
         return audioPlayer.getPlayingTrack() != null;
     }
 
+    public boolean isPaused() {
+        return audioPlayer.isPaused();
+    }
+
     public boolean isQueueEmpty() {
-        return TRACKS_QUEUE.isEmpty();
+        return tracks.isEmpty();
     }
 
     public void load(String URL, Consumer<AudioTrackEvent> eventConsumer) {
@@ -96,28 +101,27 @@ public final class MusicPlayer extends AudioEventAdapter implements AudioSendHan
             manager.loadItem(new AudioReference(URL.trim(), null), new AudioLoadResultHandler() {
                 @Override
                 public void trackLoaded(AudioTrack track) {
+                    add(track);
                     eventConsumer.accept(new AudioTrackEvent(track, AudioTrackEvent.Info.SUCCESS));
-                    System.out.println("LOL");
                 }
 
                 @Override
                 public void playlistLoaded(AudioPlaylist playlist) {
-                    // Allow playlists maybe?
+                    playlist.getTracks().forEach(track -> {
+                        add(track);
+                    });
                     eventConsumer.accept(new AudioTrackEvent(playlist.getSelectedTrack(), AudioTrackEvent.Info.SUCCESS));
-                    System.out.println("LOL");
                 }
 
                 @Override
                 public void noMatches() {
                     eventConsumer.accept(new AudioTrackEvent(null, AudioTrackEvent.Info.NO_MATCHES));
-                    System.out.println("LOL");
                 }
 
                 @Override
                 public void loadFailed(FriendlyException exception) {
                     eventConsumer.accept(new AudioTrackEvent(null, AudioTrackEvent.Info.FAILED));
                     LogHelper.info(exception.getMessage());
-                    exception.printStackTrace();
                 }
             });
         } catch (Throwable e) {
@@ -129,18 +133,22 @@ public final class MusicPlayer extends AudioEventAdapter implements AudioSendHan
         return this.status;
     }
 
+    public List<AudioTrack> getTracks() {
+        return tracks.stream().toList();
+    }
+
     public void play() {
-        AudioTrack track = TRACKS_QUEUE.poll();
+        AudioTrack track = tracks.poll();
         if (track != null)
             audioPlayer.playTrack(track);
     }
 
     public void playNext() {
-
+        play();
     }
 
     public void add(AudioTrack track) {
-        TRACKS_QUEUE.add(track);
+        tracks.add(track);
     }
 
     public void pause() {
@@ -149,6 +157,8 @@ public final class MusicPlayer extends AudioEventAdapter implements AudioSendHan
 
     public void resume() {
         audioPlayer.setPaused(false);
+        if (audioPlayer.getPlayingTrack() == null)
+            playNext();
     }
 
     public void stop() {

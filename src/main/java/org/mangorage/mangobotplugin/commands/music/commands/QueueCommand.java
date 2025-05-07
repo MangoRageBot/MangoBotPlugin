@@ -22,20 +22,27 @@
 
 package org.mangorage.mangobotplugin.commands.music.commands;
 
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.utils.MarkdownUtil;
 import org.jetbrains.annotations.NotNull;
 import org.mangorage.commonutils.misc.Arguments;
 import org.mangorage.mangobotcore.jda.command.api.CommandResult;
 import org.mangorage.mangobotcore.jda.command.api.ICommand;
+import org.mangorage.mangobotplugin.PagedListManager;
 import org.mangorage.mangobotplugin.commands.music.MusicPlayer;
+import org.mangorage.mangobotplugin.commands.music.MusicUtil;
 
 import java.util.List;
 
 public class QueueCommand implements ICommand {
+    private final PagedListManager pagedListManager;
+
+    public QueueCommand(PagedListManager pagedListManager) {
+        this.pagedListManager = pagedListManager;
+    }
+
     @Override
     public String id() {
         return "queue";
@@ -48,37 +55,41 @@ public class QueueCommand implements ICommand {
 
     @Override
     public String usage() {
-        return "Queue Usage: N/A";
+        return """
+                Queue Usage:
+                
+                !queue
+                !queue url
+                """;
     }
 
     @NotNull
     @Override
-    public CommandResult execute(Message message, Arguments arg) {
-        String[] args = arg.getArgs();
-        String URL = args[0];
+    public CommandResult execute(Message message, Arguments args) {
         MessageChannelUnion channel = message.getChannel();
         Guild guild = message.getGuild();
         MusicPlayer player = MusicPlayer.getInstance(guild.getId());
 
+        if (args.getArgs().length == 0) {
+            MusicUtil.sendSongs(channel, pagedListManager, player);
+            return CommandResult.PASS;
+        }
+
+        String URL = args.getFrom(0);
+
         if (URL != null) {
             player.load(URL, e -> {
-                /**
-                 MessageEmbed embed = new EmbedBuilder()
-                 .setTitle(track.getInfo().title, track.getInfo().uri)
-                 .build();
-                 channel.sendMessage("Playing: ").addEmbeds(embed).queue();
-
-
-                 channel.sendMessage("Queued: " + track.getInfo().title).queue();
-                 **/
                 switch (e.getReason()) {
                     case SUCCESS -> {
-                        player.add(e.getTrack());
-                        MessageEmbed embed = new EmbedBuilder()
-                                .setTitle(e.getTrack().getInfo().title, e.getTrack().getInfo().uri)
-                                .build();
-                        channel.sendMessage("Added to Queue: ").addEmbeds(embed).queue();
-
+                        channel.sendMessage(
+                                """
+                                send '!queue' to see list of songs in queue!
+                                send '!play' to have bot join and start playing next song!
+                                
+                                
+                                Added to Queue:
+                                %s
+                                """.formatted(MarkdownUtil.maskedLink(e.getTrack().getInfo().title, e.getTrack().getInfo().uri))).queue();
                     }
                     case FAILED -> {
                         channel.sendMessage("Failed").queue();

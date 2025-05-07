@@ -71,7 +71,7 @@ dependencies {
     installer('org.mangorage:installer:4.0.13')
 
     bootstrap("org.mangorage:mangobotbootstrap:1.0.22")
-    plugin('org.mangorage:mangobot:12.0.57')
+    plugin('org.mangorage:mangobot:12.0.61')
 
     library 'org.slf4j:slf4j-simple:2.0.13' // Use a recent version)
     library('org.luaj:luaj-jme:3.0.1')

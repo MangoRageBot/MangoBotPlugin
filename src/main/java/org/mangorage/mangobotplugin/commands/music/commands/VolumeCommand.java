@@ -52,18 +52,17 @@ public class VolumeCommand implements ICommand {
     @NotNull
     @Override
     public CommandResult execute(Message message, Arguments args) {
-        String VOLUME = args.getOrDefault(0, "10");
         MessageChannelUnion channel = message.getChannel();
         Guild guild = message.getGuild();
         CommandResult result = CommandResult.FAIL;
 
         try {
-            int volume = Integer.valueOf(VOLUME);
-            if (volume <= 100) {
+            int volume = Integer.valueOf(args.getOrDefault(0, "10"));
+            if (volume <= 200) {
                 MusicPlayer.getInstance(guild.getId()).setVolume(volume);
                 channel.sendMessage("Volume set to " + volume).queue();
             } else
-                channel.sendMessage("Max Volume allowed is 30").queue();
+                channel.sendMessage("Max Volume allowed is 200").queue();
 
             result = CommandResult.PASS;
         } catch (NumberFormatException e) {

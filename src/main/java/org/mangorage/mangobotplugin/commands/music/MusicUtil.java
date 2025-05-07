@@ -27,8 +27,18 @@ import dev.lavalink.youtube.YoutubeAudioSourceManager;
 import net.dv8tion.jda.api.audio.SpeakingMode;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.managers.AudioManager;
+import net.dv8tion.jda.api.utils.MarkdownUtil;
 import org.mangorage.commonutils.log.LogHelper;
+import org.mangorage.commonutils.misc.PagedList;
+import org.mangorage.commonutils.misc.RunnableTask;
+import org.mangorage.commonutils.misc.TaskScheduler;
+import org.mangorage.mangobotplugin.PagedListManager;
+import org.mangorage.mangobotplugin.PagedListWithAction;
+
+import java.util.concurrent.TimeUnit;
 
 public class MusicUtil {
     public static void connectToAudioChannel(VoiceChannel channel) {
@@ -75,5 +85,56 @@ public class MusicUtil {
 
     public static void registerRemoteSources(AudioPlayerManager playerManager) {
         playerManager.registerSourceManager(new YoutubeAudioSourceManager());
+    }
+
+    public static String formatDuration(long millis) {
+        long seconds = millis / 1000;
+        long hours = seconds / 3600;
+        long minutes = (seconds % 3600) / 60;
+        long secs = seconds % 60;
+
+        StringBuilder sb = new StringBuilder();
+        if (hours > 0) sb.append(hours).append("h ");
+        if (minutes > 0) sb.append(minutes).append("m ");
+        if (secs > 0 || sb.length() == 0) sb.append(secs).append("s");
+
+        return sb.toString().trim();
+    }
+
+    private static String getResult(PagedList.Page<String> page, int currentPage, int totalPage) {
+        return """
+                Song: (%s/%s)
+                %s
+                """.formatted(currentPage, totalPage, page.getEntries()[0]);
+    }
+
+    public static void sendSongs(MessageChannel channel, PagedListManager listManager, MusicPlayer player) {
+        var songs = player
+                .getTracks()
+                .stream()
+                .map(track -> {
+                    return MarkdownUtil.maskedLink(track.getInfo().title, track.getInfo().uri);
+                })
+                .toArray(String[]::new);
+
+
+        channel.sendMessage(
+                        """
+                        Getting List... 
+                        """
+        ).queue(m -> {
+            var list = new PagedListWithAction((page, current, total) -> {
+                m.editMessage(getResult(page, current, total)).queue();
+            });
+
+            list.get().rebuild(songs, 1);
+
+            Button prev = Button.primary("prev".formatted(m.getId()), "previous");
+            Button next = Button.primary("next".formatted(m.getId()), "next");
+
+            m.editMessage(getResult(list.get().current(), list.get().getPage(), list.get().totalPages())).setActionRow(prev, next).queue();
+
+            listManager.putList(m.getId(), list);
+        });
     }
 }

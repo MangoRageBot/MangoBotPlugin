@@ -18,6 +18,7 @@ import org.mangorage.mangobotcore.jda.command.api.CommandManager;
 import org.mangorage.mangobotcore.plugin.api.MangoBotPlugin;
 import org.mangorage.mangobotcore.plugin.api.Plugin;
 import org.mangorage.mangobotplugin.BotEventListener;
+import org.mangorage.mangobotplugin.PagedListManager;
 import org.mangorage.mangobotplugin.actions.TrashButtonAction;
 import org.mangorage.mangobotplugin.commands.PingCommand;
 import org.mangorage.mangobotplugin.commands.PingsCommand;
@@ -26,6 +27,7 @@ import org.mangorage.mangobotplugin.commands.music.commands.PauseCommand;
 import org.mangorage.mangobotplugin.commands.music.commands.PlayCommand;
 import org.mangorage.mangobotplugin.commands.music.commands.PlayingCommand;
 import org.mangorage.mangobotplugin.commands.music.commands.QueueCommand;
+import org.mangorage.mangobotplugin.commands.music.commands.SkipCommand;
 import org.mangorage.mangobotplugin.commands.music.commands.StopCommand;
 import org.mangorage.mangobotplugin.commands.music.commands.VolumeCommand;
 import org.mangorage.mangobotplugin.commands.trick.TrickCommand;
@@ -76,6 +78,7 @@ public final class MangoBot implements Plugin {
     );
 
     private final CommandManager commandManager = CommandManager.create();
+    private final PagedListManager pagedListManager = new PagedListManager();
 
     private JDA jda;
 
@@ -92,9 +95,10 @@ public final class MangoBot implements Plugin {
         commandManager.register(new PauseCommand());
         commandManager.register(new PlayCommand());
         commandManager.register(new PlayingCommand());
-        commandManager.register(new QueueCommand());
+        commandManager.register(new QueueCommand(pagedListManager));
         commandManager.register(new StopCommand());
         commandManager.register(new VolumeCommand());
+        commandManager.register(new SkipCommand());
     }
 
     @Override
@@ -135,6 +139,10 @@ public final class MangoBot implements Plugin {
 
     public CommandManager getCommandManager() {
         return commandManager;
+    }
+
+    public PagedListManager getPagedListManager() {
+        return pagedListManager;
     }
 
     public Path getPluginDirectory() {
