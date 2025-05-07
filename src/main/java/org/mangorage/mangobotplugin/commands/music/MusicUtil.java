@@ -22,14 +22,7 @@
 
 package org.mangorage.mangobotplugin.commands.music;
 
-import com.sedmelluq.discord.lavaplayer.container.MediaContainerRegistry;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.source.bandcamp.BandcampAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.beam.BeamAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.getyarn.GetyarnAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.http.HttpAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.vimeo.VimeoAudioSourceManager;
 import dev.lavalink.youtube.YoutubeAudioSourceManager;
 import net.dv8tion.jda.api.audio.SpeakingMode;
 import net.dv8tion.jda.api.entities.Guild;
@@ -59,6 +52,7 @@ public class MusicUtil {
     }
 
     public static void connectToAudioChannelNoMusic(VoiceChannel channel) {
+
         try {
             Guild guild = channel.getGuild();
             AudioManager audioManager = guild.getAudioManager();
@@ -80,14 +74,6 @@ public class MusicUtil {
     }
 
     public static void registerRemoteSources(AudioPlayerManager playerManager) {
-        var containerRegistry = MediaContainerRegistry.DEFAULT_REGISTRY;
         playerManager.registerSourceManager(new YoutubeAudioSourceManager());
-        playerManager.registerSourceManager(SoundCloudAudioSourceManager.createDefault());
-        playerManager.registerSourceManager(new BandcampAudioSourceManager());
-        playerManager.registerSourceManager(new VimeoAudioSourceManager());
-        // playerManager.registerSourceManager(new TwitchStreamAudioSourceManager());
-        playerManager.registerSourceManager(new BeamAudioSourceManager());
-        playerManager.registerSourceManager(new GetyarnAudioSourceManager());
-        playerManager.registerSourceManager(new HttpAudioSourceManager(containerRegistry));
     }
 }

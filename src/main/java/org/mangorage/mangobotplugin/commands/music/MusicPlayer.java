@@ -42,7 +42,7 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.function.Consumer;
 
-public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
+public final class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
     private static final HashMap<String, MusicPlayer> MUSIC_PLAYERS = new HashMap<>();
 
     public static MusicPlayer getInstance(String guildID) {
@@ -92,28 +92,37 @@ public class MusicPlayer extends AudioEventAdapter implements AudioSendHandler {
 
     public void load(String URL, Consumer<AudioTrackEvent> eventConsumer) {
 
-        manager.loadItem(new AudioReference(URL.trim(), null), new AudioLoadResultHandler() {
-            @Override
-            public void trackLoaded(AudioTrack track) {
-                eventConsumer.accept(new AudioTrackEvent(track, AudioTrackEvent.Info.SUCCESS));
-            }
+        try {
+            manager.loadItem(new AudioReference(URL.trim(), null), new AudioLoadResultHandler() {
+                @Override
+                public void trackLoaded(AudioTrack track) {
+                    eventConsumer.accept(new AudioTrackEvent(track, AudioTrackEvent.Info.SUCCESS));
+                    System.out.println("LOL");
+                }
 
-            @Override
-            public void playlistLoaded(AudioPlaylist playlist) {
-                // Allow playlists maybe?
-            }
+                @Override
+                public void playlistLoaded(AudioPlaylist playlist) {
+                    // Allow playlists maybe?
+                    eventConsumer.accept(new AudioTrackEvent(playlist.getSelectedTrack(), AudioTrackEvent.Info.SUCCESS));
+                    System.out.println("LOL");
+                }
 
-            @Override
-            public void noMatches() {
-                eventConsumer.accept(new AudioTrackEvent(null, AudioTrackEvent.Info.NO_MATCHES));
-            }
+                @Override
+                public void noMatches() {
+                    eventConsumer.accept(new AudioTrackEvent(null, AudioTrackEvent.Info.NO_MATCHES));
+                    System.out.println("LOL");
+                }
 
-            @Override
-            public void loadFailed(FriendlyException exception) {
-                eventConsumer.accept(new AudioTrackEvent(null, AudioTrackEvent.Info.FAILED));
-                LogHelper.info(exception.getMessage());
-            }
-        });
+                @Override
+                public void loadFailed(FriendlyException exception) {
+                    eventConsumer.accept(new AudioTrackEvent(null, AudioTrackEvent.Info.FAILED));
+                    LogHelper.info(exception.getMessage());
+                    exception.printStackTrace();
+                }
+            });
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
     }
 
     public AudioStatus getStatus() {

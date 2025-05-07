@@ -8,10 +8,12 @@ module org.mangorage.mangobotplugin {
     requires net.minecraftforge.eventbus;
     requires org.jetbrains.annotations;
 
-    requires static lavaplayer;
-    requires static common;
+    requires lavaplayer;
+    requires common;
+
     requires java.desktop;
     requires luaj.jme;
+    requires org.apache.logging.log4j;
 
 
     exports org.mangorage.mangobotplugin.entrypoint;
@@ -21,6 +23,9 @@ module org.mangorage.mangobotplugin {
 
     opens org.mangorage.mangobotplugin.commands.trick to com.google.gson;
     opens org.mangorage.mangobotplugin.commands.trick.lua to com.google.gson;
+
+    exports org.mangorage.mangobotplugin.commands.music;
+    opens org.mangorage.mangobotplugin.commands.music;
 
     provides org.mangorage.mangobotcore.plugin.api.Plugin with org.mangorage.mangobotplugin.entrypoint.MangoBot;
     uses org.mangorage.mangobotcore.plugin.api.Plugin;

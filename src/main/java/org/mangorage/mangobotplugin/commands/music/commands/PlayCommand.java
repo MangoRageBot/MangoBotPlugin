@@ -100,6 +100,7 @@ public class PlayCommand implements ICommand {
                         });
                     } catch (Exception e) {
                         LogHelper.error(e.getMessage());
+                        e.getStackTrace();
                     }
                 } else
                     channel.sendMessage("Already playing!").queue();
