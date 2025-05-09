@@ -3,7 +3,6 @@ module org.mangorage.mangobotplugin {
 
     requires net.dv8tion.jda;
     requires com.google.gson;
-    requires jdk.unsupported;
 
     requires net.minecraftforge.eventbus;
     requires org.jetbrains.annotations;
@@ -14,6 +13,7 @@ module org.mangorage.mangobotplugin {
     requires java.desktop;
     requires luaj.jme;
     requires org.apache.logging.log4j;
+    requires org.mangorage.bootstrap;
 
 
     exports org.mangorage.mangobotplugin.entrypoint;
@@ -28,5 +28,7 @@ module org.mangorage.mangobotplugin {
     opens org.mangorage.mangobotplugin.commands.music;
 
     provides org.mangorage.mangobotcore.plugin.api.Plugin with org.mangorage.mangobotplugin.entrypoint.MangoBot;
+    provides org.mangorage.bootstrap.api.module.IModuleConfigurator with org.mangorage.mangobotplugin.module.ModuleConfigurator;
+
     uses org.mangorage.mangobotcore.plugin.api.Plugin;
 }

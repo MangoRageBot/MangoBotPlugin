@@ -83,7 +83,6 @@ public final class MangoBot implements Plugin {
     private JDA jda;
 
     public MangoBot() {
-
         ACTION_REGISTRY.register(new TrashButtonAction());
 
         commandManager.register(new EmojiCommand());
