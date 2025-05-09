@@ -23,6 +23,7 @@
 package org.mangorage.mangobotplugin.commands.music.commands;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import dev.lavalink.youtube.YoutubeAudioSourceManager;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
@@ -76,13 +77,20 @@ public final class QueueCommand implements ICommand {
             return CommandResult.PASS;
         }
 
-        String URL = args.getFrom(0);
+        String query = args.getFrom(0);
 
-        if (URL != null) {
-            player.load(URL, e -> {
+        if (query != null) {
+
+            if (!query.contains("search") && !query.startsWith("https://")) {
+                query = YoutubeAudioSourceManager.SEARCH_PREFIX + " " + query;
+            }
+
+            final String queryFinal = query;
+
+            player.load(query, e -> {
                 switch (e.getReason()) {
                     case SUCCESS -> {
-                        if (URL.startsWith("https://")) {
+                        if (queryFinal.startsWith("https://")) {
 
                             e.getTracks().forEach(player::add);
 
