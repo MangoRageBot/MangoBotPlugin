@@ -1,4 +1,9 @@
 module org.mangorage.mangobotplugin {
+    requires okio;
+    requires kotlin.stdlib;
+    requires com.fasterxml.jackson.databind;
+    requires org.slf4j.simple;
+
     requires org.mangorage.mangobotcore;
 
     requires net.dv8tion.jda;
@@ -29,7 +34,7 @@ module org.mangorage.mangobotplugin {
     exports org.mangorage.mangobotplugin.pagedlist to net.dv8tion.jda;
 
     provides org.mangorage.mangobotcore.plugin.api.Plugin with org.mangorage.mangobotplugin.entrypoint.MangoBot;
-    provides org.mangorage.bootstrap.api.module.IModuleConfigurator with org.mangorage.mangobotplugin.module.ModuleConfigurator;
+    //provides org.mangorage.bootstrap.api.module.IModuleConfigurator with org.mangorage.mangobotplugin.module.ModuleConfigurator;
 
     uses org.mangorage.mangobotcore.plugin.api.Plugin;
 }

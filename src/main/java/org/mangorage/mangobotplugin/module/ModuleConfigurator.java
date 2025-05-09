@@ -1,13 +1,12 @@
 package org.mangorage.mangobotplugin.module;
 
 
-import org.mangorage.bootstrap.api.module.IModuleConfigurator;
 
 import java.util.List;
 
-public final class ModuleConfigurator implements IModuleConfigurator {
+public final class ModuleConfigurator  {
 
-    @Override
+
     public List<String> getChildren(String s) {
         System.out.println("Found This -> " + s);
         if (s.equals("lavaplayer")) {
