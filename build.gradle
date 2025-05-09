@@ -70,7 +70,7 @@ dependencies {
 
     installer('org.mangorage:installer:4.0.20')
 
-    bootstrap("org.mangorage:mangobotbootstrap:1.0.30")
+    bootstrap("org.mangorage:mangobotbootstrap:1.0.31")
     plugin('org.mangorage:mangobot:12.0.63')
 
     library('org.slf4j:slf4j-simple:2.0.13') // Use a recent version)
