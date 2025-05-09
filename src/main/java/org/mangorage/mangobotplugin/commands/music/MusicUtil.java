@@ -23,6 +23,16 @@
 package org.mangorage.mangobotplugin.commands.music;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
+import com.sedmelluq.discord.lavaplayer.source.bandcamp.BandcampAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.beam.BeamAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.getyarn.GetyarnAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.http.HttpAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.local.LocalAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.nico.NicoAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.twitch.TwitchStreamAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.vimeo.VimeoAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.source.yamusic.YandexMusicAudioSourceManager;
 import dev.lavalink.youtube.YoutubeAudioSourceManager;
 import net.dv8tion.jda.api.audio.SpeakingMode;
 import net.dv8tion.jda.api.entities.Guild;
@@ -35,6 +45,7 @@ import org.mangorage.commonutils.log.LogHelper;
 import org.mangorage.commonutils.misc.PagedList;
 import org.mangorage.commonutils.misc.RunnableTask;
 import org.mangorage.commonutils.misc.TaskScheduler;
+import org.mangorage.entrypoint.MangoBotCore;
 import org.mangorage.mangobotplugin.PagedListManager;
 import org.mangorage.mangobotplugin.PagedListWithAction;
 
@@ -84,7 +95,30 @@ public class MusicUtil {
     }
 
     public static void registerRemoteSources(AudioPlayerManager playerManager) {
+        playerManager.registerSourceManager(new TwitchStreamAudioSourceManager());
+        playerManager.registerSourceManager(new VimeoAudioSourceManager());
         playerManager.registerSourceManager(new YoutubeAudioSourceManager());
+        playerManager.registerSourceManager(SoundCloudAudioSourceManager.createDefault());
+        playerManager.registerSourceManager(new BandcampAudioSourceManager());
+
+        // Not Available in my area...
+        //playerManager.registerSourceManager(new NicoAudioSourceManager());
+        //playerManager.registerSourceManager(new YandexMusicAudioSourceManager());
+
+        // Dead or Broken?
+        // playerManager.registerSourceManager(new GetyarnAudioSourceManager());
+
+        // Dead, was shutdown
+        // playerManager.registerSourceManager(new BeamAudioSourceManager());
+
+
+        if (MangoBotCore.isDevMode()) {
+            // I dont want to expose files in any way in production, in dev mode its nice for testing...
+            playerManager.registerSourceManager(new LocalAudioSourceManager());
+        }
+
+        // Goes last to avoid messing up any of the above...
+        playerManager.registerSourceManager(new HttpAudioSourceManager());
     }
 
     public static String formatDuration(long millis) {

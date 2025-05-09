@@ -36,7 +36,7 @@ import org.mangorage.mangobotplugin.commands.music.MusicUtil;
 
 import java.util.List;
 
-public class QueueCommand implements ICommand {
+public final class QueueCommand implements ICommand {
     private final PagedListManager pagedListManager;
 
     public QueueCommand(PagedListManager pagedListManager) {

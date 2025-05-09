@@ -96,9 +96,8 @@ public final class MusicPlayer extends AudioEventAdapter implements AudioSendHan
     }
 
     public void load(String URL, Consumer<AudioTrackEvent> eventConsumer) {
-
         try {
-            manager.loadItem(new AudioReference(URL.trim(), null), new AudioLoadResultHandler() {
+            manager.loadItem(URL, new AudioLoadResultHandler() {
                 @Override
                 public void trackLoaded(AudioTrack track) {
                     add(track);
@@ -107,10 +106,11 @@ public final class MusicPlayer extends AudioEventAdapter implements AudioSendHan
 
                 @Override
                 public void playlistLoaded(AudioPlaylist playlist) {
+                    final var trackSelected = playlist.getSelectedTrack() == null ? playlist.getTracks().get(0) : playlist.getSelectedTrack();
                     playlist.getTracks().forEach(track -> {
                         add(track);
                     });
-                    eventConsumer.accept(new AudioTrackEvent(playlist.getSelectedTrack(), AudioTrackEvent.Info.SUCCESS));
+                    eventConsumer.accept(new AudioTrackEvent(trackSelected, AudioTrackEvent.Info.SUCCESS));
                 }
 
                 @Override

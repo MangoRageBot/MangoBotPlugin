@@ -34,7 +34,7 @@ import org.mangorage.mangobotplugin.commands.music.MusicUtil;
 
 import java.util.List;
 
-public class StopCommand implements ICommand {
+public final class StopCommand implements ICommand {
     @Override
     public String id() {
         return "stop";

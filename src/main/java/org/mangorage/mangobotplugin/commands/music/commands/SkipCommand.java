@@ -14,7 +14,7 @@ import org.mangorage.mangobotplugin.commands.music.MusicUtil;
 
 import java.util.List;
 
-public class SkipCommand implements ICommand {
+public final class SkipCommand implements ICommand {
     @Override
     public String id() {
         return "skip";

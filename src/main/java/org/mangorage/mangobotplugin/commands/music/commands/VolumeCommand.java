@@ -33,7 +33,7 @@ import org.mangorage.mangobotplugin.commands.music.MusicPlayer;
 
 import java.util.List;
 
-public class VolumeCommand implements ICommand {
+public final class VolumeCommand implements ICommand {
     @Override
     public String id() {
         return "setVolume";
