@@ -22,6 +22,7 @@
 
 package org.mangorage.mangobotplugin.commands.music.commands;
 
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
@@ -30,7 +31,7 @@ import org.jetbrains.annotations.NotNull;
 import org.mangorage.commonutils.misc.Arguments;
 import org.mangorage.mangobotcore.jda.command.api.CommandResult;
 import org.mangorage.mangobotcore.jda.command.api.ICommand;
-import org.mangorage.mangobotplugin.PagedListManager;
+import org.mangorage.mangobotplugin.pagedlist.PagedListManager;
 import org.mangorage.mangobotplugin.commands.music.MusicPlayer;
 import org.mangorage.mangobotplugin.commands.music.MusicUtil;
 
@@ -81,15 +82,23 @@ public final class QueueCommand implements ICommand {
             player.load(URL, e -> {
                 switch (e.getReason()) {
                     case SUCCESS -> {
-                        channel.sendMessage(
-                                """
-                                send '!queue' to see list of songs in queue!
-                                send '!play' to have bot join and start playing next song!
-                                
-                                
-                                Added to Queue:
-                                %s
-                                """.formatted(MarkdownUtil.maskedLink(e.getTrack().getInfo().title, e.getTrack().getInfo().uri))).queue();
+                        if (URL.startsWith("https://")) {
+
+                            e.getTracks().forEach(player::add);
+
+                            channel.sendMessage(
+                                    """
+                                            send '!queue' to see list of songs in queue!
+                                            send '!play' to have bot join and start playing next song!
+                                            
+                                            
+                                            Added to Queue:
+                                            %s
+                                            """.formatted(MarkdownUtil.maskedLink(e.getTrack().getInfo().title, e.getTrack().getInfo().uri))).queue();
+                        } else {
+                            // Searching for something instead
+                            MusicUtil.sendSongsQueue(channel, pagedListManager, player, e.getTracks().toArray(AudioTrack[]::new));
+                        }
                     }
                     case FAILED -> {
                         channel.sendMessage("Failed").queue();

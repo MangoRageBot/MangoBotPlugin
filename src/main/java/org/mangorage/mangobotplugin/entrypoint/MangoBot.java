@@ -18,7 +18,7 @@ import org.mangorage.mangobotcore.jda.command.api.CommandManager;
 import org.mangorage.mangobotcore.plugin.api.MangoBotPlugin;
 import org.mangorage.mangobotcore.plugin.api.Plugin;
 import org.mangorage.mangobotplugin.BotEventListener;
-import org.mangorage.mangobotplugin.PagedListManager;
+import org.mangorage.mangobotplugin.pagedlist.PagedListManager;
 import org.mangorage.mangobotplugin.actions.TrashButtonAction;
 import org.mangorage.mangobotplugin.commands.PingCommand;
 import org.mangorage.mangobotplugin.commands.PingsCommand;

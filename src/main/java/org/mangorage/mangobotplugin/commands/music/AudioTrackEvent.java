@@ -24,17 +24,32 @@ package org.mangorage.mangobotplugin.commands.music;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
+import java.util.List;
+
 public class AudioTrackEvent {
-    private final AudioTrack track;
+    private final List<AudioTrack> tracks;
     private final Info reason;
 
-    public AudioTrackEvent(AudioTrack track, Info info) {
-        this.track = track;
+    public AudioTrackEvent(Info info) {
+        this(List.of(), info);
+    }
+
+    public AudioTrackEvent(List<AudioTrack> tracks, Info info) {
+        this.tracks = List.copyOf(tracks);
         this.reason = info;
     }
 
+    public AudioTrackEvent(AudioTrack track, Info info) {
+        this.tracks = List.of(track);
+        this.reason = info;
+    }
+
+    public List<AudioTrack> getTracks() {
+        return tracks;
+    }
+
     public AudioTrack getTrack() {
-        return track;
+        return tracks.isEmpty() ? null : tracks.getFirst();
     }
 
     public Info getReason() {

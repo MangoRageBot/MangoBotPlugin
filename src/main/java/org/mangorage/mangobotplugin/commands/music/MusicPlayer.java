@@ -100,27 +100,22 @@ public final class MusicPlayer extends AudioEventAdapter implements AudioSendHan
             manager.loadItem(URL, new AudioLoadResultHandler() {
                 @Override
                 public void trackLoaded(AudioTrack track) {
-                    add(track);
                     eventConsumer.accept(new AudioTrackEvent(track, AudioTrackEvent.Info.SUCCESS));
                 }
 
                 @Override
                 public void playlistLoaded(AudioPlaylist playlist) {
-                    final var trackSelected = playlist.getSelectedTrack() == null ? playlist.getTracks().get(0) : playlist.getSelectedTrack();
-                    playlist.getTracks().forEach(track -> {
-                        add(track);
-                    });
-                    eventConsumer.accept(new AudioTrackEvent(trackSelected, AudioTrackEvent.Info.SUCCESS));
+                    eventConsumer.accept(new AudioTrackEvent(playlist.getTracks(), AudioTrackEvent.Info.SUCCESS));
                 }
 
                 @Override
                 public void noMatches() {
-                    eventConsumer.accept(new AudioTrackEvent(null, AudioTrackEvent.Info.NO_MATCHES));
+                    eventConsumer.accept(new AudioTrackEvent(AudioTrackEvent.Info.NO_MATCHES));
                 }
 
                 @Override
                 public void loadFailed(FriendlyException exception) {
-                    eventConsumer.accept(new AudioTrackEvent(null, AudioTrackEvent.Info.FAILED));
+                    eventConsumer.accept(new AudioTrackEvent(AudioTrackEvent.Info.FAILED));
                     LogHelper.info(exception.getMessage());
                 }
             });

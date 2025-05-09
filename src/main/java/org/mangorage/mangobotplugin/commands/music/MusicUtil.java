@@ -24,15 +24,12 @@ package org.mangorage.mangobotplugin.commands.music;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.source.bandcamp.BandcampAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.beam.BeamAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.getyarn.GetyarnAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.http.HttpAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.local.LocalAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.nico.NicoAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.soundcloud.SoundCloudAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.twitch.TwitchStreamAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.vimeo.VimeoAudioSourceManager;
-import com.sedmelluq.discord.lavaplayer.source.yamusic.YandexMusicAudioSourceManager;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import dev.lavalink.youtube.YoutubeAudioSourceManager;
 import net.dv8tion.jda.api.audio.SpeakingMode;
 import net.dv8tion.jda.api.entities.Guild;
@@ -43,13 +40,12 @@ import net.dv8tion.jda.api.managers.AudioManager;
 import net.dv8tion.jda.api.utils.MarkdownUtil;
 import org.mangorage.commonutils.log.LogHelper;
 import org.mangorage.commonutils.misc.PagedList;
-import org.mangorage.commonutils.misc.RunnableTask;
-import org.mangorage.commonutils.misc.TaskScheduler;
 import org.mangorage.entrypoint.MangoBotCore;
-import org.mangorage.mangobotplugin.PagedListManager;
-import org.mangorage.mangobotplugin.PagedListWithAction;
+import org.mangorage.mangobotplugin.pagedlist.PagedListAction;
+import org.mangorage.mangobotplugin.pagedlist.PagedListManager;
+import org.mangorage.mangobotplugin.pagedlist.PagedListWithAction;
 
-import java.util.concurrent.TimeUnit;
+import java.util.List;
 
 public class MusicUtil {
     public static void connectToAudioChannel(VoiceChannel channel) {
@@ -142,6 +138,50 @@ public class MusicUtil {
                 """.formatted(currentPage, totalPage, page.getEntries()[0]);
     }
 
+    public static String getResultTrack(PagedList.Page<AudioTrack> page, int currentPage, int totalPage) {
+        return """
+                Song: (%s/%s)
+                %s
+                """.formatted(currentPage, totalPage, MarkdownUtil.maskedLink(page.getEntries()[0].getInfo().title, page.getEntries()[0].getInfo().uri));
+    }
+
+    public static void sendSongsQueue(MessageChannel channel, PagedListManager listManager, MusicPlayer manager, AudioTrack[] songs) {
+
+        channel.sendMessage(
+                """
+                Getting List... 
+                """
+        ).queue(m -> {
+            var list = new PagedListWithAction<AudioTrack>((pageList, button,id, total) -> {
+                switch (id) {
+                    case "next" -> pageList.next();
+                    case "prev" -> pageList.previous();
+                    case "add" -> {
+                        manager.add(
+                                pageList.current().getEntries()[0].makeClone()
+                        );
+
+                        button.deferReply(true).setContent("Added Song to queue!").queue();
+
+                        return;
+                    }
+                }
+
+                m.editMessage(getResultTrack(pageList.current(), pageList.getPage(), total)).queue();
+            });
+
+            list.get().rebuild(songs, 1);
+
+            Button prev = Button.primary("prev", "Previous");
+            Button next = Button.primary("next", "Next");
+            Button add = Button.primary("add", "Add to Queue");
+
+            m.editMessage(getResultTrack(list.get().current(), list.get().getPage(), list.get().totalPages())).setActionRow(prev, next, add).queue();
+
+            listManager.putList(m.getId(), list);
+        });
+    }
+
     public static void sendSongs(MessageChannel channel, PagedListManager listManager, MusicPlayer player) {
         var songs = player
                 .getTracks()
@@ -157,14 +197,20 @@ public class MusicUtil {
                         Getting List... 
                         """
         ).queue(m -> {
-            var list = new PagedListWithAction((page, current, total) -> {
-                m.editMessage(getResult(page, current, total)).queue();
+            var list = new PagedListWithAction<String>((pageList, button,id, total) -> {
+
+                switch (id) {
+                    case "next" -> pageList.next();
+                    case "prev" -> pageList.previous();
+                }
+
+                m.editMessage(getResult(pageList.current(), pageList.getPage(), total)).queue();
             });
 
             list.get().rebuild(songs, 1);
 
-            Button prev = Button.primary("prev".formatted(m.getId()), "previous");
-            Button next = Button.primary("next".formatted(m.getId()), "next");
+            Button prev = Button.primary("prev", "Previous");
+            Button next = Button.primary("next", "Next");
 
             m.editMessage(getResult(list.get().current(), list.get().getPage(), list.get().totalPages())).setActionRow(prev, next).queue();
 
