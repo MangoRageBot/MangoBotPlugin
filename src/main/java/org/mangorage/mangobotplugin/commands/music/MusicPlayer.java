@@ -22,6 +22,7 @@
 
 package org.mangorage.mangobotplugin.commands.music;
 
+import com.sedmelluq.discord.lavaplayer.format.StandardAudioDataFormats;
 import com.sedmelluq.discord.lavaplayer.player.AudioConfiguration;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
@@ -71,6 +72,8 @@ public final class MusicPlayer extends AudioEventAdapter implements AudioSendHan
 
         manager.enableGcMonitoring();
         manager.getConfiguration().setResamplingQuality(AudioConfiguration.ResamplingQuality.HIGH);
+        manager.getConfiguration().setOutputFormat(StandardAudioDataFormats.COMMON_PCM_S16_BE);
+
 
         MusicUtil.registerRemoteSources(manager);
 
@@ -201,6 +204,6 @@ public final class MusicPlayer extends AudioEventAdapter implements AudioSendHan
 
     @Override
     public boolean isOpus() {
-        return true;
+        return false;
     }
 }

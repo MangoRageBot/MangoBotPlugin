@@ -77,7 +77,7 @@ dependencies {
     library('org.slf4j:slf4j-simple:2.0.13') // Use a recent version)
     library('org.luaj:luaj-jme:3.0.1')
 
-    library('dev.arbjerg:lavaplayer:2.2.3')
+    library('dev.arbjerg:lavaplayer:2.2.1')
     library('dev.lavalink.youtube:common:+')
 }
 

@@ -8,10 +8,10 @@ public final class ModuleConfigurator implements IModuleConfigurator {
 
     @Override
     public List<String> getChildren(String s) {
-        System.out.println("Found This -> " + s);
-        if (s.equals("lavaplayer")) {
-            return List.of("lavaplayer.natives");
-        }
-        return List.of();
+        return switch (s) {
+            case "lavaplayer" -> List.of("lavaplayer.natives");
+            case "opus.java", "opus.java.api" -> List.of("opus.java.natives");
+            default -> List.of();
+        };
     }
 }
