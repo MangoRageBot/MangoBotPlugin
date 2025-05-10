@@ -72,7 +72,7 @@ public final class MusicPlayer extends AudioEventAdapter implements AudioSendHan
 
         manager.enableGcMonitoring();
         manager.getConfiguration().setResamplingQuality(AudioConfiguration.ResamplingQuality.HIGH);
-        manager.getConfiguration().setOutputFormat(StandardAudioDataFormats.COMMON_PCM_S16_BE);
+        manager.getConfiguration().setOutputFormat(StandardAudioDataFormats.DISCORD_PCM_S16_BE);
 
 
         MusicUtil.registerRemoteSources(manager);
