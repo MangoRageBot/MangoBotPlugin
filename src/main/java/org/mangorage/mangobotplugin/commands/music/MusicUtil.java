@@ -23,7 +23,6 @@
 package org.mangorage.mangobotplugin.commands.music;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
-import com.sedmelluq.discord.lavaplayer.source.AudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.bandcamp.BandcampAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.http.HttpAudioSourceManager;
 import com.sedmelluq.discord.lavaplayer.source.local.LocalAudioSourceManager;
@@ -42,27 +41,24 @@ import net.dv8tion.jda.api.utils.MarkdownUtil;
 import org.mangorage.commonutils.log.LogHelper;
 import org.mangorage.commonutils.misc.PagedList;
 import org.mangorage.entrypoint.MangoBotCore;
-import org.mangorage.mangobotplugin.pagedlist.PagedListAction;
 import org.mangorage.mangobotplugin.pagedlist.PagedListManager;
 import org.mangorage.mangobotplugin.pagedlist.PagedListWithAction;
-
-import java.util.List;
 
 public class MusicUtil {
     public static void connectToAudioChannel(VoiceChannel channel) {
         try {
             Guild guild = channel.getGuild();
             AudioManager audioManager = guild.getAudioManager();
+            MusicPlayer musicPlayer = MusicPlayer.getInstance(guild.getId());
 
-            audioManager.setSendingHandler(MusicPlayer.getInstance(guild.getId()));
-
+            audioManager.setSendingHandler(musicPlayer);
             audioManager.setSelfDeafened(true);
             audioManager.setSelfMuted(false);
             audioManager.setAutoReconnect(true);
             audioManager.setSpeakingMode(SpeakingMode.SOUNDSHARE);
             audioManager.setConnectTimeout(30_000);
+            musicPlayer.setVolume(5); // Default volume so nobody gets there ears torn out by sound.
 
-            MusicPlayer.getInstance(guild.getId()).setVolume(5); // Default volume so nobody gets there ears torn out by sound.
             audioManager.openAudioConnection(channel);
         } catch (Exception e) {
             LogHelper.error("Failed to connect to voice channel: " + e.getMessage());

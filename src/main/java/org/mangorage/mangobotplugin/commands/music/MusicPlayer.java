@@ -22,6 +22,7 @@
 
 package org.mangorage.mangobotplugin.commands.music;
 
+import com.sedmelluq.discord.lavaplayer.player.AudioConfiguration;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayer;
@@ -29,7 +30,6 @@ import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
-import com.sedmelluq.discord.lavaplayer.track.AudioReference;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrame;
@@ -67,6 +67,10 @@ public final class MusicPlayer extends AudioEventAdapter implements AudioSendHan
         this.guildID = guildID;
         this.manager = new DefaultAudioPlayerManager();
         this.audioPlayer = new DefaultAudioPlayer(manager);
+
+
+        manager.enableGcMonitoring();
+        manager.getConfiguration().setResamplingQuality(AudioConfiguration.ResamplingQuality.HIGH);
 
         MusicUtil.registerRemoteSources(manager);
 
