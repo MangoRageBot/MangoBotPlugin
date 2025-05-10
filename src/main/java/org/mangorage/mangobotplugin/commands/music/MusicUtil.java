@@ -40,7 +40,7 @@ import net.dv8tion.jda.api.managers.AudioManager;
 import net.dv8tion.jda.api.utils.MarkdownUtil;
 import org.mangorage.commonutils.log.LogHelper;
 import org.mangorage.commonutils.misc.PagedList;
-import org.mangorage.entrypoint.MangoBotCore;
+import org.mangorage.mangobotcore.MangoBotCore;
 import org.mangorage.mangobotplugin.pagedlist.PagedListManager;
 import org.mangorage.mangobotplugin.pagedlist.PagedListWithAction;
 

@@ -8,12 +8,12 @@ import net.dv8tion.jda.api.hooks.AnnotatedEventManager;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
-import org.mangorage.commonutils.config.Config;
-import org.mangorage.commonutils.config.ConfigSetting;
-import org.mangorage.commonutils.config.ISetting;
 import org.mangorage.commonutils.jda.ButtonActionRegistry;
 import org.mangorage.commonutils.jda.MessageSettings;
 import org.mangorage.commonutils.jda.slash.command.Command;
+import org.mangorage.mangobotcore.config.api.ConfigTypes;
+import org.mangorage.mangobotcore.config.api.IConfig;
+import org.mangorage.mangobotcore.config.api.IConfigSetting;
 import org.mangorage.mangobotcore.jda.command.api.CommandManager;
 import org.mangorage.mangobotcore.plugin.api.MangoBotPlugin;
 import org.mangorage.mangobotcore.plugin.api.Plugin;
@@ -42,10 +42,9 @@ public final class MangoBot implements Plugin {
     public static final ButtonActionRegistry ACTION_REGISTRY = new ButtonActionRegistry();
 
     // Where we create our "config"
-    public final static Config CONFIG = new Config(Path.of("plugins/%s/.env".formatted(MangoBot.ID)));
-
+    public final static IConfig CONFIG =  IConfig.create(Path.of("plugins/%s/.env".formatted(MangoBot.ID)));
     // Where we create Settings for said Config
-    public static final ISetting<String> BOT_TOKEN = ConfigSetting.create(CONFIG, "BOT_TOKEN", "empty");
+    public static final IConfigSetting<String> BOT_TOKEN = IConfigSetting.create(CONFIG, "BOT_TOKEN", ConfigTypes.STRING, "empty");
 
     private static final EnumSet<GatewayIntent> intents = EnumSet.of(
             // Enables MessageReceivedEvent for guild (also known as servers)
