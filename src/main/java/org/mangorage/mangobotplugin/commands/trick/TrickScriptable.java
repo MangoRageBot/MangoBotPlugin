@@ -30,9 +30,6 @@ import org.luaj.vm2.LoadState;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.compiler.LuaC;
-import org.luaj.vm2.lib.BaseLib;
-import org.luaj.vm2.lib.MathLib;
-import org.luaj.vm2.lib.PackageLib;
 import org.mangorage.mangobotplugin.commands.trick.lua.LuaJDA;
 import org.mangorage.mangobotplugin.commands.trick.lua.internal.CoerceJavaToLua;
 import org.mangorage.mangobotplugin.commands.trick.lua.objects.LuaStringArray;
@@ -57,9 +54,7 @@ public class TrickScriptable {
     public Globals sandBoxedGlobals() {
         Globals server_globals = new Globals();
 
-        server_globals.load(new BaseLib());
-        server_globals.load(new MathLib());
-        server_globals.load(new PackageLib());
+
 
         LoadState.install(server_globals);
         LuaC.install(server_globals);
