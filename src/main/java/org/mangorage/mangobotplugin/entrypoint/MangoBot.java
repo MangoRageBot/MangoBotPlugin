@@ -18,6 +18,7 @@ import org.mangorage.mangobotcore.jda.command.api.CommandManager;
 import org.mangorage.mangobotcore.plugin.api.MangoBotPlugin;
 import org.mangorage.mangobotcore.plugin.api.Plugin;
 import org.mangorage.mangobotplugin.BotEventListener;
+import org.mangorage.mangobotplugin.commands.internal.HomeDepotAlertCommand;
 import org.mangorage.mangobotplugin.pagedlist.PagedListManager;
 import org.mangorage.mangobotplugin.actions.TrashButtonAction;
 import org.mangorage.mangobotplugin.commands.PingCommand;
@@ -85,6 +86,7 @@ public final class MangoBot implements Plugin {
         ACTION_REGISTRY.register(new TrashButtonAction());
 
         commandManager.register(new EmojiCommand());
+        commandManager.register(new HomeDepotAlertCommand());
 
         commandManager.register(new PingCommand());
         commandManager.register(new TrickCommand(this));
