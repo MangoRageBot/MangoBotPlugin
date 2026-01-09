@@ -2,8 +2,8 @@ import org.mangorage.mangobotgradle.util.GitVersion
 
 buildscript {
     repositories {
-        mavenCentral()
         mavenLocal()
+        mavenCentral()
         maven {
             url = uri("https://plugins.gradle.org/m2/")
         }
@@ -17,7 +17,7 @@ buildscript {
 
     dependencies {
         classpath 'gradle.plugin.com.github.johnrengelman:shadow:7.1.2'
-        classpath 'org.mangorage:MangoBotGradle:6.0.11'
+        classpath 'org.mangorage:MangoBotGradle:6.0.17'
     }
 }
 
@@ -73,16 +73,19 @@ dependencies {
     testImplementation platform('org.junit:junit-bom:5.9.1')
     testImplementation 'org.junit.jupiter:junit-jupiter'
 
-    installer('org.mangorage:installer:4.0.20')
+    installer('org.mangorage:installer:4.0.26')
+    bootstrap("org.mangorage:mangobotbootstrap:1.0.66")
 
-    bootstrap("org.mangorage:mangobotbootstrap:1.0.43")
-    plugin('org.mangorage:mangobot:12.0.74')
+    plugin('org.mangorage:mangobot:12.0.76')
 
     library('org.slf4j:slf4j-simple:2.0.13') // Use a recent version)
     library('org.luaj:luaj-jme:3.0.1')
 
     library('dev.arbjerg:lavaplayer:+')
     library('dev.lavalink.youtube:common:+')
+
+    library("com.google.zxing:core:3.5.4")
+    library("com.google.zxing:javase:3.5.4")
 }
 
 test {

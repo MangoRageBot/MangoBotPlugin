@@ -19,6 +19,8 @@ module org.mangorage.mangobotplugin {
     requires luaj.jme;
     requires org.apache.logging.log4j;
     requires org.mangorage.bootstrap;
+    requires com.google.zxing;
+    requires com.google.zxing.javase;
 
 
     exports org.mangorage.mangobotplugin.entrypoint;
