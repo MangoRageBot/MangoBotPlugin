@@ -1,7 +1,7 @@
 package org.mangorage.mangobotplugin.pagedlist;
 
 import net.dv8tion.jda.api.entities.Message;
-import org.mangorage.mangobotcore.jda.event.DiscordButtonInteractEvent;
+import org.mangorage.mangobotcore.api.jda.event.v1.DiscordButtonInteractEvent;
 
 import java.util.HashMap;
 import java.util.Map;

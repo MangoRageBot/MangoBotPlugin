@@ -26,7 +26,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
-import org.mangorage.commonutils.jda.ButtonAction;
+import org.mangorage.mangobotcore.api.util.jda.ButtonAction;
 
 public class TrashButtonAction extends ButtonAction {
 

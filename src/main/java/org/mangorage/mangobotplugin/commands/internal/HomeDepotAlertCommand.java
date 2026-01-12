@@ -7,9 +7,9 @@ import com.google.zxing.Result;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
 import net.dv8tion.jda.api.entities.Message;
-import org.mangorage.commonutils.misc.Arguments;
-import org.mangorage.mangobotcore.jda.command.api.CommandResult;
-import org.mangorage.mangobotcore.jda.command.api.ICommand;
+import org.mangorage.mangobotcore.api.jda.command.v1.CommandResult;
+import org.mangorage.mangobotcore.api.jda.command.v1.ICommand;
+import org.mangorage.mangobotcore.api.util.misc.Arguments;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

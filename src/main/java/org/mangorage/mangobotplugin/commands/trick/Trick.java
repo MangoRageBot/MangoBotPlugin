@@ -1,8 +1,8 @@
 package org.mangorage.mangobotplugin.commands.trick;
 
 import com.google.gson.annotations.Expose;
-import org.mangorage.commonutils.data.FileName;
-import org.mangorage.commonutils.data.IFileNameResolver;
+import org.mangorage.mangobotcore.api.util.data.FileName;
+import org.mangorage.mangobotcore.api.util.data.IFileNameResolver;
 import org.mangorage.mangobotplugin.commands.trick.lua.MemoryBank;
 
 import java.util.HashMap;

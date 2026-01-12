@@ -7,11 +7,11 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.SubscribeEvent;
-import org.mangorage.commonutils.jda.slash.command.watcher.WatcherManager;
-import org.mangorage.mangobotcore.jda.event.DiscordButtonInteractEvent;
-import org.mangorage.mangobotcore.jda.event.DiscordMessageReactionAddEvent;
-import org.mangorage.mangobotcore.jda.event.DiscordMessageReceivedEvent;
-import org.mangorage.mangobotcore.jda.event.DiscordModalInteractionEvent;
+import org.mangorage.mangobotcore.api.jda.event.v1.DiscordButtonInteractEvent;
+import org.mangorage.mangobotcore.api.jda.event.v1.DiscordMessageReactionAddEvent;
+import org.mangorage.mangobotcore.api.jda.event.v1.DiscordMessageReceivedEvent;
+import org.mangorage.mangobotcore.api.jda.event.v1.DiscordModalInteractionEvent;
+import org.mangorage.mangobotcore.api.util.jda.slash.command.watcher.WatcherManager;
 import org.mangorage.mangobotplugin.entrypoint.MangoBot;
 
 public final class BotEventListener {

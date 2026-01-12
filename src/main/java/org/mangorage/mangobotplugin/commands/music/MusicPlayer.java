@@ -35,7 +35,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import com.sedmelluq.discord.lavaplayer.track.playback.AudioFrame;
 import net.dv8tion.jda.api.audio.AudioSendHandler;
-import org.mangorage.commonutils.log.LogHelper;
+import org.mangorage.mangobotcore.api.util.log.LogHelper;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayDeque;

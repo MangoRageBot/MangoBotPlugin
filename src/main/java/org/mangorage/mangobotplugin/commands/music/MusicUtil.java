@@ -38,9 +38,9 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.managers.AudioManager;
 import net.dv8tion.jda.api.utils.MarkdownUtil;
-import org.mangorage.commonutils.log.LogHelper;
-import org.mangorage.commonutils.misc.PagedList;
-import org.mangorage.mangobotcore.MangoBotCore;
+import org.mangorage.mangobotcore.api.plugin.MangoBotCore;
+import org.mangorage.mangobotcore.api.util.log.LogHelper;
+import org.mangorage.mangobotcore.api.util.misc.PagedList;
 import org.mangorage.mangobotplugin.pagedlist.PagedListManager;
 import org.mangorage.mangobotplugin.pagedlist.PagedListWithAction;
 

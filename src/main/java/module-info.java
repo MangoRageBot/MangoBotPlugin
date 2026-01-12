@@ -1,3 +1,7 @@
+import org.mangorage.bootstrap.api.module.IModuleConfigurator;
+import org.mangorage.mangobotcore.api.plugin.v1.Plugin;
+import org.mangorage.mangobotplugin.module.ModuleConfigurator;
+
 module org.mangorage.mangobotplugin {
     requires okio;
     requires kotlin.stdlib;
@@ -35,8 +39,10 @@ module org.mangorage.mangobotplugin {
     opens org.mangorage.mangobotplugin.commands.trick.lua to com.google.gson;
     opens org.mangorage.mangobotplugin.commands.music;
 
-    provides org.mangorage.mangobotcore.plugin.api.Plugin with org.mangorage.mangobotplugin.entrypoint.MangoBot;
-    provides org.mangorage.bootstrap.api.module.IModuleConfigurator with org.mangorage.mangobotplugin.module.ModuleConfigurator;
 
-    uses org.mangorage.mangobotcore.plugin.api.Plugin;
+    provides Plugin with org.mangorage.mangobotplugin.entrypoint.MangoBot;
+    provides IModuleConfigurator with ModuleConfigurator;
+
+    uses Plugin;
+    uses IModuleConfigurator;
 }
