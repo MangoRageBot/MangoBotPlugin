@@ -330,6 +330,9 @@ public class TrickCommand implements ICommand {
                 }
 
                 trick.setAliasTarget(alias);
+            } else {
+                dMessage.apply(message.reply("Trick needs a type! content, script or alias. !trick -a -<type> <stuff>")).queue();
+                return CommandResult.PASS;
             }
 
             trick.setOwnerID(member.getIdLong());
@@ -380,6 +383,9 @@ public class TrickCommand implements ICommand {
                     }
 
                     trick.setAliasTarget(alias);
+                } else {
+                    dMessage.apply(message.reply("Trick needs a type! content, script or alias. !trick -a -<type> <stuff>")).queue();
+                    return CommandResult.PASS;
                 }
 
                 trick.setLastUserEdited(member.getIdLong());
