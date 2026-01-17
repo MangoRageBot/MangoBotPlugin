@@ -100,12 +100,13 @@ public final class MangoBot implements Plugin {
                         .build()
         );
 
+        PingCommand.register("ping", getCommandDispatcher());
+        PingsCommand.register("pings", getCommandDispatcher());
+
         commandManager.register(new EmojiCommand());
         commandManager.register(new HomeDepotAlertCommand());
 
-        commandManager.register(new PingCommand());
         commandManager.register(new TrickCommand(this));
-        commandManager.register(new PingsCommand());
 
         commandManager.register(new PauseCommand());
         commandManager.register(new PlayCommand());
