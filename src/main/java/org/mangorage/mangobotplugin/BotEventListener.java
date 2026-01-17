@@ -1,5 +1,6 @@
 package org.mangorage.mangobotplugin;
 
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -7,14 +8,38 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.SubscribeEvent;
+import org.mangorage.mangobotcore.api.command.v1.ICommandContext;
+import org.mangorage.mangobotcore.api.jda.command.v1.CommandResult;
+import org.mangorage.mangobotcore.api.jda.event.v1.CommandEvent;
 import org.mangorage.mangobotcore.api.jda.event.v1.DiscordButtonInteractEvent;
 import org.mangorage.mangobotcore.api.jda.event.v1.DiscordMessageReactionAddEvent;
 import org.mangorage.mangobotcore.api.jda.event.v1.DiscordMessageReceivedEvent;
 import org.mangorage.mangobotcore.api.jda.event.v1.DiscordModalInteractionEvent;
+import org.mangorage.mangobotcore.api.plugin.MangoBotCore;
 import org.mangorage.mangobotcore.api.util.jda.slash.command.watcher.WatcherManager;
+import org.mangorage.mangobotcore.api.util.misc.Arguments;
+import org.mangorage.mangobotcore.api.util.misc.TaskScheduler;
 import org.mangorage.mangobotplugin.entrypoint.MangoBot;
 
+import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
+
 public final class BotEventListener {
+    private record JDAMessageContext(Message message) implements ICommandContext {
+
+        @Override
+        public <T> T get(Class<T> tClass) {
+            if (tClass == Message.class) return (T) message;
+            return null;
+        }
+
+        @Override
+        public boolean hasType(Class<?> tClass) {
+            return tClass == Message.class;
+        }
+    }
+
+
     private final MangoBot mangoBot;
 
     public BotEventListener(MangoBot mangoBot) {
@@ -45,7 +70,52 @@ public final class BotEventListener {
     @SubscribeEvent
     public void onMessageReceived(MessageReceivedEvent event) {
         DiscordMessageReceivedEvent.BUS.post(new DiscordMessageReceivedEvent(event));
-        mangoBot.getCommandManager().handle(event.getMessage());
+
+        // Command Logic
+        final var message = event.getMessage();
+        final var rawMessage = message.getContentRaw();
+        final var cmdPrefix = MangoBotCore.isDevMode() ? "dev!" : "!";
+        final var silentPrefix = "s" + cmdPrefix;
+        final var isSilent = rawMessage.startsWith(silentPrefix);
+
+
+        if (isSilent || rawMessage.startsWith(cmdPrefix)) {
+            final var dispatcher = mangoBot.getCommandDispatcher();
+            final var result = dispatcher.execute(
+                    isSilent ?
+                            rawMessage.replaceFirst(silentPrefix, "") : rawMessage.replaceFirst(cmdPrefix, ""),
+                    new JDAMessageContext(message)
+            );
+
+            if (result != CommandResult.INVALID_COMMAND) {
+               if (result != null) {
+                   if (result instanceof CommandResult finalResult)
+                       finalResult.accept(message);
+               }
+
+                if (isSilent)
+                    TaskScheduler.getExecutor().schedule(() -> {
+                        message.delete().queue();
+                    }, 250, TimeUnit.MILLISECONDS);
+            } else {
+                mangoBot.getCommandManager().handle(event.getMessage());
+
+                // TODO: Undo When we remove the old cmd manager!
+//                String[] command_pre = rawMessage.split(" ");
+//                Arguments arguments = Arguments.of(Arrays.copyOfRange(command_pre, 1, command_pre.length));
+//
+//                var cmd = rawMessage.replaceFirst(cmdPrefix, "").split(" ");
+//
+//                final var cmdEvent = CommandEvent.BUS.fire(new CommandEvent(message, cmd[0], arguments));
+//                if (cmdEvent.isHandled())
+//                    cmdEvent.getResult().accept(message);
+            }
+
+            // TODO: Move isSilent check to here, to delete the cmd that was "attempted"
+        }
+
+
+
     }
 
     @SubscribeEvent
