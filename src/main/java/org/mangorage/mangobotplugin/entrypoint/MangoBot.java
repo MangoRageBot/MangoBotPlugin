@@ -10,13 +10,11 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import org.mangorage.mangobotcore.api.command.v1.ICommandDispatcher;
-import org.mangorage.mangobotcore.api.command.v1.ICommandNode;
-import org.mangorage.mangobotcore.api.command.v1.ICommandNodeBuilder;
 import org.mangorage.mangobotcore.api.config.v1.ConfigTypes;
 import org.mangorage.mangobotcore.api.config.v1.IConfig;
 import org.mangorage.mangobotcore.api.config.v1.IConfigSetting;
 import org.mangorage.mangobotcore.api.jda.command.v1.CommandManager;
-import org.mangorage.mangobotcore.api.jda.command.v1.CommandResult;
+import org.mangorage.mangobotcore.api.jda.command.v2.JDACommandResult;
 import org.mangorage.mangobotcore.api.plugin.v1.MangoBotPlugin;
 import org.mangorage.mangobotcore.api.plugin.v1.Plugin;
 import org.mangorage.mangobotcore.api.util.jda.ButtonActionRegistry;
@@ -82,7 +80,7 @@ public final class MangoBot implements Plugin {
             CacheFlag.FORUM_TAGS
     );
 
-    private final ICommandDispatcher commandDispatcher = ICommandDispatcher.create(CommandResult.INVALID_COMMAND);
+    private final ICommandDispatcher<Message, JDACommandResult> commandDispatcher = ICommandDispatcher.create(JDACommandResult.INVALID_COMMAND);
     private final CommandManager commandManager = CommandManager.create();
     private final PagedListManager pagedListManager = new PagedListManager();
 
@@ -91,17 +89,8 @@ public final class MangoBot implements Plugin {
     public MangoBot() {
         ACTION_REGISTRY.register(new TrashButtonAction());
 
-        commandDispatcher.register(
-                ICommandNode.create("new-cmd")
-                        .executes((ctx, args) -> {
-                            ctx.get(Message.class).reply("Whelp it works now!").queue();
-                            return CommandResult.PASS;
-                        })
-                        .build()
-        );
-
-        PingCommand.register("ping", getCommandDispatcher());
-        PingsCommand.register("pings", getCommandDispatcher());
+        commandDispatcher.register(new PingCommand("ping"));
+        commandDispatcher.register(new PingsCommand("pings"));;
 
         commandManager.register(new EmojiCommand());
         commandManager.register(new HomeDepotAlertCommand());
@@ -161,7 +150,7 @@ public final class MangoBot implements Plugin {
         return commandManager;
     }
 
-    public ICommandDispatcher getCommandDispatcher() {
+    public ICommandDispatcher<Message, JDACommandResult> getCommandDispatcher() {
         return commandDispatcher;
     }
 

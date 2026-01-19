@@ -1,6 +1,5 @@
 package org.mangorage.mangobotplugin;
 
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -8,8 +7,8 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.SubscribeEvent;
-import org.mangorage.mangobotcore.api.command.v1.ICommandContext;
 import org.mangorage.mangobotcore.api.jda.command.v1.CommandResult;
+import org.mangorage.mangobotcore.api.jda.command.v2.JDACommandResult;
 import org.mangorage.mangobotcore.api.jda.event.v1.CommandEvent;
 import org.mangorage.mangobotcore.api.jda.event.v1.DiscordButtonInteractEvent;
 import org.mangorage.mangobotcore.api.jda.event.v1.DiscordMessageReactionAddEvent;
@@ -25,19 +24,6 @@ import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 public final class BotEventListener {
-    private record JDAMessageContext(Message message) implements ICommandContext {
-
-        @Override
-        public <T> T get(Class<T> tClass) {
-            if (tClass == Message.class) return (T) message;
-            return null;
-        }
-
-        @Override
-        public boolean hasType(Class<?> tClass) {
-            return tClass == Message.class;
-        }
-    }
 
 
     private final MangoBot mangoBot;
@@ -82,16 +68,13 @@ public final class BotEventListener {
         if (isSilent || rawMessage.startsWith(cmdPrefix)) {
             final var dispatcher = mangoBot.getCommandDispatcher();
             final var result = dispatcher.execute(
-                    isSilent ?
-                            rawMessage.replaceFirst(silentPrefix, "") : rawMessage.replaceFirst(cmdPrefix, ""),
-                    new JDAMessageContext(message)
+                    isSilent ? rawMessage.replaceFirst(silentPrefix, "") : rawMessage.replaceFirst(cmdPrefix, ""),
+                    message
             );
 
-            if (result != CommandResult.INVALID_COMMAND) {
-               if (result != null) {
-                   if (result instanceof CommandResult finalResult)
-                       finalResult.accept(message);
-               }
+            if (result != JDACommandResult.INVALID_COMMAND) {
+                if (result.getMessage() != null)
+                    event.getMessage().reply(result.getMessage()).queue();
 
                 if (isSilent)
                     TaskScheduler.getExecutor().schedule(() -> {

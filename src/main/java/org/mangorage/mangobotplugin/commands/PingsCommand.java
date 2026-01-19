@@ -3,16 +3,13 @@ package org.mangorage.mangobotplugin.commands;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import org.mangorage.mangobotcore.api.command.v1.ICommandDispatcher;
-import org.mangorage.mangobotcore.api.command.v1.ICommandNode;
-import org.mangorage.mangobotcore.api.jda.command.v1.CommandResult;
-import org.mangorage.mangobotcore.api.jda.command.v1.ICommand;
+
+import org.mangorage.mangobotcore.api.jda.command.v2.AbstractJDACommand;
+import org.mangorage.mangobotcore.api.jda.command.v2.JDACommandResult;
 import org.mangorage.mangobotcore.api.util.misc.Arguments;
-
 import java.awt.*;
-import java.util.List;
 
-public final class PingsCommand {
+public final class PingsCommand extends AbstractJDACommand {
     public static final MessageEmbed EMBED =
             new EmbedBuilder()
                     .setTitle("Please disable pings when replying to others")
@@ -25,21 +22,18 @@ public final class PingsCommand {
                                     """
                     ).build();
 
-    public static void register(String id, ICommandDispatcher dispatcher) {
-        dispatcher.register(
-                ICommandNode.create(id)
-                        .requires(ctx -> ctx.hasType(Message.class))
-                        .executes((ctx, args) -> {
-                            final var message = ctx.get(Message.class);
-                            var referenced = message.getReferencedMessage();
-                            if (referenced == null) {
-                                message.getChannel().sendMessageEmbeds(EMBED).queue();
-                            } else {
-                                referenced.replyEmbeds(EMBED).queue();
-                            }
-                            return CommandResult.PASS;
-                        })
-                        .build()
-        );
+    public PingsCommand(String name) {
+        super(name);
+    }
+
+    @Override
+    public JDACommandResult run(Message message, Arguments arguments) {
+        var referenced = message.getReferencedMessage();
+        if (referenced == null) {
+            message.getChannel().sendMessageEmbeds(EMBED).queue();
+        } else {
+            referenced.replyEmbeds(EMBED).queue();
+        }
+        return JDACommandResult.PASS;
     }
 }
