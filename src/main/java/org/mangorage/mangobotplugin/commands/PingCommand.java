@@ -5,11 +5,12 @@ import org.mangorage.mangobotcore.api.command.v1.ICommandDispatcher;
 import org.mangorage.mangobotcore.api.command.v1.ICommandNode;
 import org.mangorage.mangobotcore.api.jda.command.v1.CommandResult;
 import org.mangorage.mangobotcore.api.jda.command.v1.ICommand;
+import org.mangorage.mangobotcore.api.jda.command.v2.AbstractJDACommand;
 import org.mangorage.mangobotcore.api.util.misc.Arguments;
 
 import java.util.List;
 
-public final class PingCommand {
+public final class PingCommand extends AbstractJDACommand {
 
     public static void register(String id, ICommandDispatcher dispatcher) {
         dispatcher.register(
