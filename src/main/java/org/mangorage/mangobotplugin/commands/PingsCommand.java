@@ -6,7 +6,6 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 
 import org.mangorage.mangobotcore.api.jda.command.v2.AbstractJDACommand;
 import org.mangorage.mangobotcore.api.jda.command.v2.JDACommandResult;
-import org.mangorage.mangobotcore.api.util.misc.Arguments;
 import java.awt.*;
 
 public final class PingsCommand extends AbstractJDACommand {
@@ -27,7 +26,7 @@ public final class PingsCommand extends AbstractJDACommand {
     }
 
     @Override
-    public JDACommandResult run(Message message, Arguments arguments) {
+    public JDACommandResult run(Message message, String[] arguments) {
         var referenced = message.getReferencedMessage();
         if (referenced == null) {
             message.getChannel().sendMessageEmbeds(EMBED).queue();

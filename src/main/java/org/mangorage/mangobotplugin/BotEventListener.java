@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.SubscribeEvent;
+import org.mangorage.mangobotcore.api.command.v1.CommandParseResult;
 import org.mangorage.mangobotcore.api.jda.command.v1.CommandResult;
 import org.mangorage.mangobotcore.api.jda.command.v2.JDACommandResult;
 import org.mangorage.mangobotcore.api.jda.event.v1.CommandEvent;
@@ -66,10 +67,12 @@ public final class BotEventListener {
 
 
         if (isSilent || rawMessage.startsWith(cmdPrefix)) {
+            final var cmdParseResult = new CommandParseResult(); // TODO: Do something with this when we convert to new cmd system!
             final var dispatcher = mangoBot.getCommandDispatcher();
             final var result = dispatcher.execute(
                     isSilent ? rawMessage.replaceFirst(silentPrefix, "") : rawMessage.replaceFirst(cmdPrefix, ""),
-                    message
+                    message,
+                    cmdParseResult
             );
 
             if (result != JDACommandResult.INVALID_COMMAND) {
