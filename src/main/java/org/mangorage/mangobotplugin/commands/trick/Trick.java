@@ -3,7 +3,6 @@ package org.mangorage.mangobotplugin.commands.trick;
 import com.google.gson.annotations.Expose;
 import org.mangorage.mangobotcore.api.util.data.FileName;
 import org.mangorage.mangobotcore.api.util.data.IFileNameResolver;
-import org.mangorage.mangobotplugin.commands.trick.lua.MemoryBank;
 
 import java.util.HashMap;
 
@@ -50,15 +49,11 @@ public class Trick implements IFileNameResolver {
     @Expose
     private TrickType type;
 
-    @Expose
-    private MemoryBank memoryBank;
 
     protected Trick(String trickID, long guildID) {
         this.trickID = trickID;
         this.guildID = guildID;
         this.created = System.currentTimeMillis();
-        if (getType() == TrickType.SCRIPT)
-            memoryBank = new MemoryBank(new HashMap<>());
     }
 
     protected void setAliasTarget(String target) {
@@ -146,12 +141,6 @@ public class Trick implements IFileNameResolver {
 
     public boolean isSuppressed() {
         return suppress;
-    }
-
-    public MemoryBank getMemoryBank() {
-        if (memoryBank == null)
-            memoryBank = new MemoryBank(new HashMap<>());
-        return memoryBank;
     }
 
     protected void use() {

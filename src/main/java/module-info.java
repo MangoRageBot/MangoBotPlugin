@@ -35,7 +35,6 @@ module org.mangorage.mangobotplugin {
     exports org.mangorage.mangobotplugin.pagedlist to net.dv8tion.jda;
 
     opens org.mangorage.mangobotplugin.commands.trick to com.google.gson;
-    opens org.mangorage.mangobotplugin.commands.trick.lua to com.google.gson;
 
 
     provides Plugin with org.mangorage.mangobotplugin.entrypoint.MangoBot;

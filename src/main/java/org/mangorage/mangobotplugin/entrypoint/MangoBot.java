@@ -22,11 +22,12 @@ import org.mangorage.mangobotcore.api.util.jda.MessageSettings;
 import org.mangorage.mangobotcore.api.util.jda.slash.command.Command;
 import org.mangorage.mangobotplugin.BotEventListener;
 import org.mangorage.mangobotplugin.commands.internal.homedepot.HomeDepotCommand;
+import org.mangorage.mangobotplugin.commands.trick.TrickManager;
+import org.mangorage.mangobotplugin.commands.trick.impl.TrickCommand;
 import org.mangorage.mangobotplugin.pagedlist.PagedListManager;
 import org.mangorage.mangobotplugin.actions.TrashButtonAction;
 import org.mangorage.mangobotplugin.commands.PingCommand;
 import org.mangorage.mangobotplugin.commands.PingsCommand;
-import org.mangorage.mangobotplugin.commands.trick.TrickCommand;
 
 import java.nio.file.Path;
 import java.util.EnumSet;
@@ -74,6 +75,7 @@ public final class MangoBot implements Plugin {
 
     private final ICommandDispatcher<Message, JDACommandResult> commandDispatcher = ICommandDispatcher.create(JDACommandResult.INVALID_COMMAND);
     private final CommandManager commandManager = CommandManager.create();
+    private final TrickManager trickManager = new TrickManager(this);
     private final PagedListManager pagedListManager = new PagedListManager();
 
     private JDA jda;
@@ -84,8 +86,8 @@ public final class MangoBot implements Plugin {
         commandDispatcher.register(new PingCommand("ping"));
         commandDispatcher.register(new PingsCommand("pings"));;
         commandDispatcher.register(new HomeDepotCommand("homedepot"));
+        commandDispatcher.register(new TrickCommand("trick", this));
 
-        commandManager.register(new TrickCommand(this));
     }
 
     @Override
@@ -148,4 +150,7 @@ public final class MangoBot implements Plugin {
         return MessageSettings.create().build();
     }
 
+    public TrickManager getTrickManager() {
+        return trickManager;
+    }
 }
