@@ -13,7 +13,6 @@ import org.mangorage.mangobotcore.api.command.v1.ICommandDispatcher;
 import org.mangorage.mangobotcore.api.config.v1.ConfigTypes;
 import org.mangorage.mangobotcore.api.config.v1.IConfig;
 import org.mangorage.mangobotcore.api.config.v1.IConfigSetting;
-import org.mangorage.mangobotcore.api.jda.command.v1.CommandManager;
 import org.mangorage.mangobotcore.api.jda.command.v2.JDACommandResult;
 import org.mangorage.mangobotcore.api.plugin.v1.MangoBotPlugin;
 import org.mangorage.mangobotcore.api.plugin.v1.Plugin;
@@ -74,7 +73,6 @@ public final class MangoBot implements Plugin {
     );
 
     private final ICommandDispatcher<Message, JDACommandResult> commandDispatcher = ICommandDispatcher.create(JDACommandResult.INVALID_COMMAND);
-    private final CommandManager commandManager = CommandManager.create();
     private final TrickManager trickManager = new TrickManager(this);
     private final PagedListManager pagedListManager = new PagedListManager();
 
@@ -124,14 +122,6 @@ public final class MangoBot implements Plugin {
 
     public JDA getJDA() {
         return jda;
-    }
-
-    /**
-     * Use {@link #getCommandDispatcher()}
-     */
-    @Deprecated(forRemoval = true)
-    public CommandManager getCommandManager() {
-        return commandManager;
     }
 
     public ICommandDispatcher<Message, JDACommandResult> getCommandDispatcher() {

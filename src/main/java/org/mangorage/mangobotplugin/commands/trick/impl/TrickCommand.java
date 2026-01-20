@@ -2,7 +2,6 @@ package org.mangorage.mangobotplugin.commands.trick.impl;
 
 import net.dv8tion.jda.api.entities.Message;
 import org.mangorage.mangobotcore.api.command.v1.CommandParseResult;
-import org.mangorage.mangobotcore.api.jda.command.v1.CommandResult;
 import org.mangorage.mangobotcore.api.jda.command.v2.AbstractJDACommand;
 import org.mangorage.mangobotcore.api.jda.command.v2.JDACommandResult;
 import org.mangorage.mangobotcore.api.jda.event.v1.CommandEvent;
@@ -10,8 +9,6 @@ import org.mangorage.mangobotplugin.commands.trick.TrickManager;
 import org.mangorage.mangobotplugin.entrypoint.MangoBot;
 
 public final class TrickCommand extends AbstractJDACommand {
-
-
     private final TrickManager trickManager;
 
     public TrickCommand(String name, MangoBot plugin) {
@@ -47,7 +44,7 @@ public final class TrickCommand extends AbstractJDACommand {
                         },
                         new CommandParseResult()
                 );
-                event.setHandled(CommandResult.PASS);
+                event.setHandled(JDACommandResult.PASS);
             }
         }
     }

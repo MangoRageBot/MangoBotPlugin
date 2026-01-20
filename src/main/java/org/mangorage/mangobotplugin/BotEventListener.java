@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.SubscribeEvent;
 import org.mangorage.mangobotcore.api.command.v1.CommandParseResult;
-import org.mangorage.mangobotcore.api.jda.command.v1.CommandResult;
 import org.mangorage.mangobotcore.api.jda.command.v2.JDACommandResult;
 import org.mangorage.mangobotcore.api.jda.event.v1.CommandEvent;
 import org.mangorage.mangobotcore.api.jda.event.v1.DiscordButtonInteractEvent;
@@ -84,24 +83,21 @@ public final class BotEventListener {
                         message.delete().queue();
                     }, 250, TimeUnit.MILLISECONDS);
             } else {
-                mangoBot.getCommandManager().handle(event.getMessage());
 
-                // TODO: Undo When we remove the old cmd manager!
-//                String[] command_pre = rawMessage.split(" ");
-//                Arguments arguments = Arguments.of(Arrays.copyOfRange(command_pre, 1, command_pre.length));
-//
-//                var cmd = rawMessage.replaceFirst(cmdPrefix, "").split(" ");
-//
-//                final var cmdEvent = CommandEvent.BUS.fire(new CommandEvent(message, cmd[0], arguments));
-//                if (cmdEvent.isHandled())
-//                    cmdEvent.getResult().accept(message);
+                String[] command_pre = rawMessage.split(" ");
+                Arguments arguments = Arguments.of(Arrays.copyOfRange(command_pre, 1, command_pre.length));
+
+                var cmd = rawMessage.replaceFirst(cmdPrefix, "").split(" ");
+
+                final var cmdEvent = CommandEvent.BUS.fire(new CommandEvent(message, cmd[0], arguments));
+                if (cmdEvent.isHandled()) {
+                    final var msg = cmdEvent.getResult().getMessage();
+                    if (msg != null)
+                        message.reply(msg).queue();
+                }
+
             }
-
-            // TODO: Move isSilent check to here, to delete the cmd that was "attempted"
         }
-
-
-
     }
 
     @SubscribeEvent
