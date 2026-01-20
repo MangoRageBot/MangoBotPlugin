@@ -21,19 +21,11 @@ import org.mangorage.mangobotcore.api.util.jda.ButtonActionRegistry;
 import org.mangorage.mangobotcore.api.util.jda.MessageSettings;
 import org.mangorage.mangobotcore.api.util.jda.slash.command.Command;
 import org.mangorage.mangobotplugin.BotEventListener;
-import org.mangorage.mangobotplugin.commands.internal.HomeDepotAlertCommand;
+import org.mangorage.mangobotplugin.commands.internal.homedepot.HomeDepotCommand;
 import org.mangorage.mangobotplugin.pagedlist.PagedListManager;
 import org.mangorage.mangobotplugin.actions.TrashButtonAction;
 import org.mangorage.mangobotplugin.commands.PingCommand;
 import org.mangorage.mangobotplugin.commands.PingsCommand;
-import org.mangorage.mangobotplugin.commands.internal.EmojiCommand;
-import org.mangorage.mangobotplugin.commands.music.commands.PauseCommand;
-import org.mangorage.mangobotplugin.commands.music.commands.PlayCommand;
-import org.mangorage.mangobotplugin.commands.music.commands.PlayingCommand;
-import org.mangorage.mangobotplugin.commands.music.commands.QueueCommand;
-import org.mangorage.mangobotplugin.commands.music.commands.SkipCommand;
-import org.mangorage.mangobotplugin.commands.music.commands.StopCommand;
-import org.mangorage.mangobotplugin.commands.music.commands.VolumeCommand;
 import org.mangorage.mangobotplugin.commands.trick.TrickCommand;
 
 import java.nio.file.Path;
@@ -91,19 +83,9 @@ public final class MangoBot implements Plugin {
 
         commandDispatcher.register(new PingCommand("ping"));
         commandDispatcher.register(new PingsCommand("pings"));;
-
-        commandManager.register(new EmojiCommand());
-        commandManager.register(new HomeDepotAlertCommand());
+        commandDispatcher.register(new HomeDepotCommand("homedepot"));
 
         commandManager.register(new TrickCommand(this));
-
-        commandManager.register(new PauseCommand());
-        commandManager.register(new PlayCommand());
-        commandManager.register(new PlayingCommand());
-        commandManager.register(new QueueCommand(pagedListManager));
-        commandManager.register(new StopCommand());
-        commandManager.register(new VolumeCommand());
-        commandManager.register(new SkipCommand());
     }
 
     @Override
