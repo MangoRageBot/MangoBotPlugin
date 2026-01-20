@@ -1,6 +1,7 @@
 package org.mangorage.mangobotplugin.commands;
 
 import net.dv8tion.jda.api.entities.Message;
+import org.mangorage.mangobotcore.api.command.v1.CommandParseResult;
 import org.mangorage.mangobotcore.api.jda.command.v2.AbstractJDACommand;
 import org.mangorage.mangobotcore.api.jda.command.v2.JDACommandResult;
 
@@ -11,7 +12,7 @@ public final class PingCommand extends AbstractJDACommand {
     }
 
     @Override
-    public JDACommandResult run(Message message, String[] arguments) {
+    public JDACommandResult run(Message message, String[] arguments, CommandParseResult commandParseResult) {
         message.reply("Pong!").queue();
         return JDACommandResult.PASS;
     }
