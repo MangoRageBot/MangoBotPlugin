@@ -1,4 +1,4 @@
-package org.mangorage.mangobotplugin.commands;
+package org.mangorage.mangobotplugin.commands.misc;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;

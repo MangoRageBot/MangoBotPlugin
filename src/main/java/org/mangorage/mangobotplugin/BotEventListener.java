@@ -79,11 +79,14 @@ public final class BotEventListener {
                     event.getMessage().reply(result.getMessage()).queue();
 
                 if (isSilent)
-                    TaskScheduler.getExecutor().schedule(() -> {
-                        message.delete().queue();
-                    }, 250, TimeUnit.MILLISECONDS);
+                    TaskScheduler.getExecutor().schedule(
+                            () -> {
+                                message.delete().queue();
+                                },
+                            250,
+                            TimeUnit.MILLISECONDS
+                    );
             } else {
-
                 String[] command_pre = rawMessage.split(" ");
                 Arguments arguments = Arguments.of(Arrays.copyOfRange(command_pre, 1, command_pre.length));
 
@@ -95,7 +98,12 @@ public final class BotEventListener {
                     if (msg != null)
                         message.reply(msg).queue();
                 }
+            }
 
+            if (!cmdParseResult.getMessages().isEmpty()) {
+                message.reply(
+                        String.join("\n", cmdParseResult.getMessages())
+                ).queue();
             }
         }
     }

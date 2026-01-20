@@ -21,12 +21,13 @@ import org.mangorage.mangobotcore.api.util.jda.MessageSettings;
 import org.mangorage.mangobotcore.api.util.jda.slash.command.Command;
 import org.mangorage.mangobotplugin.BotEventListener;
 import org.mangorage.mangobotplugin.commands.internal.homedepot.HomeDepotCommand;
+import org.mangorage.mangobotplugin.commands.misc.HelpCommand;
 import org.mangorage.mangobotplugin.commands.trick.TrickManager;
 import org.mangorage.mangobotplugin.commands.trick.impl.TrickCommand;
 import org.mangorage.mangobotplugin.pagedlist.PagedListManager;
 import org.mangorage.mangobotplugin.actions.TrashButtonAction;
-import org.mangorage.mangobotplugin.commands.PingCommand;
-import org.mangorage.mangobotplugin.commands.PingsCommand;
+import org.mangorage.mangobotplugin.commands.misc.PingCommand;
+import org.mangorage.mangobotplugin.commands.misc.PingsCommand;
 
 import java.nio.file.Path;
 import java.util.EnumSet;
@@ -81,6 +82,7 @@ public final class MangoBot implements Plugin {
     public MangoBot() {
         ACTION_REGISTRY.register(new TrashButtonAction());
 
+        commandDispatcher.register(new HelpCommand("help", getCommandDispatcher()));
         commandDispatcher.register(new PingCommand("ping"));
         commandDispatcher.register(new PingsCommand("pings"));;
         commandDispatcher.register(new HomeDepotCommand("homedepot"));

@@ -1,4 +1,4 @@
-package org.mangorage.mangobotplugin.commands;
+package org.mangorage.mangobotplugin.commands.misc;
 
 import net.dv8tion.jda.api.entities.Message;
 import org.mangorage.mangobotcore.api.command.v1.CommandParseResult;
