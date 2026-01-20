@@ -22,6 +22,13 @@ public final class TrickManager {
         });
     }
 
+    public List<Long> getAllGuilds() {
+        return loadedTricks.values().stream()
+                .map(Trick::getGuildID)
+                .distinct()
+                .toList();
+    }
+
     public List<Trick> getTricksForGuild(long guildId) {
         return loadedTricks.values().stream()
                 .filter(trick -> trick.getGuildID() == guildId)
