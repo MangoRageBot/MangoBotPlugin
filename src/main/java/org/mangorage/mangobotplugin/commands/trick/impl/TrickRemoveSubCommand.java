@@ -19,8 +19,8 @@ public final class TrickRemoveSubCommand extends AbstractJDACommand {
         super(name);
         this.trickManager = trickManager;
         this.trickArg = registerRequiredArgument(
-                "trick_id",
-                "The Trick ID",
+                "trick",
+                "The trick name",
                 StringArgumentType.single()
         );
     }

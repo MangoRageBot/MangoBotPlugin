@@ -15,7 +15,7 @@ import org.mangorage.mangobotplugin.commands.trick.TrickType;
 
 public final class TrickAddSubCommand extends AbstractJDACommand {
     private final TrickManager trickManager;
-    private final RequiredArg<String> trickArg = registerRequiredArgument("trick", "The trick to add", StringArgumentType.single());
+    private final RequiredArg<String> trickArg = registerRequiredArgument("trick", "The trick name", StringArgumentType.single());
     private final RequiredArg<TrickType> trickTypeArg = registerRequiredArgument("type", "The trick type", EnumArgumentType.of(TrickType.class));
     private final OptionalFlagArg trickSuppressArg = registerFlagArgument("--suppress", "Whether to suppress output");
     private final RequiredArg<String> trickDataArg = registerRequiredArgument("data", "The trick data", StringArgumentType.quote());
