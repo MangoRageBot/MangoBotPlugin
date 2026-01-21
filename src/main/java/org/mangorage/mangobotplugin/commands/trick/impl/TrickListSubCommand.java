@@ -4,7 +4,6 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.mangorage.mangobotcore.api.command.v1.CommandContext;
-import org.mangorage.mangobotcore.api.command.v1.CommandParseResult;
 import org.mangorage.mangobotcore.api.jda.command.v2.AbstractJDACommand;
 import org.mangorage.mangobotcore.api.jda.command.v2.JDACommandResult;
 import org.mangorage.mangobotcore.api.jda.event.v1.DiscordButtonInteractEvent;
@@ -30,13 +29,14 @@ public final class TrickListSubCommand extends AbstractJDACommand {
     }
 
     @Override
-    public JDACommandResult run(Message context, CommandContext commandContext, CommandParseResult commandParseResult) throws Throwable {
+    public JDACommandResult run(CommandContext<Message> commandContext) throws Throwable {
+        final var message = commandContext.getContextObject();
         int length = 5;
 
-        MessageChannelUnion channel = context.getChannel();
-        if (!trickManager.getTricksForGuild(context.getGuildIdLong()).isEmpty()) {
+        MessageChannelUnion channel = message.getChannel();
+        if (!trickManager.getTricksForGuild(message.getGuildIdLong()).isEmpty()) {
 
-            final long guildID = context.getGuildIdLong();
+            final long guildID = message.getGuildIdLong();
 
             PagedList<String> tricks = createTricks(guildID, length);
 

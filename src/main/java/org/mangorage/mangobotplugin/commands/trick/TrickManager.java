@@ -42,6 +42,10 @@ public final class TrickManager {
         return loadedTricks.get(new TrickKey(name, guildId));
     }
 
+    public void saveTrick(Trick trick) {
+        TRICKS_DATA_HANDLER.save(plugin.getPluginDirectory(), trick);
+    }
+
     public boolean removeTrick(String trickID, long guildID) {
         TrickKey key = new TrickKey(trickID, guildID);
         Trick removed = loadedTricks.remove(key);
@@ -54,6 +58,6 @@ public final class TrickManager {
 
     public void addTrick(Trick trick) {
         loadedTricks.put(new TrickKey(trick.getTrickID(), trick.getGuildID()), trick);
-        TRICKS_DATA_HANDLER.save(plugin.getPluginDirectory(), trick);
+        saveTrick(trick);
     }
 }

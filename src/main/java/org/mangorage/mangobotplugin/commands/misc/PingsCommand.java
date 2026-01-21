@@ -28,7 +28,8 @@ public final class PingsCommand extends AbstractJDACommand {
     }
 
     @Override
-    public JDACommandResult run(Message message, CommandContext commandContext, CommandParseResult commandParseResult) {
+    public JDACommandResult run(CommandContext<Message> commandContext) throws Throwable {
+        final var message = commandContext.getContextObject();
         var referenced = message.getReferencedMessage();
         if (referenced == null) {
             message.getChannel().sendMessageEmbeds(EMBED).queue();

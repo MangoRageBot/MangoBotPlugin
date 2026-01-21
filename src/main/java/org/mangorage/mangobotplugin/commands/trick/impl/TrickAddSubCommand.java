@@ -26,16 +26,18 @@ public final class TrickAddSubCommand extends AbstractJDACommand {
     }
 
     @Override
-    public JDACommandResult run(Message context, CommandContext commandContext, CommandParseResult commandParseResult) throws Throwable {
-        final var trickName = commandContext.getArgument(trickArg, commandParseResult);
-        final var trickType = commandContext.getArgument(trickTypeArg, commandParseResult);
-        final var trickSuppress = commandContext.getArgument(trickSuppressArg, commandParseResult);
-        final var trickData = commandContext.getArgument(trickDataArg, commandParseResult);
+    public JDACommandResult run(CommandContext<Message> commandContext) throws Throwable {
+        final var message = commandContext.getContextObject();
+        final var trickName = commandContext.getArgument(trickArg);
+        final var trickType = commandContext.getArgument(trickTypeArg);
+        final var trickSuppress = commandContext.getArgument(trickSuppressArg);
+        final var trickData = commandContext.getArgument(trickDataArg);
 
-        final var trick = new Trick(trickName, context.getGuildIdLong());
+        final var guildId = message.getGuildIdLong();
+        final var trick = new Trick(trickName, guildId);
 
-        if (trickManager.getTrickForGuildByName(context.getGuildIdLong(), trickName) != null) {
-            context.reply("A trick with that name already exists!").queue();
+        if (trickManager.getTrickForGuildByName(guildId, trickName) != null) {
+            message.reply("A trick with that name already exists!").queue();
             return JDACommandResult.PASS;
         }
 
@@ -55,11 +57,11 @@ public final class TrickAddSubCommand extends AbstractJDACommand {
         }
 
         trick.setSuppress(trickSuppress);
-        trick.setLastUserEdited(context.getAuthor().getIdLong());
-        trick.setOwnerID(context.getAuthor().getIdLong());
+        trick.setLastUserEdited(message.getAuthor().getIdLong());
+        trick.setOwnerID(message.getAuthor().getIdLong());
 
         trickManager.addTrick(trick);
-        context.reply("Added Trick '" + trickName + "' of type '" + trickType + "'!").queue();
+        message.reply("Added Trick '" + trickName + "' of type '" + trickType + "'!").queue();
 
         return JDACommandResult.PASS;
     }

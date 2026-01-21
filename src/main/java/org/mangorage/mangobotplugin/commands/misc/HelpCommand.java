@@ -2,7 +2,6 @@ package org.mangorage.mangobotplugin.commands.misc;
 
 import net.dv8tion.jda.api.entities.Message;
 import org.mangorage.mangobotcore.api.command.v1.CommandContext;
-import org.mangorage.mangobotcore.api.command.v1.CommandParseResult;
 import org.mangorage.mangobotcore.api.command.v1.ICommandDispatcher;
 import org.mangorage.mangobotcore.api.command.v1.argument.OptionalFlagArg;
 import org.mangorage.mangobotcore.api.command.v1.argument.RequiredArg;
@@ -22,10 +21,11 @@ public class HelpCommand extends AbstractJDACommand {
     }
 
     @Override
-    public JDACommandResult run(Message message, CommandContext commandContext, CommandParseResult commandParseResult) throws Throwable {
-        final boolean advanced = commandContext.getArgument(advancedFlag, commandParseResult);
-        final boolean extraInfo = commandContext.getArgument(extraInfoFlag, commandParseResult);
-        final String commandName = commandContext.getArgument(commandArg, commandParseResult);
+    public JDACommandResult run(CommandContext<Message> commandContext) throws Throwable {
+        final var message = commandContext.getContextObject();
+        final boolean advanced = commandContext.getArgument(advancedFlag);
+        final boolean extraInfo = commandContext.getArgument(extraInfoFlag);
+        final String commandName = commandContext.getArgument(commandArg);
 
         var command = commandDispatcher.getCommand(commandName);
 

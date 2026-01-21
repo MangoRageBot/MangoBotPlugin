@@ -8,7 +8,6 @@ import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
 import net.dv8tion.jda.api.entities.Message;
 import org.mangorage.mangobotcore.api.command.v1.CommandContext;
-import org.mangorage.mangobotcore.api.command.v1.CommandParseResult;
 import org.mangorage.mangobotcore.api.jda.command.v2.AbstractJDACommand;
 import org.mangorage.mangobotcore.api.jda.command.v2.JDACommandResult;
 
@@ -23,7 +22,8 @@ public final class HomeDepotScanQRSubCommand extends AbstractJDACommand {
     }
 
     @Override
-    public JDACommandResult run(Message message, CommandContext commandContext, CommandParseResult commandParseResult) throws Throwable {
+    public JDACommandResult run(CommandContext<Message> commandContext) throws Throwable {
+        final var message = commandContext.getContextObject();
         final var attachment = message.getAttachments().getFirst();
         if (attachment != null) {
             message.reply(

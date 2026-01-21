@@ -26,12 +26,13 @@ public final class TrickRemoveSubCommand extends AbstractJDACommand {
     }
 
     @Override
-    public JDACommandResult run(Message context, CommandContext commandContext, CommandParseResult commandParseResult) throws Throwable {
-        final var trickName = commandContext.getArgument(trickArg, commandParseResult);
-        if (trickManager.removeTrick(trickName, context.getGuildIdLong())) {
-            context.reply("Successfully removed trick: " + trickName).queue();
+    public JDACommandResult run(CommandContext<Message> commandContext) throws Throwable {
+        final var message = commandContext.getContextObject();
+        final var trickName = commandContext.getArgument(trickArg);
+        if (trickManager.removeTrick(trickName, message.getGuildIdLong())) {
+            message.reply("Successfully removed trick: " + trickName).queue();
         } else {
-            context.reply("No trick found with ID: " + trickName).queue();
+            message.reply("No trick found with ID: " + trickName).queue();
         }
         return JDACommandResult.PASS;
     }

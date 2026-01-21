@@ -2,7 +2,6 @@ package org.mangorage.mangobotplugin.commands.trick.impl;
 
 import net.dv8tion.jda.api.entities.Message;
 import org.mangorage.mangobotcore.api.command.v1.CommandContext;
-import org.mangorage.mangobotcore.api.command.v1.CommandParseResult;
 import org.mangorage.mangobotcore.api.command.v1.argument.RequiredArg;
 import org.mangorage.mangobotcore.api.command.v1.argument.types.StringArgumentType;
 import org.mangorage.mangobotcore.api.jda.command.v2.AbstractJDACommand;
@@ -25,27 +24,30 @@ public final class TrickShowSubCommand extends AbstractJDACommand {
     }
 
     @Override
-    public JDACommandResult run(Message context, CommandContext commandContext, CommandParseResult commandParseResult) throws Throwable {
-        final var trickName = commandContext.getArgument(trickNameArg, commandParseResult);
+    public JDACommandResult run(CommandContext<Message> commandContext) throws Throwable {
+        final var message = commandContext.getContextObject();
+        final var trickName = commandContext.getArgument(trickNameArg);
         var trick = trickManager.getTrickForGuildByName(
-                context.getGuild().getIdLong(),
+                message.getGuild().getIdLong(),
                 trickName
         );
 
         if (trick == null) {
-            context.reply("Trick with name '" + trickName + "' not found.");
+            message.reply("Trick with name '" + trickName + "' not found.").queue();
             return JDACommandResult.PASS;
         } else {
             if (trick.getType() == TrickType.ALIAS) {
                 trick = trickManager.getTrickForGuildByName(
-                        context.getGuild().getIdLong(),
+                        message.getGuild().getIdLong(),
                         trick.getAliasTarget()
                 );
             }
             switch (trick.getType()) {
-                case NORMAL, ALIAS -> context.reply(trick.getContent()).queue();
-                case SCRIPT -> context.reply("Trick '" + trickName + "' is a script trick. (Will add back)").queue();
+                case NORMAL, ALIAS -> message.reply(trick.getContent()).queue();
+                case SCRIPT -> message.reply("Trick '" + trickName + "' is a script trick. (Will add back)").queue();
             }
+            trick.use();
+            trickManager.saveTrick(trick);
         }
 
         return JDACommandResult.PASS;

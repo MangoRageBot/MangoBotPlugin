@@ -2,7 +2,6 @@ package org.mangorage.mangobotplugin.commands.internal.homedepot;
 
 import net.dv8tion.jda.api.entities.Message;
 import org.mangorage.mangobotcore.api.command.v1.CommandContext;
-import org.mangorage.mangobotcore.api.command.v1.CommandParseResult;
 import org.mangorage.mangobotcore.api.command.v1.argument.RequiredArg;
 import org.mangorage.mangobotcore.api.command.v1.argument.types.StringArgumentType;
 import org.mangorage.mangobotcore.api.jda.command.v2.AbstractJDACommand;
@@ -27,8 +26,9 @@ public class HomeDepotSendAlertSubCommand extends AbstractJDACommand {
     }
 
     @Override
-    public JDACommandResult run(Message message, CommandContext commandContext, CommandParseResult commandParseResult) throws Throwable {
-        final var taskId = commandContext.getArgument(taskIdArg, commandParseResult);
+    public JDACommandResult run(CommandContext<Message> commandContext) throws Throwable {
+        final var message = commandContext.getContextObject();
+        final var taskId = commandContext.getArgument(taskIdArg);
         message.reply(
                 createAssociateTask(taskId)
         ).queue();

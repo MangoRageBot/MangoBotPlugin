@@ -51,7 +51,7 @@ public final class TrickCommand extends AbstractJDACommand {
     }
 
     @Override
-    public JDACommandResult run(Message context, CommandContext commandContext, CommandParseResult commandParseResult) throws Throwable {
+    public JDACommandResult run(CommandContext<Message> commandContext) throws Throwable {
         return JDACommandResult.PASS;
     }
 }
