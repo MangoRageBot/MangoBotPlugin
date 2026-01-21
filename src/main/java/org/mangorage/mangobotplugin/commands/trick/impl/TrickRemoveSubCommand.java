@@ -1,6 +1,7 @@
 package org.mangorage.mangobotplugin.commands.trick.impl;
 
 import net.dv8tion.jda.api.entities.Message;
+import org.mangorage.mangobotcore.api.command.v1.CommandContext;
 import org.mangorage.mangobotcore.api.command.v1.CommandParseResult;
 import org.mangorage.mangobotcore.api.command.v1.argument.RequiredArg;
 import org.mangorage.mangobotcore.api.command.v1.argument.types.StringArgumentType;
@@ -25,8 +26,8 @@ public final class TrickRemoveSubCommand extends AbstractJDACommand {
     }
 
     @Override
-    public JDACommandResult run(Message context, String[] arguments, CommandParseResult commandParseResult) throws Throwable {
-        final var trickName = trickArg.get(arguments, commandParseResult);
+    public JDACommandResult run(Message context, CommandContext commandContext, CommandParseResult commandParseResult) throws Throwable {
+        final var trickName = commandContext.getArgument(trickArg, commandParseResult);
         if (trickManager.removeTrick(trickName, context.getGuildIdLong())) {
             context.reply("Successfully removed trick: " + trickName).queue();
         } else {

@@ -3,6 +3,7 @@ package org.mangorage.mangobotplugin.commands.trick.impl;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.mangorage.mangobotcore.api.command.v1.CommandContext;
 import org.mangorage.mangobotcore.api.command.v1.CommandParseResult;
 import org.mangorage.mangobotcore.api.jda.command.v2.AbstractJDACommand;
 import org.mangorage.mangobotcore.api.jda.command.v2.JDACommandResult;
@@ -29,7 +30,7 @@ public final class TrickListSubCommand extends AbstractJDACommand {
     }
 
     @Override
-    public JDACommandResult run(Message context, String[] arguments, CommandParseResult commandParseResult) throws Throwable {
+    public JDACommandResult run(Message context, CommandContext commandContext, CommandParseResult commandParseResult) throws Throwable {
         int length = 5;
 
         MessageChannelUnion channel = context.getChannel();

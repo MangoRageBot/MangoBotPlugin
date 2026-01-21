@@ -1,9 +1,10 @@
 package org.mangorage.mangobotplugin.commands.trick.impl;
 
 import net.dv8tion.jda.api.entities.Message;
+import org.mangorage.mangobotcore.api.command.v1.CommandContext;
 import org.mangorage.mangobotcore.api.command.v1.CommandParseResult;
+import org.mangorage.mangobotcore.api.command.v1.argument.OptionalFlagArg;
 import org.mangorage.mangobotcore.api.command.v1.argument.RequiredArg;
-import org.mangorage.mangobotcore.api.command.v1.argument.types.BooleanArgumentType;
 import org.mangorage.mangobotcore.api.command.v1.argument.types.EnumArgumentType;
 import org.mangorage.mangobotcore.api.command.v1.argument.types.StringArgumentType;
 import org.mangorage.mangobotcore.api.jda.command.v2.AbstractJDACommand;
@@ -16,7 +17,7 @@ public final class TrickAddSubCommand extends AbstractJDACommand {
     private final TrickManager trickManager;
     private final RequiredArg<String> trickArg = registerRequiredArgument("trick", "The trick to add", StringArgumentType.single());
     private final RequiredArg<TrickType> trickTypeArg = registerRequiredArgument("type", "The trick type", EnumArgumentType.of(TrickType.class));
-    private final RequiredArg<Boolean> trickSuppressArg = registerRequiredArgument("suppress", "Whether to suppress output", BooleanArgumentType.INSTANCE);
+    private final OptionalFlagArg trickSuppressArg = registerFlagArgument("--suppress", "Whether to suppress output");
     private final RequiredArg<String> trickDataArg = registerRequiredArgument("data", "The trick data", StringArgumentType.quote());
 
     public TrickAddSubCommand(String name, TrickManager trickManager) {
@@ -25,11 +26,11 @@ public final class TrickAddSubCommand extends AbstractJDACommand {
     }
 
     @Override
-    public JDACommandResult run(Message context, String[] arguments, CommandParseResult commandParseResult) throws Throwable {
-        final var trickName = trickArg.get(arguments, commandParseResult);
-        final var trickType = trickTypeArg.get(arguments, commandParseResult);
-        final var trickSuppress = trickSuppressArg.get(arguments, commandParseResult);
-        final var trickData = trickDataArg.get(arguments, commandParseResult);
+    public JDACommandResult run(Message context, CommandContext commandContext, CommandParseResult commandParseResult) throws Throwable {
+        final var trickName = commandContext.getArgument(trickArg, commandParseResult);
+        final var trickType = commandContext.getArgument(trickTypeArg, commandParseResult);
+        final var trickSuppress = commandContext.getArgument(trickSuppressArg, commandParseResult);
+        final var trickData = commandContext.getArgument(trickDataArg, commandParseResult);
 
         final var trick = new Trick(trickName, context.getGuildIdLong());
 
