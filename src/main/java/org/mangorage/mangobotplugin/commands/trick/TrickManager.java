@@ -52,4 +52,8 @@ public final class TrickManager {
         return false;
     }
 
+    public void addTrick(Trick trick) {
+        loadedTricks.put(new TrickKey(trick.getTrickID(), trick.getGuildID()), trick);
+        TRICKS_DATA_HANDLER.save(plugin.getPluginDirectory(), trick);
+    }
 }

@@ -4,9 +4,7 @@ import com.google.gson.annotations.Expose;
 import org.mangorage.mangobotcore.api.util.data.FileName;
 import org.mangorage.mangobotcore.api.util.data.IFileNameResolver;
 
-import java.util.HashMap;
-
-public class Trick implements IFileNameResolver {
+public final class Trick implements IFileNameResolver {
     @Expose
     private long ownerID;
 
@@ -50,44 +48,45 @@ public class Trick implements IFileNameResolver {
     private TrickType type;
 
 
-    protected Trick(String trickID, long guildID) {
+    public Trick(String trickID, long guildID) {
         this.trickID = trickID;
         this.guildID = guildID;
         this.created = System.currentTimeMillis();
     }
 
-    protected void setAliasTarget(String target) {
+    public void setAliasTarget(String target) {
         this.aliasTarget = target;
     }
-    protected void setSuppress(boolean suppress) {
+
+    public void setSuppress(boolean suppress) {
         this.suppress = suppress;
     }
 
-    protected void setType(TrickType type) {
+    public void setType(TrickType type) {
         this.type = type;
     }
 
-    protected void setContent(String content) {
+    public void setContent(String content) {
         this.content = content;
     }
 
-    protected void setScript(String script) {
+    public void setScript(String script) {
         this.script = script;
     }
 
-    protected void setOwnerID(long ownerID) {
+    public void setOwnerID(long ownerID) {
         this.ownerID = ownerID;
     }
 
-    protected void setLastUserEdited(long user) {
+    public void setLastUserEdited(long user) {
         this.lastUserEdited = user;
     }
 
-    protected void setLock(boolean locked) {
+    public void setLock(boolean locked) {
         this.locked = locked;
     }
 
-    protected void setLastEdited(long ms) {
+    public void setLastEdited(long ms) {
         this.lastEdited = ms;
     }
 
@@ -143,7 +142,7 @@ public class Trick implements IFileNameResolver {
         return suppress;
     }
 
-    protected void use() {
+    public void use() {
         timesUsed++;
     }
 
