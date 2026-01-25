@@ -14,6 +14,7 @@ import org.mangorage.mangobotplugin.commands.trick.Trick;
 import org.mangorage.mangobotplugin.commands.trick.TrickManager;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -26,6 +27,14 @@ public final class TrickListSubCommand extends AbstractJDACommand {
         super(name);
         this.trickManager = trickManager;
         DiscordButtonInteractEvent.BUS.addListener(this::onButton);
+    }
+
+    @Override
+    public List<String> getCommandNotes() {
+        return List.of(
+                "Description:",
+                "Trick List Command"
+        );
     }
 
     @Override

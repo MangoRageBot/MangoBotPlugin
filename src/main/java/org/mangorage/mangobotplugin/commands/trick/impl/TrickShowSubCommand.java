@@ -9,6 +9,8 @@ import org.mangorage.mangobotcore.api.jda.command.v2.JDACommandResult;
 import org.mangorage.mangobotplugin.commands.trick.TrickManager;
 import org.mangorage.mangobotplugin.commands.trick.TrickType;
 
+import java.util.List;
+
 public final class TrickShowSubCommand extends AbstractJDACommand {
     private final RequiredArg<String> trickNameArg;
     private final TrickManager trickManager;
@@ -21,6 +23,14 @@ public final class TrickShowSubCommand extends AbstractJDACommand {
             StringArgumentType.single()
         );
         this.trickManager = trickManager;
+    }
+
+    @Override
+    public List<String> getCommandNotes() {
+        return List.of(
+                "Description:",
+                "Trick Show Command"
+        );
     }
 
     @Override

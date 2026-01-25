@@ -13,6 +13,8 @@ import org.mangorage.mangobotplugin.commands.trick.Trick;
 import org.mangorage.mangobotplugin.commands.trick.TrickManager;
 import org.mangorage.mangobotplugin.commands.trick.TrickType;
 
+import java.util.List;
+
 public final class TrickAddSubCommand extends AbstractJDACommand {
     private final TrickManager trickManager;
     private final RequiredArg<String> trickArg = registerRequiredArgument("trick", "The trick name", StringArgumentType.single());
@@ -23,6 +25,14 @@ public final class TrickAddSubCommand extends AbstractJDACommand {
     public TrickAddSubCommand(String name, TrickManager trickManager) {
         super(name);
         this.trickManager = trickManager;
+    }
+
+    @Override
+    public List<String> getCommandNotes() {
+        return List.of(
+                "Description:",
+                "Trick Add Command"
+        );
     }
 
     @Override
