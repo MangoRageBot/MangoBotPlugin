@@ -66,8 +66,12 @@ public final class BotEventListener {
 
 
         if (isSilent || rawMessage.startsWith(cmdPrefix)) {
+            final long cmdStart = System.currentTimeMillis();
             final var cmdParseResult = new CommandParseResult(); // TODO: Do something with this when we convert to new cmd system!
             final var dispatcher = mangoBot.getCommandDispatcher();
+
+            event.getChannel().sendTyping().queue(); // Let people know the command is executing!
+
             final var result = dispatcher.execute(
                     isSilent ? rawMessage.replaceFirst(silentPrefix, "") : rawMessage.replaceFirst(cmdPrefix, ""),
                     message,
@@ -79,13 +83,8 @@ public final class BotEventListener {
                     event.getMessage().reply(result.getMessage()).queue();
 
                 if (isSilent)
-                    TaskScheduler.getExecutor().schedule(
-                            () -> {
-                                message.delete().queue();
-                                },
-                            250,
-                            TimeUnit.MILLISECONDS
-                    );
+                    message.delete().queueAfter(250, TimeUnit.MILLISECONDS);
+
             } else {
                 String[] command_pre = rawMessage.split(" ");
                 Arguments arguments = Arguments.of(Arrays.copyOfRange(command_pre, 1, command_pre.length));
@@ -105,6 +104,13 @@ public final class BotEventListener {
                         String.join("\n", cmdParseResult.getMessages())
                 ).queue();
             }
+
+            final var cmdEnd = System.currentTimeMillis() - cmdStart;
+            message.reply(
+                    "Took: %sms to process command request!".formatted(cmdEnd)
+            ).queue(m -> {
+                m.delete().queueAfter(5, TimeUnit.SECONDS);
+            });
         }
     }
 

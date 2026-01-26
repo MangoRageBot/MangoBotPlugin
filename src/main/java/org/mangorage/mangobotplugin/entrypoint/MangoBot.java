@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.hooks.AnnotatedEventManager;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
@@ -114,11 +115,13 @@ public final class MangoBot implements Plugin {
 
         getJDA().addEventListener(new BotEventListener(this));
 
+        registerSlashCommands();
+
         jda.updateCommands()
                 .addCommands(
                         Command.globalCommands
                 ).queue();
-        
+
         System.out.println("Launched");
     }
 
@@ -144,5 +147,14 @@ public final class MangoBot implements Plugin {
 
     public TrickManager getTrickManager() {
         return trickManager;
+    }
+
+    void registerSlashCommands() {
+        Command.slash("flipper", "flips things")
+                .executes(listener -> {
+                    listener.getMessageChannel().sendTyping().queue();
+                    listener.getMessageChannel().sendMessage("You flipped a rock and exploded the universe!").queue();
+                })
+                .buildAndRegister();
     }
 }
