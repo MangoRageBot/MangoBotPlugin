@@ -3,6 +3,7 @@ import org.mangorage.mangobotcore.api.plugin.v1.Plugin;
 import org.mangorage.mangobotplugin.module.ModuleConfigurator;
 
 module org.mangorage.mangobotplugin {
+    requires java.naming;
     requires okio;
     requires kotlin.stdlib;
     requires com.fasterxml.jackson.databind;
@@ -25,15 +26,15 @@ module org.mangorage.mangobotplugin {
     requires org.mangorage.bootstrap;
     requires com.google.zxing;
     requires com.google.zxing.javase;
+    requires jakarta.persistence;
+    requires org.hibernate.orm.core;
 
+    opens org.mangorage.mangobotplugin;
 
     exports org.mangorage.mangobotplugin.entrypoint;
     exports org.mangorage.mangobotplugin.commands.trick;
 
-    exports org.mangorage.mangobotplugin to net.dv8tion.jda;
-
-    exports org.mangorage.mangobotplugin.pagedlist to net.dv8tion.jda;
-
+    opens org.mangorage.mangobotplugin.pagedlist to net.dv8tion.jda;
     opens org.mangorage.mangobotplugin.commands.trick to com.google.gson;
 
 

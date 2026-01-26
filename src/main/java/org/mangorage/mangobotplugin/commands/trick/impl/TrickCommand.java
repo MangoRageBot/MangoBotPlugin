@@ -48,12 +48,14 @@ public final class TrickCommand extends AbstractJDACommand {
             final var trick = trickManager.getTrickForGuildByName(guildID, command);
             if (trick != null) {
                 execute(
-                        message,
-                        new String[]{
-                                "show",
-                                trick.getTrickID()
-                        },
-                        new CommandParseResult()
+                        CommandContext.of(
+                                message,
+                                new String[]{
+                                        "show",
+                                        trick.getTrickID()
+                                },
+                                new CommandParseResult()
+                        )
                 );
                 event.setHandled(JDACommandResult.PASS);
             }

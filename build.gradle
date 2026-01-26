@@ -77,7 +77,7 @@ dependencies {
     bootstrap("org.mangorage:mangobotbootstrap:1.0.84")
     launchtarget("org.mangorage:mangobotlaunchtarget:0.1.8")
 
-    plugin('org.mangorage:mangobot:12.0.116')
+    plugin('org.mangorage:mangobot:12.0.118')
 
     library('org.slf4j:slf4j-simple:2.0.13') // Use a recent version)
     library('org.luaj:luaj-jme:3.0.1')
@@ -87,6 +87,17 @@ dependencies {
 
     library("com.google.zxing:core:3.5.4")
     library("com.google.zxing:javase:3.5.4")
+
+    // SQL Stuff
+    library("org.hibernate.orm:hibernate-core:6.4.4.Final")
+    library("jakarta.persistence:jakarta.persistence-api:3.1.0")
+    library("jakarta.interceptor:jakarta.interceptor-api:2.1.0")
+    library('jakarta.enterprise:jakarta.enterprise.cdi-api:4.0.1')
+
+    // SQL Driver
+    library('org.postgresql:postgresql:42.7.9')
+    library('com.h2database:h2:2.2.224')
+
 }
 
 test {

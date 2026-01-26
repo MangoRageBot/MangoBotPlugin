@@ -1,6 +1,7 @@
 package org.mangorage.mangobotplugin.module;
 
 import org.mangorage.bootstrap.api.module.IModuleConfigurator;
+import org.mangorage.bootstrap.api.module.IModuleLayer;
 
 import java.util.List;
 
@@ -13,5 +14,13 @@ public final class ModuleConfigurator implements IModuleConfigurator {
             case "opus.java", "opus.java.api" -> List.of("opus.java.natives");
             default -> List.of();
         };
+    }
+
+    @Override
+    public void configureModuleLayer(IModuleLayer moduleLayer) {
+        moduleLayer.addReads(
+                "org.jboss.logging",
+                "java.logging"
+        );
     }
 }
