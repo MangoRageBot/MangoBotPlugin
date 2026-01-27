@@ -1,10 +1,24 @@
 package org.mangorage.mangobotplugin.commands.trick;
 
 import com.google.gson.annotations.Expose;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import org.mangorage.mangobotcore.api.util.data.FileName;
 import org.mangorage.mangobotcore.api.util.data.IFileNameResolver;
 
+import java.util.UUID;
+
+@Entity
+@Table(name = "tricks")
 public final class Trick implements IFileNameResolver {
+
+    @GeneratedValue
+    @Id
+    private UUID uuid;
+
     @Expose
     private long ownerID;
 
@@ -22,6 +36,7 @@ public final class Trick implements IFileNameResolver {
 
     // Cant be used for Script Based Tricks
     @Expose
+    @Column(columnDefinition = "TEXT")
     private String content;
 
     @Expose
@@ -29,24 +44,28 @@ public final class Trick implements IFileNameResolver {
 
     // Used for Script Based Tricks
     @Expose
+    @Column(columnDefinition = "TEXT")
     private String script;
 
     // Used for Alias Based Tricks
     @Expose
+    @Column(columnDefinition = "TEXT")
     private String aliasTarget;
 
     @Expose
-    private final String trickID;
+    @Column(columnDefinition = "TEXT")
+    private String trickID;
 
     @Expose
-    private final long guildID;
+    private long guildID;
 
     @Expose
-    private final long created;
+    private long created;
 
     @Expose
     private TrickType type;
 
+    private Trick() {}
 
     public Trick(String trickID, long guildID) {
         this.trickID = trickID;

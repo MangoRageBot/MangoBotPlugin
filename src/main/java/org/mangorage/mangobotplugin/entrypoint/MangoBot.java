@@ -39,9 +39,14 @@ public final class MangoBot implements Plugin {
     public static final ButtonActionRegistry ACTION_REGISTRY = new ButtonActionRegistry();
 
     // Where we create our "config"
-    public final static IConfig CONFIG =  IConfig.create(Path.of("plugins/%s/.env".formatted(MangoBot.ID)));
+    public final static IConfig CONFIG = IConfig.create(Path.of("plugins/%s/.env".formatted(MangoBot.ID)));
+
     // Where we create Settings for said Config
     public static final IConfigSetting<String> BOT_TOKEN = IConfigSetting.create(CONFIG, "BOT_TOKEN", ConfigTypes.STRING, "empty");
+    public static final IConfigSetting<String> BOT_DATABASE_URL = IConfigSetting.create(CONFIG, "BOT_DATABASE_URL", ConfigTypes.STRING, "empty");
+    public static final IConfigSetting<String> BOT_DATABASE_USERNAME = IConfigSetting.create(CONFIG, "BOT_DATABASE_USERNAME", ConfigTypes.STRING, "empty");
+    public static final IConfigSetting<String> BOT_DATABASE_PASSWORD = IConfigSetting.create(CONFIG, "BOT_DATABASE_PASSWORD", ConfigTypes.STRING, "empty");
+    public static final IConfigSetting<Boolean> BOT_USE_DATABASE = IConfigSetting.create(CONFIG, "BOT_USE_DATABASE", ConfigTypes.BOOLEAN, false);
 
     private static final EnumSet<GatewayIntent> intents = EnumSet.of(
             // Enables MessageReceivedEvent for guild (also known as servers)
