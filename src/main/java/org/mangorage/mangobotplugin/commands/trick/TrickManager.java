@@ -118,16 +118,21 @@ public final class TrickManager {
     }
 
     public boolean removeTrick(String trickID, long guildID) {
-        TrickKey key = new TrickKey(trickID, guildID);
-        Trick removed = loadedTricks.remove(key);
+        final var removed = loadedTricks.remove(new TrickKey(trickID, guildID));
 
         if (removed == null) return false;
 
         if (useDatabase) {
             try (Session session = sessionFactory.openSession()) {
-                Transaction tx = session.beginTransaction();
-                session.remove(removed);
-                tx.commit();
+                final var transaction = session.beginTransaction();
+                session
+                        .createMutationQuery(
+                                "delete from Trick t where t.trickID = :trickId and t.guildID = :guildId"
+                        )
+                        .setParameter("trickId", trickID)
+                        .setParameter("guildId", guildID)
+                        .executeUpdate();
+                transaction.commit();
             }
         } else {
             TRICKS_DATA_HANDLER.delete(plugin.getPluginDirectory(), removed);
