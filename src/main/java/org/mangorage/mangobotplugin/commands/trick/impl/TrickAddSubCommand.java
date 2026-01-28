@@ -2,7 +2,6 @@ package org.mangorage.mangobotplugin.commands.trick.impl;
 
 import net.dv8tion.jda.api.entities.Message;
 import org.mangorage.mangobotcore.api.command.v1.CommandContext;
-import org.mangorage.mangobotcore.api.command.v1.CommandParseResult;
 import org.mangorage.mangobotcore.api.command.v1.argument.OptionalFlagArg;
 import org.mangorage.mangobotcore.api.command.v1.argument.RequiredArg;
 import org.mangorage.mangobotcore.api.command.v1.argument.types.EnumArgumentType;
@@ -33,6 +32,11 @@ public final class TrickAddSubCommand extends AbstractJDACommand {
                 "Description:",
                 "Trick Add Command"
         );
+    }
+
+    @Override
+    public List<String> aliases() {
+        return List.of("a");
     }
 
     @Override

@@ -34,6 +34,11 @@ public final class TrickShowSubCommand extends AbstractJDACommand {
     }
 
     @Override
+    public List<String> aliases() {
+        return List.of("s");
+    }
+
+    @Override
     public JDACommandResult run(CommandContext<Message> commandContext) throws Throwable {
         final var message = commandContext.getContextObject();
         final var trickName = commandContext.getArgument(trickNameArg);

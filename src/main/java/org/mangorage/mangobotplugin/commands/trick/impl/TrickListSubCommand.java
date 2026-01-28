@@ -38,6 +38,11 @@ public final class TrickListSubCommand extends AbstractJDACommand {
     }
 
     @Override
+    public List<String> aliases() {
+        return List.of("l");
+    }
+
+    @Override
     public JDACommandResult run(CommandContext<Message> commandContext) throws Throwable {
         final var message = commandContext.getContextObject();
         int length = 5;

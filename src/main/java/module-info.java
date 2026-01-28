@@ -28,6 +28,7 @@ module org.mangorage.mangobotplugin {
     requires com.google.zxing.javase;
     requires jakarta.persistence;
     requires org.hibernate.orm.core;
+    requires opus.java.api;
 
     opens org.mangorage.mangobotplugin;
 

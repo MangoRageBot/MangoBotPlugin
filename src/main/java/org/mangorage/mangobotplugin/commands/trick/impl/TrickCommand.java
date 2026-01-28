@@ -36,6 +36,11 @@ public final class TrickCommand extends AbstractJDACommand {
         );
     }
 
+    @Override
+    public List<String> aliases() {
+        return List.of("t");
+    }
+
     public void onCommandEvent(CommandEvent event) {
         if (!event.isHandled()) {
             Message message = event.getMessage();
