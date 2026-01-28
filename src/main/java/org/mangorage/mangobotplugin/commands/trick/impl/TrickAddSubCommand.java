@@ -62,11 +62,11 @@ public final class TrickAddSubCommand extends AbstractJDACommand {
             }
             case ALIAS -> {
                 trick.setType(TrickType.ALIAS);
-                trick.setAliasTarget(trickData);
+                trick.setContent(trickData);
             }
             case SCRIPT -> {
                 trick.setType(TrickType.SCRIPT);
-                trick.setScript(trickData);
+                trick.setContent(trickData);
             }
         }
 

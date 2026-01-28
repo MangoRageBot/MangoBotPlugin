@@ -5,6 +5,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.Formula;
 import org.mangorage.mangobotcore.api.util.data.FileName;
 import org.mangorage.mangobotcore.api.util.data.IFileNameResolver;
 
@@ -32,23 +33,12 @@ public final class Trick implements IFileNameResolver {
     @Expose
     private long timesUsed = 0;
 
-    // Cant be used for Script Based Tricks
     @Expose
     @Column(columnDefinition = "TEXT")
     private String content;
 
     @Expose
     private boolean suppress = false;
-
-    // Used for Script Based Tricks
-    @Expose
-    @Column(columnDefinition = "TEXT")
-    private String script;
-
-    // Used for Alias Based Tricks
-    @Expose
-    @Column(columnDefinition = "TEXT")
-    private String aliasTarget;
 
     @Expose
     @Column(columnDefinition = "TEXT")
@@ -72,24 +62,16 @@ public final class Trick implements IFileNameResolver {
         this.created = System.currentTimeMillis();
     }
 
-    public void setAliasTarget(String target) {
-        this.aliasTarget = target;
-    }
-
     public void setSuppress(boolean suppress) {
         this.suppress = suppress;
-    }
-
-    public void setType(TrickType type) {
-        this.type = type;
     }
 
     public void setContent(String content) {
         this.content = content;
     }
 
-    public void setScript(String script) {
-        this.script = script;
+    public void setType(TrickType type) {
+        this.type = type;
     }
 
     public void setOwnerID(long ownerID) {
@@ -112,10 +94,6 @@ public final class Trick implements IFileNameResolver {
         return type;
     }
 
-    public String getAliasTarget() {
-        return aliasTarget;
-    }
-
     public long getOwnerID() {
         return ownerID;
     }
@@ -134,10 +112,6 @@ public final class Trick implements IFileNameResolver {
 
     public String getContent() {
         return content;
-    }
-
-    public String getScript() {
-        return script;
     }
 
     public String getTrickID() {
