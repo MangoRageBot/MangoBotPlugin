@@ -3,7 +3,6 @@ package org.mangorage.mangobotplugin.commands.trick;
 import com.google.gson.annotations.Expose;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import org.mangorage.mangobotcore.api.util.data.FileName;
@@ -15,7 +14,6 @@ import java.util.UUID;
 @Table(name = "tricks")
 public final class Trick implements IFileNameResolver {
 
-    @GeneratedValue
     @Id
     private UUID uuid;
 
@@ -68,6 +66,7 @@ public final class Trick implements IFileNameResolver {
     private Trick() {}
 
     public Trick(String trickID, long guildID) {
+        this.uuid = UUID.randomUUID();
         this.trickID = trickID;
         this.guildID = guildID;
         this.created = System.currentTimeMillis();
