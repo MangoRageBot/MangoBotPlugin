@@ -54,7 +54,7 @@ public final class TrickShowSubCommand extends AbstractJDACommand {
             if (trick.getType() == TrickType.ALIAS) {
                 trick = trickManager.getTrickForGuildByName(
                         message.getGuild().getIdLong(),
-                        trick.getAliasTarget()
+                        trick.getContent()
                 );
             }
             switch (trick.getType()) {
