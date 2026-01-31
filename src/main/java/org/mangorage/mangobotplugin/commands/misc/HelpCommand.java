@@ -16,7 +16,7 @@ public class HelpCommand extends AbstractJDACommand {
     private final RequiredArg<String> commandArg = registerRequiredArgument("command", "The command to get help for", StringArgumentType.single());
 
     public HelpCommand(String name, ICommandDispatcher<Message, JDACommandResult> commandDispatcher) {
-        super(name);
+        super(name, "Help Command");
         this.commandDispatcher = commandDispatcher;
     }
 

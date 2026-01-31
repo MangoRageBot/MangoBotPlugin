@@ -18,20 +18,12 @@ public final class TrickRemoveSubCommand extends AbstractJDACommand {
     private final RequiredArg<String> trickArg;
 
     public TrickRemoveSubCommand(String name, TrickManager trickManager) {
-        super(name);
+        super(name, "Remove Trick");
         this.trickManager = trickManager;
         this.trickArg = registerRequiredArgument(
                 "trick",
                 "The trick name",
                 StringArgumentType.single()
-        );
-    }
-
-    @Override
-    public List<String> getCommandNotes() {
-        return List.of(
-                "Description:",
-                "Trick Remove Command"
         );
     }
 
@@ -44,11 +36,18 @@ public final class TrickRemoveSubCommand extends AbstractJDACommand {
     public JDACommandResult run(CommandContext<Message> commandContext) throws Throwable {
         final var message = commandContext.getContextObject();
         final var trickName = commandContext.getArgument(trickArg);
-        if (trickManager.removeTrick(trickName, message.getGuildIdLong())) {
-            message.reply("Successfully removed trick: " + trickName).queue();
-        } else {
+        final var trick = trickManager.getTrickForGuildByName(message.getGuildIdLong(), trickName);
+
+        if (trick == null) {
             message.reply("No trick found with ID: " + trickName).queue();
+            return JDACommandResult.PASS;
+        } else if (trick.isLocked()) {
+            message.reply("Trick is locked!").queue();
+            return JDACommandResult.PASS;
+        } else {
+            trickManager.removeTrick(trickName, trick.getGuildID());
+            message.reply("Removed Trick " + trickName).queue();
+            return JDACommandResult.PASS;
         }
-        return JDACommandResult.PASS;
     }
 }

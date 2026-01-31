@@ -7,7 +7,7 @@ import org.mangorage.mangobotcore.api.jda.command.v2.JDACommandResult;
 
 public final class HomeDepotCommand extends AbstractJDACommand {
     public HomeDepotCommand(String name) {
-        super(name);
+        super(name, "Home Depot Command");
         addSubCommand(
                 new HomeDepotScanQRSubCommand()
         );

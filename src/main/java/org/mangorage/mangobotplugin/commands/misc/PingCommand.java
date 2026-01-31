@@ -8,7 +8,7 @@ import org.mangorage.mangobotcore.api.jda.command.v2.JDACommandResult;
 public final class PingCommand extends AbstractJDACommand {
 
     public PingCommand(String name) {
-        super(name);
+        super(name, "Ping the discord bot and get a response!");
     }
 
     @Override

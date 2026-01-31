@@ -16,21 +16,13 @@ public final class TrickShowSubCommand extends AbstractJDACommand {
     private final TrickManager trickManager;
 
     public TrickShowSubCommand(String name, TrickManager trickManager) {
-        super(name);
+        super(name, "Shows a trick!");
         this.trickNameArg = registerRequiredArgument(
             "trick",
             "The trick name",
             StringArgumentType.single()
         );
         this.trickManager = trickManager;
-    }
-
-    @Override
-    public List<String> getCommandNotes() {
-        return List.of(
-                "Description:",
-                "Trick Show Command"
-        );
     }
 
     @Override

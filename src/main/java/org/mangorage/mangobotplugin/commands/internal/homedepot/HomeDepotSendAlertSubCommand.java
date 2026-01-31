@@ -17,7 +17,7 @@ public class HomeDepotSendAlertSubCommand extends AbstractJDACommand {
     private final RequiredArg<String> taskIdArg;
 
     public HomeDepotSendAlertSubCommand() {
-        super("alert");
+        super("alert", "Send an alert");
         this.taskIdArg = registerRequiredArgument(
                 "taskId",
                 "The Task ID to send the alert for (e.g., TRA128)",

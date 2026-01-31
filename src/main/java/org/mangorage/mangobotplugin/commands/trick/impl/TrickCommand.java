@@ -15,25 +15,20 @@ public final class TrickCommand extends AbstractJDACommand {
     private final TrickManager trickManager;
 
     public TrickCommand(String name, MangoBot plugin) {
-        super(name);
+        super(name, "Trick command");
         this.trickManager = plugin.getTrickManager();
 
 
         addSubCommand(new TrickAddSubCommand("add", plugin.getTrickManager()));
         addSubCommand(new TrickRemoveSubCommand("remove", plugin.getTrickManager()));
+        addSubCommand(new TrickModifyCommand("modify", plugin.getTrickManager()));
+        addSubCommand(new TrickLockCommand("lock", "Locks a trick", plugin.getTrickManager(), true));
+        addSubCommand(new TrickLockCommand("unlock", "Unlocks a trick", plugin.getTrickManager(), false));
 
         addSubCommand(new TrickShowSubCommand("show", plugin.getTrickManager()));
         addSubCommand(new TrickListSubCommand("list", plugin.getTrickManager()));
 
         CommandEvent.BUS.addListener(this::onCommandEvent);
-    }
-
-    @Override
-    public List<String> getCommandNotes() {
-        return List.of(
-                "Description:",
-                "Trick Command"
-        );
     }
 
     @Override

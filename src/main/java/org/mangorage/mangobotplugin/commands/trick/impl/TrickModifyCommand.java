@@ -9,27 +9,26 @@ import org.mangorage.mangobotcore.api.command.v1.argument.types.EnumArgumentType
 import org.mangorage.mangobotcore.api.command.v1.argument.types.StringArgumentType;
 import org.mangorage.mangobotcore.api.jda.command.v2.AbstractJDACommand;
 import org.mangorage.mangobotcore.api.jda.command.v2.JDACommandResult;
-import org.mangorage.mangobotplugin.commands.trick.Trick;
 import org.mangorage.mangobotplugin.commands.trick.TrickManager;
 import org.mangorage.mangobotplugin.commands.trick.TrickType;
 
 import java.util.List;
 
-public final class TrickAddSubCommand extends AbstractJDACommand {
+public final class TrickModifyCommand extends AbstractJDACommand {
     private final TrickManager trickManager;
     private final RequiredArg<String> trickArg = registerRequiredArgument("trick", "The trick name", StringArgumentType.single());
     private final OptionalArg<TrickType> trickTypeArg = registerOptionalArgument("type", "The trick type", EnumArgumentType.of(TrickType.class), TrickType.NORMAL);
     private final OptionalFlagArg trickSuppressArg = registerFlagArgument("--suppress", "Whether to suppress output");
     private final RequiredArg<String> trickDataArg = registerRequiredArgument("data", "The trick data", StringArgumentType.quote());
 
-    public TrickAddSubCommand(String name, TrickManager trickManager) {
-        super(name, "Add a trick");
+    public TrickModifyCommand(String name, TrickManager trickManager) {
+        super(name, "Modify a trick!");
         this.trickManager = trickManager;
     }
 
     @Override
     public List<String> aliases() {
-        return List.of("a");
+        return List.of("m");
     }
 
     @Override
@@ -41,10 +40,15 @@ public final class TrickAddSubCommand extends AbstractJDACommand {
         final var trickData = commandContext.getArgument(trickDataArg);
 
         final var guildId = message.getGuildIdLong();
-        final var trick = new Trick(trickName, guildId);
+        final var trick = trickManager.getTrickForGuildByName(guildId, trickName);
 
-        if (trickManager.getTrickForGuildByName(guildId, trickName) != null) {
-            message.reply("A trick with that name already exists!").queue();
+        if (trick == null) {
+            message.reply("A trick with that name doesn't exist!").queue();
+            return JDACommandResult.PASS;
+        }
+
+        if (trick.isLocked()) {
+            message.reply("That trick is already locked!").queue();
             return JDACommandResult.PASS;
         }
 
@@ -66,11 +70,10 @@ public final class TrickAddSubCommand extends AbstractJDACommand {
         trick.setSuppress(trickSuppress);
         trick.setLastUserEdited(message.getAuthor().getIdLong());
         trick.setLastEdited(System.currentTimeMillis());
-        trick.setOwnerID(message.getAuthor().getIdLong());
 
-        trickManager.addTrick(trick);
+        trickManager.saveTrick(trick);
 
-        message.reply("Added Trick '" + trickName + "' of type '" + trickType + "'!").queue();
+        message.reply("Modified Trick '" + trickName + "' of type '" + trickType + "'!").queue();
 
         return JDACommandResult.PASS;
     }

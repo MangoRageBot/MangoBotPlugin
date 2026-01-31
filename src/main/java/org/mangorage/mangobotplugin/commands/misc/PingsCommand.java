@@ -24,7 +24,7 @@ public final class PingsCommand extends AbstractJDACommand {
                     ).build();
 
     public PingsCommand(String name) {
-        super(name);
+        super(name, "Pings Command, send an embed...");
     }
 
     @Override

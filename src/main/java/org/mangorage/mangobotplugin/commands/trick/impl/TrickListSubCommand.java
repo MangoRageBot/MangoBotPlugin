@@ -24,17 +24,9 @@ public final class TrickListSubCommand extends AbstractJDACommand {
     private final TrickManager trickManager;
 
     public TrickListSubCommand(String name, TrickManager trickManager) {
-        super(name);
+        super(name, "List of tricks");
         this.trickManager = trickManager;
         DiscordButtonInteractEvent.BUS.addListener(this::onButton);
-    }
-
-    @Override
-    public List<String> getCommandNotes() {
-        return List.of(
-                "Description:",
-                "Trick List Command"
-        );
     }
 
     @Override

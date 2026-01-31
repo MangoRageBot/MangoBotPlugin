@@ -14,11 +14,11 @@ import org.mangorage.mangobotcore.api.jda.command.v2.JDACommandResult;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
-import java.net.URL;
+import java.net.URI;
 
 public final class HomeDepotScanQRSubCommand extends AbstractJDACommand {
     public HomeDepotScanQRSubCommand() {
-        super("scanqr");
+        super("scanqr", "scan a qr code");
     }
 
     @Override
@@ -34,7 +34,7 @@ public final class HomeDepotScanQRSubCommand extends AbstractJDACommand {
     }
 
     public static String readQrFromUrl(String imageUrl) throws Exception {
-        URL url = new URL(imageUrl);
+        final var url = URI.create(imageUrl).toURL();
 
         try (InputStream is = url.openStream()) {
             BufferedImage image = ImageIO.read(is);
