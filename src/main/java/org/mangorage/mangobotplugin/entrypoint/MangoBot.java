@@ -1,6 +1,5 @@
 package org.mangorage.mangobotplugin.entrypoint;
 
-import club.minnced.opus.util.OpusLibrary;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -29,8 +28,6 @@ import org.mangorage.mangobotplugin.pagedlist.PagedListManager;
 import org.mangorage.mangobotplugin.actions.TrashButtonAction;
 import org.mangorage.mangobotplugin.commands.misc.PingCommand;
 import org.mangorage.mangobotplugin.commands.misc.PingsCommand;
-
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.EnumSet;
 
@@ -126,13 +123,6 @@ public final class MangoBot implements Plugin {
                 .addCommands(
                         Command.globalCommands
                 ).queue();
-
-
-        try {
-            OpusLibrary.loadFromJar();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
 
         System.out.println("Launched");
     }
