@@ -5,15 +5,15 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import org.hibernate.annotations.Formula;
 import org.mangorage.mangobotcore.api.util.data.FileName;
 import org.mangorage.mangobotcore.api.util.data.IFileNameResolver;
+import org.mangorage.mangobotcore.api.util.data.IUniqueIdHolder;
 
 import java.util.UUID;
 
 @Entity
 @Table(name = "tricks")
-public final class Trick implements IFileNameResolver {
+public final class Trick implements IFileNameResolver, IUniqueIdHolder<UUID> {
 
     @Id
     private UUID uuid;
@@ -141,5 +141,10 @@ public final class Trick implements IFileNameResolver {
     @Override
     public FileName resolve() {
         return new FileName(guildID + "", trickID);
+    }
+
+    @Override
+    public UUID getId() {
+        return uuid;
     }
 }

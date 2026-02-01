@@ -9,6 +9,7 @@ module org.mangorage.mangobotplugin {
     requires com.fasterxml.jackson.databind;
     requires org.slf4j.simple;
 
+    requires org.mangorage.bootstrap;
     requires org.mangorage.mangobotcore;
 
     requires net.dv8tion.jda;
@@ -23,12 +24,7 @@ module org.mangorage.mangobotplugin {
     requires java.desktop;
     requires luaj.jme;
     requires org.apache.logging.log4j;
-    requires org.mangorage.bootstrap;
-    requires com.google.zxing;
-    requires com.google.zxing.javase;
     requires jakarta.persistence;
-    requires org.hibernate.orm.core;
-    requires opus.java.api;
 
     opens org.mangorage.mangobotplugin;
 
