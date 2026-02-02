@@ -25,6 +25,8 @@ module org.mangorage.mangobotplugin {
     requires luaj.jme;
     requires org.apache.logging.log4j;
     requires jakarta.persistence;
+    requires com.google.zxing;
+    requires com.google.zxing.javase;
 
     opens org.mangorage.mangobotplugin;
 
