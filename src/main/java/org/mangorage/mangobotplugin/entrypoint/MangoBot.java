@@ -3,6 +3,7 @@ package org.mangorage.mangobotplugin.entrypoint;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.hooks.AnnotatedEventManager;
@@ -14,14 +15,18 @@ import org.mangorage.mangobotcore.api.config.v1.ConfigTypes;
 import org.mangorage.mangobotcore.api.config.v1.IConfig;
 import org.mangorage.mangobotcore.api.config.v1.IConfigSetting;
 import org.mangorage.mangobotcore.api.jda.command.v2.JDACommandResult;
+import org.mangorage.mangobotcore.api.jda.permission.v1.JDAPermissionManager;
+import org.mangorage.mangobotcore.api.jda.permission.v1.JDAPermissionNode;
 import org.mangorage.mangobotcore.api.plugin.v1.MangoBotPlugin;
 import org.mangorage.mangobotcore.api.plugin.v1.Plugin;
+import org.mangorage.mangobotcore.api.util.data.DatabaseHandler;
 import org.mangorage.mangobotcore.api.util.jda.ButtonActionRegistry;
 import org.mangorage.mangobotcore.api.util.jda.MessageSettings;
 import org.mangorage.mangobotcore.api.util.jda.slash.command.Command;
 import org.mangorage.mangobotplugin.BotEventListener;
 import org.mangorage.mangobotplugin.commands.internal.homedepot.HomeDepotCommand;
 import org.mangorage.mangobotplugin.commands.misc.HelpCommand;
+import org.mangorage.mangobotplugin.commands.trick.Trick;
 import org.mangorage.mangobotplugin.commands.trick.TrickManager;
 import org.mangorage.mangobotplugin.commands.trick.impl.TrickCommand;
 import org.mangorage.mangobotplugin.pagedlist.PagedListManager;
@@ -79,7 +84,14 @@ public final class MangoBot implements Plugin {
 
     private final ICommandDispatcher<Message, JDACommandResult> commandDispatcher = ICommandDispatcher.create(JDACommandResult.INVALID_COMMAND);
     private final TrickManager trickManager = new TrickManager(this);
-    private final PagedListManager pagedListManager = new PagedListManager();
+    private final JDAPermissionManager permissionManager = JDAPermissionManager.create(
+            DatabaseHandler.create(
+                    MangoBot.BOT_DATABASE_URL.get(),
+                    MangoBot.BOT_DATABASE_USERNAME.get(),
+                    MangoBot.BOT_DATABASE_PASSWORD.get(),
+                    JDAPermissionNode.class
+            )
+    );
 
     private JDA jda;
 
@@ -91,6 +103,12 @@ public final class MangoBot implements Plugin {
         commandDispatcher.register(new PingsCommand("pings"));;
         commandDispatcher.register(new HomeDepotCommand("homedepot"));
         commandDispatcher.register(new TrickCommand("trick", this));
+
+        final var node = permissionManager.getPermissionNode("test_node");
+        node.authorizeUser(null, 194596094200643584L);
+        node.authoriseRoleId(null, 1128896227896224096L);
+        node.addRequiredPermission(Permission.ADMINISTRATOR);
+        permissionManager.savePermissionNode(node);
     }
 
     @Override
@@ -135,9 +153,6 @@ public final class MangoBot implements Plugin {
         return commandDispatcher;
     }
 
-    public PagedListManager getPagedListManager() {
-        return pagedListManager;
-    }
 
     public Path getPluginDirectory() {
         return Path.of("plugins").resolve(ID).toAbsolutePath();

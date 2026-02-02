@@ -5,7 +5,7 @@ import org.mangorage.mangobotcore.api.command.v1.CommandContext;
 import org.mangorage.mangobotcore.api.command.v1.PermissionNode;
 import org.mangorage.mangobotcore.api.jda.command.v2.AbstractJDACommand;
 import org.mangorage.mangobotcore.api.jda.command.v2.JDACommandResult;
-import org.mangorage.mangobotcore.api.jda.command.v2.JDAPermissionNode;
+import org.mangorage.mangobotcore.api.jda.permission.v1.JDAPermissionNode;
 
 public final class HomeDepotCommand extends AbstractJDACommand {
     private static final JDAPermissionNode DEV_PERMISSION_NODE = JDAPermissionNode.create("homedepot.dev");

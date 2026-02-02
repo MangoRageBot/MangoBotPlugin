@@ -1,7 +1,3 @@
-import org.mangorage.bootstrap.api.module.IModuleConfigurator;
-import org.mangorage.mangobotcore.api.plugin.v1.Plugin;
-import org.mangorage.mangobotplugin.module.ModuleConfigurator;
-
 module org.mangorage.mangobotplugin {
     requires java.naming;
     requires okio;
@@ -37,9 +33,9 @@ module org.mangorage.mangobotplugin {
     opens org.mangorage.mangobotplugin.commands.trick to com.google.gson, org.hibernate.orm.core;
 
 
-    provides Plugin with org.mangorage.mangobotplugin.entrypoint.MangoBot;
-    provides IModuleConfigurator with ModuleConfigurator;
+    provides org.mangorage.mangobotcore.api.plugin.v1.Plugin with org.mangorage.mangobotplugin.entrypoint.MangoBot;
+    provides org.mangorage.bootstrap.api.module.IModuleConfigurator with org.mangorage.mangobotplugin.module.ModuleConfigurator;
 
-    uses Plugin;
-    uses IModuleConfigurator;
+    uses org.mangorage.mangobotcore.api.plugin.v1.Plugin;
+    uses org.mangorage.bootstrap.api.module.IModuleConfigurator;
 }
