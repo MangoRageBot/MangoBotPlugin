@@ -102,15 +102,20 @@ public final class BotEventListener {
             if (!cmdParseResult.getMessages().isEmpty()) {
                 message.reply(
                         String.join("\n", cmdParseResult.getMessages())
-                ).queue();
+                ).queue(msg -> {
+                    // Delete after 5 seconds...
+                    msg.delete().queueAfter(5, TimeUnit.SECONDS);
+                });
             }
 
-            final var cmdEnd = System.currentTimeMillis() - cmdStart;
-            message.reply(
-                    "Took: %sms to process command request!".formatted(cmdEnd)
-            ).queue(m -> {
-                m.delete().queueAfter(5, TimeUnit.SECONDS);
-            });
+            if (MangoBotCore.isDevMode()) {
+                final var cmdEnd = System.currentTimeMillis() - cmdStart;
+                message.reply(
+                        "Took: %sms to process command request!".formatted(cmdEnd)
+                ).queue(m -> {
+                    m.delete().queueAfter(5, TimeUnit.SECONDS);
+                });
+            }
         }
     }
 
