@@ -23,6 +23,7 @@ module org.mangorage.mangobotplugin {
     requires jakarta.persistence;
     requires com.google.zxing;
     requires com.google.zxing.javase;
+    requires org.slf4j;
 
     opens org.mangorage.mangobotplugin;
 
