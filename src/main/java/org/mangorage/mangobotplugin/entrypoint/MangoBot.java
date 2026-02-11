@@ -31,6 +31,8 @@ import org.mangorage.mangobotplugin.commands.trick.impl.TrickCommand;
 import org.mangorage.mangobotplugin.actions.TrashButtonAction;
 import org.mangorage.mangobotplugin.commands.misc.PingCommand;
 import org.mangorage.mangobotplugin.commands.misc.PingsCommand;
+import org.slf4j.LoggerFactory;
+
 import java.nio.file.Path;
 import java.util.EnumSet;
 
