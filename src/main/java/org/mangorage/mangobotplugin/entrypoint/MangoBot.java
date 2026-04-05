@@ -1,5 +1,12 @@
 package org.mangorage.mangobotplugin.entrypoint;
 
+import dev.arbjerg.lavalink.client.Helpers;
+import dev.arbjerg.lavalink.client.LavalinkClient;
+import dev.arbjerg.lavalink.client.LinkState;
+import dev.arbjerg.lavalink.client.NodeOptions;
+import dev.arbjerg.lavalink.client.loadbalancing.VoiceRegion;
+import dev.arbjerg.lavalink.libraries.jda.JDAVoiceUpdateListener;
+import dev.arbjerg.lavalink.protocol.v4.VoiceState;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -7,6 +14,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.hooks.AnnotatedEventManager;
+import net.dv8tion.jda.api.hooks.VoiceDispatchInterceptor;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
@@ -19,6 +27,7 @@ import org.mangorage.mangobotcore.api.jda.permission.v1.JDAPermissionManager;
 import org.mangorage.mangobotcore.api.jda.permission.v1.JDAPermissionNode;
 import org.mangorage.mangobotcore.api.plugin.v1.MangoBotPlugin;
 import org.mangorage.mangobotcore.api.plugin.v1.Plugin;
+import org.mangorage.mangobotcore.api.plugin.v1.PluginManager;
 import org.mangorage.mangobotcore.api.util.data.DatabaseHandler;
 import org.mangorage.mangobotcore.api.util.jda.ButtonActionRegistry;
 import org.mangorage.mangobotcore.api.util.jda.MessageSettings;
@@ -26,6 +35,7 @@ import org.mangorage.mangobotcore.api.util.jda.slash.command.Command;
 import org.mangorage.mangobotplugin.BotEventListener;
 import org.mangorage.mangobotplugin.commands.internal.homedepot.HomeDepotCommand;
 import org.mangorage.mangobotplugin.commands.misc.HelpCommand;
+import org.mangorage.mangobotplugin.commands.music.impl.MusicCommand;
 import org.mangorage.mangobotplugin.commands.trick.TrickManager;
 import org.mangorage.mangobotplugin.commands.trick.impl.TrickCommand;
 import org.mangorage.mangobotplugin.actions.TrashButtonAction;
@@ -93,16 +103,30 @@ public final class MangoBot implements Plugin {
             )
     );
 
+    private final LavalinkClient client;
     private JDA jda;
 
     public MangoBot() {
         ACTION_REGISTRY.register(new TrashButtonAction());
+
+        this.client = new LavalinkClient(
+                Helpers.getUserIdFromToken(BOT_TOKEN.get())
+        );
+
+        client.addNode(
+                new NodeOptions.Builder()
+                        .setName("Main")
+                        .setServerUri("https://lavalinkv4.serenetia.com:443")
+                        .setPassword("https://seretia.link/discord")
+                        .build()
+        );
 
         commandDispatcher.register(new HelpCommand("help", getCommandDispatcher()));
         commandDispatcher.register(new PingCommand("ping"));
         commandDispatcher.register(new PingsCommand("pings"));;
         commandDispatcher.register(new HomeDepotCommand("homedepot"));
         commandDispatcher.register(new TrickCommand("trick", this));
+        commandDispatcher.register(new MusicCommand("music", client));
 
         final var node = permissionManager.getPermissionNode("test_node");
         node.authorizeUser(null, 194596094200643584L);
@@ -117,6 +141,7 @@ public final class MangoBot implements Plugin {
     }
 
     public void load() {
+
         jda = JDABuilder.createDefault(BOT_TOKEN.get())
                 .setEnabledIntents(intents)
                 .enableCache(cacheFlags)
@@ -131,6 +156,55 @@ public final class MangoBot implements Plugin {
                 .setEventManager(new AnnotatedEventManager())
                 .setEnableShutdownHook(true)
                 .setAutoReconnect(true)
+                .setVoiceDispatchInterceptor(
+                        new VoiceDispatchInterceptor() {
+                            @Override
+                            public void onVoiceServerUpdate(VoiceServerUpdate update) {
+                                String channelId = null;
+
+                                if (update.getGuild().getSelfMember().getVoiceState() != null &&
+                                        update.getGuild().getSelfMember().getVoiceState().getChannel() != null) {
+                                    channelId = update.getGuild().getSelfMember().getVoiceState().getChannel().getId();
+                                }
+
+                                VoiceState state = new VoiceState(
+                                        update.getToken(),
+                                        update.getEndpoint(),
+                                        update.getSessionId(),
+                                        channelId // yeah, still sketchy here too
+                                );
+
+                                VoiceRegion region = VoiceRegion.fromEndpoint(update.getEndpoint());
+                                var link = client.getOrCreateLink(update.getGuildIdLong(), region);
+
+                                link.onVoiceServerUpdate(state);
+                            }
+
+                            @Override
+                            public boolean onVoiceStateUpdate(VoiceStateUpdate update) {
+                                var channel = update.getChannel();
+                                var link = client.getLinkIfCached(update.getGuildIdLong());
+                                if (link == null) return false;
+
+                                var player = link.getNode().getCachedPlayer(update.getGuildIdLong());
+                                if (player == null) return false;
+
+                                var playerState = player.getState();
+
+                                if (channel == null) {
+                                    if (playerState.getConnected()) {
+                                        link.setState$lavalink_client(LinkState.CONNECTED);
+                                    } else {
+                                        link.setState$lavalink_client(LinkState.DISCONNECTED);
+                                        link.destroy().subscribe();
+                                    }
+                                }
+
+                                // Return true if a connection was previously established
+                                return playerState.getConnected();
+                            }
+                        }
+                )
                 .build();
 
         getJDA().addEventListener(new BotEventListener(this));
