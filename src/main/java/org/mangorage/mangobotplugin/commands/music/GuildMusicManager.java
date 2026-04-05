@@ -17,6 +17,14 @@ public class GuildMusicManager {
         this.guildId = guildId;
     }
 
+    public void next() {
+        if (this.scheduler.queue.isEmpty()) return;
+        final var track = this.scheduler.queue.poll();
+        getPlayer().ifPresent(player -> {
+            player.setPaused(false).setTrack(track).subscribe();
+        });
+    }
+
     public void stop() {
         this.scheduler.queue.clear();
 

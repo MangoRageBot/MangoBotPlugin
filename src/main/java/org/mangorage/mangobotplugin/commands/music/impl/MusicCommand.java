@@ -26,7 +26,10 @@ public final class MusicCommand extends AbstractJDACommand implements IMusicMana
         addSubCommand(new JoinCommand(this));
         addSubCommand(new PlayCommand(this));
         addSubCommand(new PauseCommand(this));
+        addSubCommand(new QueueCommand(this));
         addSubCommand(new StopCommand(this));
+        addSubCommand(new SkipCommand(this));
+        addSubCommand(new StatusCommand(this));
     }
 
     @Override
