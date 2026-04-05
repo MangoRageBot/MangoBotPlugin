@@ -3,21 +3,24 @@ package org.mangorage.mangobotplugin.commands.music;
 
 import dev.arbjerg.lavalink.client.AbstractAudioLoadResultHandler;
 import dev.arbjerg.lavalink.client.player.*;
+import net.dv8tion.jda.api.entities.Message;
 
 import java.util.List;
 
 public final class AudioLoader extends AbstractAudioLoadResultHandler {
     private final GuildMusicManager mngr;
+    private final Message message;
 
-    public AudioLoader(GuildMusicManager mngr) {
+    public AudioLoader(GuildMusicManager mngr, Message message) {
         this.mngr = mngr;
+        this.message = message;
     }
 
     @Override
     public void ontrackLoaded(TrackLoaded result) {
         final Track track = result.getTrack();
 
-        var userData = new MyUserData(0l);
+        var userData = new MyUserData(message.getAuthor().getIdLong());
 
         track.setUserData(userData);
 
@@ -25,15 +28,14 @@ public final class AudioLoader extends AbstractAudioLoadResultHandler {
 
         final var trackTitle = track.getInfo().getTitle();
 
-//        event.getHook().sendMessage("Added to queue: " + trackTitle + "\nRequested by: <@" + userData.requester() + '>').queue();
+        message.reply("Added to queue: " + trackTitle + "\nRequested by: <@" + userData.requester() + '>').queue();
     }
 
     @Override
     public void onPlaylistLoaded(PlaylistLoaded result) {
         final int trackCount = result.getTracks().size();
-//        event.getHook()
-//                .sendMessage("Added " + trackCount + " tracks to the queue from " + result.getInfo().getName() + "!")
-//                .queue();
+        message.reply("Added " + trackCount + " tracks to the queue from " + result.getInfo().getName() + "!")
+                .queue();
 
         this.mngr.scheduler.enqueuePlaylist(result.getTracks());
     }
@@ -49,18 +51,18 @@ public final class AudioLoader extends AbstractAudioLoadResultHandler {
 
         final Track firstTrack = tracks.get(0);
 
-        //event.getHook().sendMessage("Adding to queue: " + firstTrack.getInfo().getTitle()).queue();
+        message.reply("Adding to queue: " + firstTrack.getInfo().getTitle()).queue();
 
         this.mngr.scheduler.enqueue(firstTrack);
     }
 
     @Override
     public void noMatches() {
-        //event.getHook().sendMessage("No matches found for your input!").queue();
+        message.reply("No matches found for your input!").queue();
     }
 
     @Override
     public void loadFailed(LoadFailed result) {
-        //.getHook().sendMessage("Failed to load track! " + result.getException().getMessage()).queue();
+        message.reply("Failed to load track! " + result.getException().getMessage()).queue();
     }
 }

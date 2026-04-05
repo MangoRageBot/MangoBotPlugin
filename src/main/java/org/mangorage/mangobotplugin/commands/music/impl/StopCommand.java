@@ -17,13 +17,16 @@ public final class StopCommand extends AbstractJDACommand {
 
     @Override
     public JDACommandResult run(CommandContext<Message> commandContext) throws Throwable {
+        final var context = commandContext.getContextObject();
         final var guild = commandContext.getContextObject().getGuild();
 
         final var guildManager = manager.getOrCreate(guild.getIdLong());
         final var player = guildManager.getPlayer();
 
         player.ifPresent(lp -> {
-            lp.stopTrack().subscribe();
+            lp.stopTrack().subscribe(plr -> {
+                context.reply("Stopped Current Music Track!").queue();
+            });
         });
 
         return JDACommandResult.PASS;

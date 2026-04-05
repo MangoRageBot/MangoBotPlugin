@@ -26,13 +26,16 @@ public final class PauseCommand extends AbstractJDACommand {
 
     @Override
     public JDACommandResult run(CommandContext<Message> commandContext) throws Throwable {
+        final var context = commandContext.getContextObject();
         final var guild = commandContext.getContextObject().getGuild();
 
         final var guildManager = manager.getOrCreate(guild.getIdLong());
 
         guildManager.getPlayer()
                 .ifPresent(player -> {
-                    player.setPaused(true).subscribe();
+                    player.setPaused(true).subscribe(plr -> {
+                        context.reply("Paused Music!").queue();
+                    });
                 });
 
         return JDACommandResult.PASS;

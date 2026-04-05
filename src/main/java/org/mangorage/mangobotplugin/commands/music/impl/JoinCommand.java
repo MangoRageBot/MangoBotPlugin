@@ -29,19 +29,26 @@ public final class JoinCommand extends AbstractJDACommand {
         final var context = commandContext.getContextObject();
         final var member = context.getMember();
 
-        joinHelper(member, commandContext.getContextObject().getJDA());
+        if(joinHelper(member, commandContext.getContextObject().getJDA())) {
+            context.reply("Joined Voice Channel!").queue();
+        } else {
+            context.reply("Please move to a Voice Channel!").queue();
+        }
 
         return JDACommandResult.PASS;
     }
 
     // Makes sure that the bot is in a voice channel!
-    private void joinHelper(Member member, JDA jda) {
+    private boolean joinHelper(Member member, JDA jda) {
+        musicManager.getOrCreate(member.getGuild().getIdLong());
+
         final GuildVoiceState memberVoiceState = member.getVoiceState();
 
         if (memberVoiceState.inAudioChannel()) {
             jda.getDirectAudioController().connect(memberVoiceState.getChannel());
+            return true;
         }
 
-        musicManager.getOrCreate(member.getGuild().getIdLong());
+        return false;
     }
 }
