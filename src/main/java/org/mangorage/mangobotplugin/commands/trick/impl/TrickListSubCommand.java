@@ -1,8 +1,9 @@
 package org.mangorage.mangobotplugin.commands.trick.impl;
 
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.components.buttons.Button;
 import org.mangorage.mangobotcore.api.command.v1.CommandContext;
 import org.mangorage.mangobotcore.api.jda.command.v2.AbstractJDACommand;
 import org.mangorage.mangobotcore.api.jda.command.v2.JDACommandResult;
@@ -73,7 +74,7 @@ public final class TrickListSubCommand extends AbstractJDACommand {
             Button prev = Button.primary("prev".formatted(message.getId()), "previous");
             Button next = Button.primary("next".formatted(message.getId()), "next");
 
-            message.editMessage(result).setActionRow(prev, next).queue();
+            message.editMessage(result).setComponents(ActionRow.of(prev, next)).queue();
         } else {
             message.editMessage(result).queue();
         }
@@ -120,7 +121,7 @@ public final class TrickListSubCommand extends AbstractJDACommand {
         String ID = message.getId();
 
         if (PAGES.containsKey(ID)) {
-            updateTrickListMessage(PAGES.get(ID), message, false, interaction.getButton().getId());
+            updateTrickListMessage(PAGES.get(ID), message, false, interaction.getButton().getCustomId());
             interaction.getInteraction().deferEdit().queue();
         }
     }

@@ -1,12 +1,15 @@
 package org.mangorage.mangobotplugin;
 
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.SelfUser;
+import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.hooks.SubscribeEvent;
 import org.mangorage.mangobotcore.api.command.v1.CommandParseResult;
 import org.mangorage.mangobotcore.api.command.v1.ICommandDispatcher;
@@ -25,6 +28,11 @@ import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 public final class BotEventListener {
+
+    static String formatMessage(SelfUser bot, String message) {
+        return message.replaceFirst("<@" + bot.getId() + ">", "").trim();
+    }
+
 
     private final MangoBot mangoBot;
 
@@ -55,10 +63,16 @@ public final class BotEventListener {
 
     @SubscribeEvent
     public void onMessageReceived(MessageReceivedEvent event) {
-        DiscordMessageReceivedEvent.BUS.post(new DiscordMessageReceivedEvent(event));
 
         final var message = event.getMessage();
-        final var rawMessage = message.getContentRaw();
+        if (message.getContentRaw().isEmpty()) return;
+
+        DiscordMessageReceivedEvent.BUS.post(new DiscordMessageReceivedEvent(event));
+
+        final var rawMessage = formatMessage(mangoBot.getJDA().getSelfUser(), message.getContentRaw());
+
+        System.out.println(rawMessage);
+
         final var cmdPrefix = MangoBotCore.isDevMode() ? "dev!" : "!";
         final var silentPrefix = "s" + cmdPrefix;
         final var isSilent = rawMessage.startsWith(silentPrefix);

@@ -24,8 +24,8 @@ package org.mangorage.mangobotplugin.actions;
 
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
+import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.buttons.ButtonStyle;
 import org.mangorage.mangobotcore.api.util.jda.ButtonAction;
 
 public class TrashButtonAction extends ButtonAction {
@@ -40,10 +40,10 @@ public class TrashButtonAction extends ButtonAction {
 
     @Override
     public boolean onClick(ButtonInteractionEvent event) {
-        if (event.getComponent().getId() == null) return false;
+        if (event.getComponent().getCustomId() == null) return false;
 
-        if (event.getComponent().getId().startsWith(getId() + ":")) {
-            var list = event.getComponent().getId().split(":");
+        if (event.getComponent().getCustomId().startsWith(getId() + ":")) {
+            var list = event.getComponent().getCustomId().split(":");
             var clicked = event.getUser().getId();
             var msg = event.getMessage();
 

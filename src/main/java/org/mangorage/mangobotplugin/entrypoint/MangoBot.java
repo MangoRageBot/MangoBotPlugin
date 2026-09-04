@@ -63,29 +63,23 @@ public final class MangoBot implements Plugin {
     public static final IConfigSetting<Boolean> BOT_USE_DATABASE = IConfigSetting.create(CONFIG, "BOT_USE_DATABASE", ConfigTypes.BOOLEAN, false);
 
     private static final EnumSet<GatewayIntent> intents = EnumSet.of(
-            // Enables MessageReceivedEvent for guild (also known as servers)
-            GatewayIntent.GUILD_MESSAGES,
             // Enables the event for private channels (also known as direct messages)
+            GatewayIntent.GUILD_MESSAGES,
             GatewayIntent.DIRECT_MESSAGES,
-            // Enables access to message.getContentRaw()
-            GatewayIntent.MESSAGE_CONTENT,
+
             // Enables MessageReactionAddEvent for guild
             GatewayIntent.GUILD_MESSAGE_REACTIONS,
             // Enables MessageReactionAddEvent for private channels
             GatewayIntent.DIRECT_MESSAGE_REACTIONS,
             GatewayIntent.GUILD_VOICE_STATES,
-            GatewayIntent.GUILD_EMOJIS_AND_STICKERS,
-            GatewayIntent.SCHEDULED_EVENTS,
-            GatewayIntent.GUILD_MEMBERS,
-            GatewayIntent.GUILD_PRESENCES
+            GatewayIntent.GUILD_EXPRESSIONS,
+            GatewayIntent.SCHEDULED_EVENTS
     );
 
     private static final EnumSet<CacheFlag> cacheFlags = EnumSet.of(
             CacheFlag.EMOJI,
             CacheFlag.ROLE_TAGS,
             CacheFlag.VOICE_STATE,
-            CacheFlag.ACTIVITY,
-            CacheFlag.CLIENT_STATUS,
             CacheFlag.MEMBER_OVERRIDES,
             CacheFlag.STICKER,
             CacheFlag.SCHEDULED_EVENTS,
@@ -107,19 +101,21 @@ public final class MangoBot implements Plugin {
     private JDA jda;
 
     public MangoBot() {
+        Message.suppressContentIntentWarning();
+
         ACTION_REGISTRY.register(new TrashButtonAction());
 
         this.client = new LavalinkClient(
                 Helpers.getUserIdFromToken(BOT_TOKEN.get())
         );
 
-        client.addNode(
-                new NodeOptions.Builder()
-                        .setName("Main")
-                        .setServerUri("https://lavalinkv4.serenetia.com:443")
-                        .setPassword("https://seretia.link/discord")
-                        .build()
-        );
+//        client.addNode(
+//                new NodeOptions.Builder()
+//                        .setName("Main")
+//                        .setServerUri("https://lavalinkv4.serenetia.com:443")
+//                        .setPassword("https://seretia.link/discord")
+//                        .build()
+//        );
 
         commandDispatcher.register(new HelpCommand("help", getCommandDispatcher()));
         commandDispatcher.register(new PingCommand("ping"));
@@ -152,7 +148,7 @@ public final class MangoBot implements Plugin {
                         )
                 )
                 .setStatus(OnlineStatus.ONLINE)
-                .setMemberCachePolicy(MemberCachePolicy.ALL)
+                .setMemberCachePolicy(MemberCachePolicy.ONLINE)
                 .setEventManager(new AnnotatedEventManager())
                 .setEnableShutdownHook(true)
                 .setAutoReconnect(true)

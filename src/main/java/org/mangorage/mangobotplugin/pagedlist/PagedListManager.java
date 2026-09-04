@@ -30,7 +30,7 @@ public final class PagedListManager {
 
 
         if (pages.containsKey(ID)) {
-            pages.get(ID).consume(interaction.getInteraction(), interaction.getButton().getId());
+            pages.get(ID).consume(interaction.getInteraction(), interaction.getButton().getCustomId());
             if (interaction.isAcknowledged()) return;
             interaction.deferEdit().queue();
         }
