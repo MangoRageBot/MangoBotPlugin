@@ -63,48 +63,38 @@ public final class BotEventListener {
 
     @SubscribeEvent
     public void onMessageReceived(MessageReceivedEvent event) {
-
         final var message = event.getMessage();
-        if (message.getContentRaw().isEmpty()) return;
+        if (message.getContentRaw().isEmpty()) return; // No reason to send event, its blank...
+
+        final long cmdStart = System.currentTimeMillis();
 
         DiscordMessageReceivedEvent.BUS.post(new DiscordMessageReceivedEvent(event));
 
+        if (event.getAuthor().isBot()) return;
+
         final var rawMessage = formatMessage(mangoBot.getJDA().getSelfUser(), message.getContentRaw());
+        final var processed = rawMessage.split("!");
 
-        System.out.println(rawMessage);
+        final var isSilent = processed.length > 1 && processed[0].contains("s");
+        final var isDev = processed.length > 1 && processed[0].contains("dev");
 
-        final var cmdPrefix = MangoBotCore.isDevMode() ? "dev!" : "!";
-        final var silentPrefix = "s" + cmdPrefix;
-        final var isSilent = rawMessage.startsWith(silentPrefix);
+        if (!isDev && MangoBotCore.isDevMode()) return;
+        final var commandText = processed.length > 1 ? processed[1] : processed[0];
+
+        event.getChannel().sendTyping().queue();
+
         final var dispatcher = mangoBot.getCommandDispatcher();
-
-        if (isCommand(rawMessage, cmdPrefix, silentPrefix)) {
-            executeCommand(event, message, rawMessage, cmdPrefix, silentPrefix, isSilent, dispatcher);
-        }
-    }
-
-    private boolean isCommand(String rawMessage, String cmdPrefix, String silentPrefix) {
-        return rawMessage.startsWith(cmdPrefix) || rawMessage.startsWith(silentPrefix);
-    }
-
-    private void executeCommand(MessageReceivedEvent event, Message message, String rawMessage, String cmdPrefix, String silentPrefix, boolean isSilent, ICommandDispatcher<Message, JDACommandResult> dispatcher) {
-        final long cmdStart = System.currentTimeMillis();
         final var cmdParseResult = new CommandParseResult();
-
-        event.getChannel().sendTyping().queue();  // Indicate command processing
-
-        // Clean the command prefix and execute
-        final String commandText = rawMessage.replaceFirst(isSilent ? silentPrefix : cmdPrefix, "");
         final var result = dispatcher.execute(commandText, message, cmdParseResult);
 
-        handleCommandResult(message, result, isSilent, cmdParseResult, cmdStart);
+        handleCommandResult(message, commandText, result, isSilent, cmdParseResult, cmdStart);
     }
 
-    private void handleCommandResult(Message message, JDACommandResult result, boolean isSilent, CommandParseResult cmdParseResult, long cmdStart) {
+    private void handleCommandResult(Message message, String commandText, JDACommandResult result, boolean isSilent, CommandParseResult cmdParseResult, long cmdStart) {
         if (result != JDACommandResult.INVALID_COMMAND) {
             handleValidCommand(message, result, isSilent);
         } else {
-            handleUnknownCommand(message);
+            handleUnknownCommand(message, commandText, isSilent);
         }
 
         sendCmdExecutionStats(message, cmdStart);
@@ -121,17 +111,21 @@ public final class BotEventListener {
         }
     }
 
-    private void handleUnknownCommand(Message message) {
-        String[] commandParts = message.getContentRaw().split(" ");
+    private void handleUnknownCommand(Message message, String commandText, boolean isSilent) {
+        String[] commandParts = commandText.split(" ");
         Arguments arguments = Arguments.of(Arrays.copyOfRange(commandParts, 1, commandParts.length));
 
-        var cmd = message.getContentRaw().replaceFirst("!", "").split(" ");
-        final var cmdEvent = CommandEvent.BUS.fire(new CommandEvent(message, cmd[0], arguments));
+        final var cmdEvent = CommandEvent.BUS.fire(new CommandEvent(message, commandText, arguments));
 
         if (cmdEvent.isHandled()) {
             var msg = cmdEvent.getResult().getMessage();
             if (msg != null) {
                 message.reply(msg).queue();
+            }
+            handleValidCommand(message, cmdEvent.getResult(), isSilent);
+        } else {
+            if (!isSilent) {
+                message.reply("Unknown command: `%s`".formatted(commandText)).queue();
             }
         }
     }
