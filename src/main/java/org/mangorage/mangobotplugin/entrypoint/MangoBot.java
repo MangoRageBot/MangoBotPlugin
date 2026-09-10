@@ -25,6 +25,7 @@ import org.mangorage.mangobotcore.api.config.v1.IConfigSetting;
 import org.mangorage.mangobotcore.api.jda.command.v2.JDACommandResult;
 import org.mangorage.mangobotcore.api.jda.permission.v1.JDAPermissionManager;
 import org.mangorage.mangobotcore.api.jda.permission.v1.JDAPermissionNode;
+import org.mangorage.mangobotcore.api.plugin.MangoBotCore;
 import org.mangorage.mangobotcore.api.plugin.v1.MangoBotPlugin;
 import org.mangorage.mangobotcore.api.plugin.v1.Plugin;
 import org.mangorage.mangobotcore.api.plugin.v1.PluginManager;
@@ -109,13 +110,15 @@ public final class MangoBot implements Plugin {
                 Helpers.getUserIdFromToken(BOT_TOKEN.get())
         );
 
-//        client.addNode(
-//                new NodeOptions.Builder()
-//                        .setName("Main")
-//                        .setServerUri("https://lavalinkv4.serenetia.com:443")
-//                        .setPassword("https://seretia.link/discord")
-//                        .build()
-//        );
+        if (!MangoBotCore.isDevMode()) {
+            client.addNode(
+                    new NodeOptions.Builder()
+                            .setName("Main")
+                            .setServerUri("https://lavalinkv4.serenetia.com:443")
+                            .setPassword("https://seretia.link/discord")
+                            .build()
+            );
+        }
 
         commandDispatcher.register(new HelpCommand("help", getCommandDispatcher()));
         commandDispatcher.register(new PingCommand("ping"));
@@ -123,12 +126,6 @@ public final class MangoBot implements Plugin {
         commandDispatcher.register(new HomeDepotCommand("homedepot"));
         commandDispatcher.register(new TrickCommand("trick", this));
         commandDispatcher.register(new MusicCommand("music", client));
-
-        final var node = permissionManager.getPermissionNode("test_node");
-        node.authorizeUser(null, 194596094200643584L);
-        node.authoriseRoleId(null, 1128896227896224096L);
-        node.addRequiredPermission(Permission.ADMINISTRATOR);
-        permissionManager.savePermissionNode(node);
     }
 
     @Override

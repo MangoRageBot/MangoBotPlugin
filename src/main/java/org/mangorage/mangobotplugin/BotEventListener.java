@@ -63,12 +63,13 @@ public final class BotEventListener {
 
     @SubscribeEvent
     public void onMessageReceived(MessageReceivedEvent event) {
+        DiscordMessageReceivedEvent.BUS.post(new DiscordMessageReceivedEvent(event));
+
         final var message = event.getMessage();
         if (message.getContentRaw().isEmpty()) return; // No reason to send event, its blank...
 
         final long cmdStart = System.currentTimeMillis();
 
-        DiscordMessageReceivedEvent.BUS.post(new DiscordMessageReceivedEvent(event));
 
         if (event.getAuthor().isBot()) return;
 
